@@ -1,0 +1,62 @@
+{
+  "component": "TextView",
+  "description": {
+    "en": "Multi-line text input for long-form user-entered strings (comments, descriptions, messages). Grows vertically with content unless constrained by `height`.",
+    "ja": "複数行の長文入力（コメント・説明・メッセージ）用。`height` で制約されない限り、内容に応じて縦に伸びる。"
+  },
+  "usage": {
+    "en": "Use TextView when expected input exceeds one line. For messaging UI, pair with a fixed-height container and a Scroll. On Android, `borderWidth` sets the outline's width the same way as on TextField: the declared width unfocused, the larger of it and 2dp under focus, and no line at 0; a bound width with no value yet draws 1dp. No screen was drawn here, and Dynamic is jsonui-cli's measurement. Unwritten, `cornerRadius` is 0, a square corner, on all three platforms. No setting changes the default. rjui.config's `defaults.textView.cornerRadius` is not read, and written it draws no corner; the same block's `fontColor`, `padding` and `background` are applied to a TextView that does not write them, the layout's own keys winning.",
+    "ja": "入力が複数行に及ぶことが想定される場合に使う。メッセージ UI では固定高さのコンテナと Scroll を組み合わせる。Android では `borderWidth` が TextField と同じく枠の太さになる。未フォーカスは宣言の太さ、フォーカス中は宣言の太さと 2dp の大きいほう、0 は線なし。binding の値がまだ無いときは 1dp。画面は描いていない。Dynamic は jsonui-cli の測定。 `cornerRadius` を書かないと、3 面とも 0、つまり四角になる。既定は設定では変えられない。rjui.config の `defaults.textView.cornerRadius` は読まれず、書いても角は付かない。同じ所の `fontColor`・`padding`・`background` は、それを書いていない TextView に付き、レイアウトに書いた値が勝つ。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Auto-growing multi-line", "ja": "自動伸張の複数行" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextView\",\n  \"text\": \"@{description}\",\n  \"hint\": \"@string/description_placeholder\",\n  \"width\": \"matchParent\"\n}"
+    },
+    {
+      "title": { "en": "Character counter", "ja": "文字数カウンタ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"TextView\", \"text\": \"@{bio}\", \"maxLength\": 160 },\n    { \"type\": \"Label\", \"text\": \"@{bioCounter}\", \"fontSize\": 12, \"fontColor\": \"#9CA3AF\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Fixed height (internal scroll)", "ja": "高さ固定（内部スクロール）" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextView\",\n  \"text\": \"@{longText}\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}"
+    }
+  ],
+  "attributes": {
+    "placeholder": { "summary": { "en": "Placeholder text (alias for `hint`).", "ja": "プレースホルダー文字列（`hint` のエイリアス）。" } },
+    "input": {
+      "note": {
+        "en": "Cross-platform keyboard hint, with one limit a TextField does not have: on web a TextView is a `textarea`, which has no `type` attribute, so `date`, `time` and `datetime` cannot be honoured there at all. Everywhere else it behaves as on TextField — native in Android's generated code on Compose 1.12 or newer, plain text in the Android dynamic renderer, and the default keyboard on iOS, which has no member for the date family.",
+        "ja": "クロスプラットフォームのキーボード指定。TextField に無い制約が 1 つある: web では TextView は `textarea` で、`type` 属性を持たないため `date` / `time` / `datetime` はそこでは一切反映されない。それ以外は TextField と同じ — Compose 1.12 以降の Android 生成コードではネイティブ、Android の dynamic レンダラーではプレーンなテキスト、iOS には date 系のメンバーが無いので既定のキーボード。"
+      }
+    },
+    "text": {
+      "note": {
+        "en": "Two-way. Same semantics as TextField.text. Multi-line input preserves newlines.",
+        "ja": "Two-way。TextField.text と同じ仕様。複数行入力では改行が保持される。"
+      }
+    },
+    "hint": {
+      "note": {
+        "en": "Placeholder shown while empty. Supports multi-line hints.",
+        "ja": "空欄時のプレースホルダ。複数行対応。"
+      }
+    },
+    "maxLength": {
+      "note": {
+        "en": "Positive integer; enforced platform-side. Characters beyond limit are silently dropped.",
+        "ja": "正の整数。プラットフォーム側で強制。超過文字は silent に破棄される。"
+      }
+    },
+    "returnKeyType": {
+      "note": {
+        "en": "Changes the return key's label on the on-screen keyboard (Done / Go / Next / Search / Send, ...). It does not change what pressing return does — handle that in the ViewModel. iOS Dynamic mode reads it, the same as the generated code. Continue / Join / Route show the return key there.",
+        "ja": "スクリーンキーボードのリターンキー表示を変える（Done / Go / Next / Search / Send など）。押下時の挙動自体は変わらない — 挙動は ViewModel 側で扱う。iOS の Dynamic モードも、生成コードと同じにこれを読む。Continue / Join / Route は、そこではリターンキーになる。"
+      }
+    }
+  },
+  "relatedComponents": ["TextField", "EditText", "Input", "Label"]
+}

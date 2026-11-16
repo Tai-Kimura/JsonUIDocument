@@ -1,0 +1,43 @@
+{
+  "component": "IconLabel",
+  "description": {
+    "en": "Label with an icon beside it. The `selected` binding switches the icon between `icon_off` and `icon_on`, and the text color between `fontColor` and `selectedFontColor`.",
+    "ja": "アイコン付きラベル。`selected` バインディングでアイコンが `icon_off` / `icon_on` に、文字色が `fontColor` / `selectedFontColor` に切り替わる。"
+  },
+  "usage": {
+    "en": "Use for icon + text rows whose visual state follows a boolean — favorites, selection rows, tab-like items. Icons are image asset names; place them with `iconPosition` (Left / Right / Top / Bottom) and space them with `iconMargin`.",
+    "ja": "boolean で見た目が切り替わるアイコン + テキスト行（お気に入り・選択行・タブ的な項目）に使う。アイコンは画像アセット名で指定し、位置は `iconPosition`（Left / Right / Top / Bottom）、テキストとの間隔は `iconMargin` で調整する。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Favorite toggle", "ja": "お気に入りトグル" },
+      "language": "json",
+      "code": "{\n  \"type\": \"IconLabel\",\n  \"text\": \"@string/favorite\",\n  \"icon_off\": \"star_outline\",\n  \"icon_on\": \"star_filled\",\n  \"selected\": \"@{isFavorite}\",\n  \"fontSize\": 14\n}"
+    },
+    {
+      "title": { "en": "Icon above the text", "ja": "アイコンを上に配置" },
+      "language": "json",
+      "code": "{\n  \"type\": \"IconLabel\",\n  \"text\": \"@string/home\",\n  \"icon_off\": \"home\",\n  \"iconPosition\": \"Top\",\n  \"iconMargin\": 4,\n  \"fontSize\": 12\n}"
+    },
+    {
+      "title": { "en": "Selected state colors", "ja": "選択状態の色" },
+      "language": "json",
+      "code": "{\n  \"type\": \"IconLabel\",\n  \"text\": \"@{sectionTitle}\",\n  \"icon_off\": \"folder\",\n  \"icon_on\": \"folder_open\",\n  \"selected\": \"@{isExpanded}\",\n  \"fontColor\": \"#6B7280\",\n  \"selectedFontColor\": \"#F59E0B\"\n}"
+    }
+  ],
+  "attributes": {
+    "icon_on": {
+      "note": {
+        "en": "Image asset name shown while `selected` is true.",
+        "ja": "`selected` が true の間に表示する画像アセット名。"
+      }
+    },
+    "icon_off": {
+      "note": {
+        "en": "Image asset name shown while `selected` is false (the normal state).",
+        "ja": "`selected` が false（通常状態）の間に表示する画像アセット名。"
+      }
+    }
+  },
+  "relatedComponents": ["Label", "Button", "Image"]
+}

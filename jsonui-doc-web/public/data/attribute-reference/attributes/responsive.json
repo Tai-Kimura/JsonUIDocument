@@ -1,0 +1,272 @@
+{
+  "category": "responsive",
+  "title": "Responsive attributes",
+  "description": {
+    "en": "Responsive attributes pick attribute values based on the host's size class and orientation. The same Layout JSON renders differently on iPhone, iPad, and split-screen.",
+    "ja": "レスポンシブ属性はホストの size class と orientation に応じて属性値を切り替えます。同じ Layout JSON が iPhone / iPad / 分割画面で別の表示になる。"
+  },
+  "kicker": "Attribute category · Reference",
+  "kickerParentLabel": "Attributes",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "gone",
+  "aliasCalloutVisibility": "gone",
+  "aliasOf": null,
+  "aliasLinkUrl": "",
+  "aliasNotice": null,
+  "overviewRows": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "overview_platform",
+              "name": "platform",
+              "type": "string | object",
+              "summary": {
+                "en": "Platform gate on a node, two forms. String (`\"platform\": \"ios\"`, comma lists like `\"ios,android\"`…",
+                "ja": "ノードのプラットフォームゲート。2 形式ある。文字列（`\"platform\": \"ios\"`、`\"ios,android\"` のカンマ区切り、`\"swift\"` / `\"compose\"` / …"
+              },
+              "anchorUrl": "#attr-platform"
+            },
+            {
+              "id": "overview_responsive",
+              "name": "responsive",
+              "type": "object",
+              "summary": {
+                "en": "Object whose keys are size-class names (`compact` / `medium` / `regular` / `landscape` / `compact…",
+                "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `medium-l…"
+              },
+              "anchorUrl": "#attr-responsive"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subgroups": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "subgroupsVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_overview",
+      "label": {
+        "en": "Overview",
+        "ja": "概要"
+      },
+      "anchor": "section-overview",
+      "level": 1
+    },
+    {
+      "id": "toc_detail",
+      "label": {
+        "en": "Attributes",
+        "ja": "属性"
+      },
+      "anchor": "section-detail",
+      "level": 1
+    },
+    {
+      "id": "toc_next",
+      "label": {
+        "en": "Next reads",
+        "ja": "次に読む"
+      },
+      "anchor": "section-next",
+      "level": 1
+    }
+  ],
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_platform",
+              "name": "platform",
+              "anchorId": "attr-platform",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Platform gate on a node, two forms. String (`\"platform\": \"ios\"`, comma lists like `\"ios,android\"`, legacy language tokens like `\"swift\"` / `\"compose\"` / `\"react\"` also accepted): `jui build` drops the node entirely on non-matching platforms at distribution time. Object (`\"platform\": {\"ios\": {…}, \"web\": {…}}`): per-platform attribute overrides merged into the node — the target platform's map wins, other platforms use the base values. The key is consumed at build time and never reaches the generated code. Note: a `platforms` ARRAY is valid only on the layout ROOT, where it whitelists which platforms the whole screen ships to — an array on a child node is ignored.",
+                "ja": "ノードのプラットフォームゲート。2 形式ある。文字列（`\"platform\": \"ios\"`、`\"ios,android\"` のカンマ区切り、`\"swift\"` / `\"compose\"` / `\"react\"` 等のレガシー言語トークンも受理）: `jui build` が配布時に、マッチしないプラットフォームではノードを丸ごと削除する。オブジェクト（`\"platform\": {\"ios\": {…}, \"web\": {…}}`）: プラットフォーム別の属性上書きをノードにマージ — 対象プラットフォームの map が勝ち、他は base 値のまま。キーはビルド時に消費され、生成コードには残らない。注意: 配列の `platforms` はレイアウトの**ルート限定**（画面全体の配布先ホワイトリスト）— 子ノードに配列を書いても無視される。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | object",
+              "required": ""
+            },
+            {
+              "id": "attr_responsive",
+              "name": "responsive",
+              "anchorId": "attr-responsive",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Object whose keys are size-class names (`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `medium-landscape` / `regular-landscape`) or window-width conditions (`minWidth:N` — the window is at least N wide; `maxWidth:N` — narrower than N), and whose values are attribute overrides. One key wins, alone: the first in priority order that holds (composite keys, then landscape, then regular > medium > compact; among width conditions the smallest maxWidth, else the largest minWidth). Only its overrides go onto the base — the other keys add nothing. A block holds size classes or width conditions, never both (`jui build` refuses the mix).",
+                "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `medium-landscape` / `regular-landscape`）またはウィンドウ幅の条件（`minWidth:N` — 幅が N 以上、`maxWidth:N` — N 未満）、値が属性上書きのオブジェクト。勝つキーは 1 本だけ: 優先順で最初に成立するもの（複合キー、次に landscape、次に regular > medium > compact。幅の条件では成立する最小の maxWidth、無ければ最大の minWidth）。ベースに当たるのはその 1 本の上書きだけで、他のキーは何も足さない。1 つのブロックに size class と幅の条件は混ぜられない（`jui build` が拒否する）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "object",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": null,
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": {
+                "en": "Component reference",
+                "ja": "コンポーネントリファレンス"
+              },
+              "descriptionKey": {
+                "en": "The full 28-component catalog with type signatures, examples, and platform support.",
+                "ja": "28 コンポーネントの全カタログ。型・例・プラットフォーム対応を収録。"
+              },
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": {
+                "en": "All attribute categories",
+                "ja": "属性カテゴリ一覧"
+              },
+              "descriptionKey": {
+                "en": "Back to the full list of attribute categories (Layout, Style, Binding, Event, ...).",
+                "ja": "属性カテゴリ全一覧に戻る（Layout / Style / Binding / Event など）。"
+              },
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

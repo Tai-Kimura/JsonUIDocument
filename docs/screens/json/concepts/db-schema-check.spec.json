@@ -1,0 +1,130 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "DbSchemaCheck",
+    "displayName": "DB schema check (docs/db ⇔ live DB)",
+    "description": "Concept essay: the builtin db-schema checker in `jsonui-doc check` — how docs/db table JSON (schema-only OpenAPI + x-* extensions) is compared against the live database schema, declaration vs declaration at confidence proof. Covers the file format (x-table-name, the nullable convention, x-primary-key / x-unique / x-auto-increment / x-index / x-indexes / x-foreign-key / x-db-type / x-enum-values, multi-DB directory layout), what exactly gets compared (tables and columns in both directions, family-based type matching, constraints, enums), how to declare the check in jui.config.json (databases map + checks entry, dump_command vs the builtin SQLAlchemy dumper via JSONUI_CHECK_DB_URL_<DB>), running it (`check db`, `.check-report.json`, the Implementation contract HTML page, exit-code gate), and what it does not check. Six H2 sections + TOC + next-reads. ~6-min read. Deep-dive companion to /concepts/implementation-contract-check.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "concepts/db-schema-check",
+    "createdAt": "2026-07-24",
+    "updatedAt": "2026-07-24"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three follow-up cards: concepts/implementation-contract-check (umbrella concept), guides/verifying-implementation-against-docs (cookbook) and reference/cli-commands (command details)."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[DbSchemaCheckView] --> VM[DbSchemaCheckViewModel]\n    VM -- nextReadLinks --> VIEW",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope catalog (three rows: next_contract -> /concepts/implementation-contract-check, next_verify_guide -> /guides/verifying-implementation-against-docs, next_cli_reference -> /reference/cli-commands). Each row's titleKey / descriptionKey is resolved through StringManager with the concepts_db_schema_check_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "router.push(url)."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          { "name": "id", "type": "String" },
+          { "name": "titleKey", "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "url", "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    { "action": "Tap a TOC entry", "processing": "TOC-internal scroll." },
+    { "action": "Tap a NextReadLink card", "processing": "onNavigate(url)." }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped concept URL or the guide or the CLI reference",
+      "destination": "Target spec screen or tab",
+      "description": "v1 destinations: /concepts, /concepts/implementation-contract-check, /guides/verifying-implementation-against-docs, /reference/cli-commands."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/concepts/db-schema-check.json",
+      "description": "Essay layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/concepts/DbSchemaCheckViewModel.ts",
+      "description": "Mirrors ImplementationContractCheckViewModel — simple prose screen with next-reads."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/concepts/db-schema-check/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "2026-07-24 — Dedicated deep-dive page for the DB side of `jsonui-doc check`, split out from /concepts/implementation-contract-check (which stays the umbrella essay: check-vs-generate, confidence levels, plugin tiers).",
+    "Six H2 sections + TOC + next-reads (3 cards).",
+    "Section 1 — section_problem: docs/db is the SSoT for the data model but migrations move the real schema without touching it; `jui verify` guards docs→code, not docs→database. The db-schema checker closes the loop from the DB side.",
+    "Section 2 — section_docs: the table JSON format. One table per file (first non-enum object schema; files with `paths` are skipped as API docs), `info.x-table-name` fallback snake_case, nullable-only NOT-NULL convention (`required` deliberately not reused), multi-DB directory layout, enum companion schemas + x-enum-values, x-foreign-key enforced:false = ERD-only reference. Worked users.json CodeBlock inline in the layout.",
+    "Section 3 — section_compared: tables both directions (missing_in_impl / missing_in_doc, default-ignored migration bookkeeping tables + ignore_tables), columns (family-based type match, x-db-type exact pin, maxLength), constraints & indexes (x-primary-key / x-unique / x-auto-increment / x-index / x-indexes / x-foreign-key), enums & nullability. All findings confidence=proof.",
+    "Section 4 — section_declare: jui.config.json databases map + checks entry (builtin:db-schema). Two schema sources: dump_command (normalized {tables:{}} JSON on stdout) or the builtin SQLAlchemy dumper via JSONUI_CHECK_DB_URL_<DATABASE>. Security contract: no credentials in config, only declared commands run, scripts inside project root.",
+    "Section 5 — section_run: `check --list` / `check db` / `check db:<name>`, report at docs/db/.check-report.json (named DB subdir), rendered by `generate html` (--with-checks sugar) as the Implementation contract page, exit codes 0/1/2 as the CI gate, input_hashes stale banner.",
+    "Section 6 — section_limits: structure only, not data; semantic invariants are full-checker territory; family-based type matching unless x-db-type pins the column.",
+    "Strings prefix: concepts_db_schema_check_ (namespace). en + ja owned by jsonui-localize.",
+    "Public repo hygiene: no consumer project names; generic domain examples only (users / plans).",
+    "Cross-links: /concepts/implementation-contract-check gained a third next-read card pointing here (next_db_schema)."
+  ]
+}

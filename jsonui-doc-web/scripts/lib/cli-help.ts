@@ -1,0 +1,227 @@
+// Shared machinery for the two checks that read the CLI binaries' `--help`:
+// does the reference document exactly the subcommands that exist, and has a
+// human read this card against this version's help.
+//
+// Both must walk the tree and hash the help the same way, or a stamp taken by
+// one would never match the other — so the walk, the hash and the alias
+// resolution live here rather than being written twice.
+
+import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
+
+// argparse renders differently across interpreters — Python 3.13 changed how an
+// option with both a short and a long spelling is listed (`-f FORMAT, --format
+// FORMAT` became `-f, --format FORMAT`). Eight cards hashed one way on a 3.14
+// machine and another in CI on 3.11, and the gate caught it on its first real
+// run. So the interpreter is pinned, recorded, and checked: a hash of a
+// rendering is only meaningful under the renderer that produced it.
+export const HELP_PYTHON_VERSION = "3.12";
+
+let resolved: string | null = null;
+
+/** The interpreter every help read must go through, or null when it is absent. */
+export function helpPython(): string | null {
+  if (resolved !== null) return resolved;
+  for (const candidate of [`python${HELP_PYTHON_VERSION}`, "python3"]) {
+    try {
+      const out = execFileSync(candidate, ["-c", "import sys;print(f'{sys.version_info.major}.{sys.version_info.minor}')"],
+        { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+      if (out === HELP_PYTHON_VERSION) { resolved = candidate; return resolved; }
+    } catch {
+      // try the next candidate
+    }
+  }
+  return null;
+}
+
+// argparse renders help to the terminal width, so the same command hashes
+// differently at COLUMNS=80 and COLUMNS=120 (measured 2026-09-02). Every read
+// pins it, and the pinned value is recorded in the stamp.
+export const HELP_COLUMNS = "80";
+
+export const MAX_DEPTH = 3; // `jui conformance baseline update` is the deepest today
+export const MAX_NODES = 400; // a help echoing its parent would otherwise not terminate
+
+export interface Binary {
+  name: string;
+  rel: string;
+  control: string;
+}
+
+export const BINARIES: Binary[] = [
+  { name: "jui", rel: "jui_tools/bin/jui", control: "build" },
+  { name: "jsonui-test", rel: "test_tools/jsonui-test", control: "validate" },
+  { name: "jsonui-doc", rel: "document_tools/jsonui-doc", control: "validate" },
+];
+
+export interface Node {
+  leaf: boolean;
+  help: string;
+  kids: Map<string, Node>;
+  alias: Map<string, string>;
+}
+
+const CHOICES = /^\s+\{([^}]*)\}(?:\s|$)/;
+const ENTRY = /^ {4}(\S+)\s+\(([^)]*)\)/;
+
+function parseHelp(text: string): { choices: string[]; aliases: Map<string, string[]> } {
+  let choices: string[] | null = null;
+  const aliases = new Map<string, string[]>();
+  let inPositional = false;
+  for (const line of text.split("\n")) {
+    if (line.startsWith("positional arguments:")) {
+      inPositional = true;
+      continue;
+    }
+    if (line.startsWith("options:") || line.startsWith("optional arguments:")) inPositional = false;
+    if (!inPositional) continue;
+    const c = CHOICES.exec(line);
+    if (c && choices === null) choices = c[1].split(",").filter((t) => t !== "");
+    const e = ENTRY.exec(line);
+    if (e) aliases.set(e[1], e[2].split(",").map((a) => a.trim()));
+  }
+  return { choices: choices ?? [], aliases };
+}
+
+export function helpText(binPath: string, argv: string[], cwd?: string, home?: string): string {
+  const env = { ...process.env, COLUMNS: HELP_COLUMNS, ...(home ? { HOME: home } : {}) };
+  const python = helpPython();
+  if (python === null) {
+    throw new Error(
+      `no Python ${HELP_PYTHON_VERSION} on PATH — every help read goes through it, because ` +
+        "argparse renders differently across interpreters and a hash of one rendering says " +
+        "nothing about another",
+    );
+  }
+  try {
+    return execFileSync(python, [binPath, ...argv, "--help"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+      env,
+      cwd,
+    });
+  } catch (err) {
+    const e = err as { stdout?: string; stderr?: string };
+    return `${e.stdout ?? ""}${e.stderr ?? ""}`;
+  }
+}
+
+export function walk(
+  binPath: string,
+  argv: string[] = [],
+  parentChoices: string[] | null = null,
+  depth = 0,
+  budget = { n: 0 },
+  cwd?: string,
+  home?: string,
+): Node {
+  budget.n += 1;
+  const text = budget.n > MAX_NODES ? "" : helpText(binPath, argv, cwd, home);
+  const leaf: Node = { leaf: true, help: text, kids: new Map(), alias: new Map() };
+  if (budget.n > MAX_NODES) return leaf;
+  const { choices, aliases } = parseHelp(text);
+  const aliasTokens = new Set<string>();
+  for (const list of aliases.values()) for (const a of list) aliasTokens.add(a);
+  const canonical = choices.filter((c) => !aliasTokens.has(c));
+  // A subcommand whose --help repeats its parent's choices did not descend.
+  const repeatsParent =
+    parentChoices !== null &&
+    choices.length === parentChoices.length &&
+    choices.every((c) => parentChoices.includes(c));
+  if (canonical.length === 0 || depth >= MAX_DEPTH || repeatsParent) return leaf;
+  const node: Node = { leaf: false, help: text, kids: new Map(), alias: new Map() };
+  for (const c of canonical) {
+    node.kids.set(c, walk(binPath, [...argv, c], choices, depth + 1, budget, cwd, home));
+  }
+  for (const [canon, list] of aliases) {
+    if (!node.kids.has(canon)) continue;
+    for (const a of list) node.alias.set(a, canon);
+  }
+  return node;
+}
+
+/** Every node at or below `prefix`, as path -> help text. The binary itself is excluded. */
+export function nodesUnder(root: Node, prefix: string[] = []): Map<string, string> {
+  const out = new Map<string, string>();
+  const visit = (node: Node, path: string[]) => {
+    if (path.length >= prefix.length && prefix.every((t, i) => path[i] === t)) {
+      out.set(path.join(" "), node.help);
+    }
+    for (const [name, kid] of node.kids) visit(kid, [...path, name]);
+  };
+  visit(root, []);
+  out.delete("");
+  return out;
+}
+
+export function leavesOf(node: Node, prefix: string[] = []): string[][] {
+  if (node.leaf) return prefix.length > 0 ? [prefix] : [];
+  const out: string[][] = [];
+  for (const [name, kid] of node.kids) out.push(...leavesOf(kid, [...prefix, name]));
+  return out;
+}
+
+/** Cards spell some paths with the binary's aliases (`jui g project` is `generate project`). */
+export function normalize(root: Node, tokens: string[]): string[] {
+  const out: string[] = [];
+  let cur = root;
+  for (const token of tokens) {
+    if (cur.leaf) {
+      out.push(token);
+      continue;
+    }
+    const canon = cur.alias.get(token) ?? token;
+    out.push(canon);
+    cur = cur.kids.get(canon) ?? { leaf: true, help: "", kids: new Map(), alias: new Map() };
+  }
+  return out;
+}
+
+/**
+ * The hash a stamp records: every node at or below the card's path, in path
+ * order, path and help text both. Hashing only the card's own node would miss a
+ * change one level down (`jsonui-test generate` documents shapes that live in
+ * `generate test` and `generate description`); hashing only the leaves would
+ * miss the intermediate node that lists them.
+ */
+export function helpHashFor(root: Node, cardPath: string[]): string {
+  const nodes = [...nodesUnder(root, cardPath).entries()].sort(([a], [b]) =>
+    a < b ? -1 : a > b ? 1 : 0,
+  );
+  const h = createHash("sha256");
+  for (const [path, text] of nodes) h.update(path + "\x00" + text + "\x00");
+  return h.digest("hex");
+}
+
+export function stableStringify(value: unknown): string {
+  if (Array.isArray(value)) return "[" + value.map(stableStringify).join(",") + "]";
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>).sort(([a], [b]) =>
+      a < b ? -1 : 1,
+    );
+    return (
+      "{" + entries.map(([k, v]) => JSON.stringify(k) + ":" + stableStringify(v)).join(",") + "}"
+    );
+  }
+  return JSON.stringify(value) ?? "null";
+}
+
+/**
+ * The hash of a card's own content, with the stamp removed — hashing the stamp
+ * into itself would change the value the moment it is written.
+ */
+export function cardHashFor(card: Record<string, unknown>): string {
+  const rest: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(card)) if (k !== "verifiedAgainst") rest[k] = v;
+  return createHash("sha256").update(stableStringify(rest)).digest("hex");
+}
+
+/** Which fields differ between two cards — for the message when a stamp lapses. */
+export function changedFields(
+  a: Record<string, unknown>,
+  b: Record<string, unknown>,
+): string[] {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  keys.delete("verifiedAgainst");
+  return [...keys].filter((k) => stableStringify(a[k]) !== stableStringify(b[k])).sort();
+}

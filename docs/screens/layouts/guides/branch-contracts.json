@@ -1,0 +1,813 @@
+{
+  "type": "View",
+  "id": "guides_branch_contracts_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "nextReadLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateGuides",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onNavigateBranchTests",
+          "class": "() -> Void"
+        },
+        {
+          "name": "onNavigateContractGaps",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "guides_branch_contracts_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "guides_branch_contracts_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateGuides}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "guides_branch_contracts_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "guides_branch_contracts_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_what",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_what_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_what_body"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_example",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_example_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_example_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "\"branchContracts\": {\n  \"conditions\": {\n    \"formValid\": {\n      \"meaning\": \"every required field is filled\",\n      \"witness_true\":  { \"form\": { \"nickname\": \"a\" } },\n      \"witness_false\": { \"form\": { \"nickname\": \"\" } }\n    }\n  },\n  \"methods\": {\n    \"onTapSave\": {\n      \"baseline\": { \"isSaving\": false },\n      \"branches\": [\n        { \"when\": { \"cond\": \"!formValid\" },\n          \"then\": { \"data.errorMessage\": \"@profile_screen_invalid\", \"api\": \"none\" } },\n        { \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"success\" },\n          \"then\": { \"transition\": \"HomeScreen\",\n                    \"api.updateProfile.request\": { \"nickname\": \"@data.form\" } } },\n        { \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"failure\" },\n          \"then\": { \"data.errorMessage\": \"@profile_screen_failed\",\n                    \"api.updateProfile\": \"called\" } },\n        { \"note\": \"double-tap guard: second tap while isSaving is dropped\" }\n      ]\n    }\n  }\n}",
+                      "language": "json",
+                      "filename": "ProfileScreen.spec.json — branchContracts",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_conditions",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_conditions_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_conditions_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_conditions_checks"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "[WARNING] branchContracts.conditions.hasStock: Condition is declared but no branch\n          gates on it — its witnesses are never exercised\n[WARNING] ...branches[0].when.cond: Condition 'formValid' has no witness_false, so this\n          branch cannot be arranged — test generation fails on it\n[WARNING] branchContracts.conditions.formValid: witness_true and witness_false arrange\n          the same state, so they cannot tell the condition's two sides apart",
+                      "language": "text",
+                      "filename": "condition usage warnings — one seeded mistake each",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_when",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_when_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_when_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_when_arg_list"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "key           | value                          | means\n--------------+--------------------------------+-------------------------------------------------\ndata.<field>  | literal                        | the declared data field holds this value\nstate.<name>  | literal (seedableState)        | the declared view-model-internal state holds this value\narg.<name>    | literal, or [literal, ...]     | the method argument holds this value (or one of a list)\napi.<op>      | named mock scenario            | the API operation answers with this scenario\ncond          | condition name ('!' prefix ok) | a named condition from branchContracts.conditions\nharness.<name>| one of the declared values      | the harness sets up this precondition (harnessConditions)",
+                      "language": "text",
+                      "filename": "when keys",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_then",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_then_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_then_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_then_seed_wire"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "key              | value                                    | asserts\n-----------------+------------------------------------------+--------------------------------------------\ndata.<field>     | literal / \"@strings_key\" / \"@data.<field>\" | the field ends up holding this value\ntransition       | destination name                         | the screen navigates there\napi              | \"none\"                                   | no API operation is called at all\napi.<op>         | \"called\" or \"not-called\"                 | whether that operation fires\napi.<op>.request | partial object                           | the request body contains these entries",
+                      "language": "text",
+                      "filename": "then keys",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_then_passthrough"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "// the three @ forms, side by side\n\"data.title\":        \"@profile_screen_saved\"   // a string from your table\n\"data.previousName\": \"@data.form\"             // a field's value before the act\n\"data.errorMessage\": \"@response.error.message\" // what the server returned\n\n// a passthrough branch names exactly one scenario:\n{ \"when\": { \"api.createOrder\": \"declined\" },\n  \"then\": { \"data.errorMessage\": \"@response.error.message\" } }",
+                      "language": "jsonc",
+                      "filename": "@key / @data.<field> / @response.<path>",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "Error: ...branches[2]: '@response.<path>' needs exactly one `api.<op>` in `when` to read\n       the response from, found 0\nError: ...then.data.errorMessage: scenario 'declined' has no 'error.detail' in its response\n       body — at error the available keys are: code, message\nError: ...then.data.errorMessage: 'error' in scenario 'declined' is a dict, and a displayed\n       value must be a scalar\n\n[WARNING] ...branches[2].then: '@response.<path>' reads the response of the branch's own\n          scenario, but `when` names 0 `api.<op>` scenario(s) — test generation needs\n          exactly one",
+                      "language": "text",
+                      "filename": "generation stops, and validate warns first",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_scoped",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontColor": "#0B1220",
+                      "text": "section_scoped_heading",
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_scoped_body",
+                      "topMargin": 12
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "{ \"platforms\": [\"ios\"],\n  \"when\": { \"cond\": \"formValid\", \"api.updateProfile\": \"failure\" },\n  \"then\": { \"data.errorMessage\": \"@profile_screen_failed\" } }",
+                      "language": "json",
+                      "filename": "a branch that exists only on iOS",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_validate",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_validate_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_validate_body"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_validate_bullet_error"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_validate_bullet_warning"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_validate_bullet_ambiguous"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_validate_bullet_promote"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_validate_bullet_skip"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 6,
+                      "fontSize": 14,
+                      "fontColor": "#475467",
+                      "text": "section_validate_bullet_crossface"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "[ERROR] ...when.flag.debug: Unknown when key 'flag.debug' — allowed: 'data.<field>',\n        'state.<name>', 'arg.<name>', 'api.<op>', 'cond' (a branchContracts.conditions\n        witness), 'harness.<name>' (a precondition the harness sets up, declared in the\n        app contracts spec's harnessConditions)\n[ERROR] ...when.cond: cond references undeclared condition 'ghostCondition' — declare it\n        in branchContracts.conditions\n[ERROR] ...branches[3]: A note branch must contain only 'note' (found ['when']). Declare\n        the contract half as a separate {when, then} branch.\n[ERROR] branchContracts.methods.ghostMethod: Method 'ghostMethod' not found in\n        dataFlow.viewModel.methods or stateManagement.eventHandlers\n[ERROR] ...when.api.updateProfile: API operation 'updateProfile' is declared by\n        ProfileRepository.updateProfile and AccountUseCase.updateProfile — the bare\n        name does not say which endpoint this means, and the generator would bind it\n        to one of them. Qualify it, e.g. 'ProfileRepository.updateProfile'\n[WARNING] ...then.data.typoField: Data field 'typoField' is not declared in\n        stateManagement.uiVariables / dataFlow.viewModel.vars / stateManagement.states\n[WARNING] ...when.api.deleteProfile: API operation 'deleteProfile' is not declared in\n        dataFlow.repositories[].methods or dataFlow.useCases[].methods\n[WARNING] ...then.transition: Transition destination 'GhostScreen' does not match any\n        transitions[].destination",
+                      "language": "text",
+                      "filename": "jsonui-doc validate spec — findings",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "[WARNING] validation.serverSide[0]: Prose mentions branch-like token 'payment_expired'\n          that branchContracts does not know — declare the branch (or scenario) or\n          update the stale prose\n[WARNING] userActions[0]: Prose routes to transition 'SettingsScreen' but no branch of\n          the contracted method(s) declares `then.transition` to it — declare the\n          branch or update the stale prose",
+                      "language": "text",
+                      "filename": "cross-face warnings — one seeded drift each",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_render",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontWeight": "bold",
+                      "fontColor": "#0B1220",
+                      "text": "section_render_heading"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_render_body"
+                    },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "code": "Branch Contracts\n1 method(s) — 3 declared branch(es), 1 note-only branch(es) outside the\nmachine-checkable contract.\n\nNamed Conditions\n  Name      | Meaning                        | Witness (true)          | Witness (false)\n  formValid | every required field is filled | form = {\"nickname\":\"a\"} | form = {\"nickname\":\"\"}\n\nonTapSave — Baseline: isSaving = false\n  # | When                                              | Then\n  1 | cond = \"!formValid\"                               | data.errorMessage = \"@profile_screen_invalid\", api = \"none\"\n  2 | cond = \"formValid\", api.updateProfile = \"success\" | transition = \"HomeScreen\", api.updateProfile.request = {...}\n  3 | cond = \"formValid\", api.updateProfile = \"failure\" | data.errorMessage = \"@profile_screen_failed\", api.updateProfile = \"called\"\n  4 | note (not machine-checked): double-tap guard: second tap while isSaving is dropped",
+                      "language": "text",
+                      "filename": "generated HTML — decision table (as text)",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_generate",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    24,
+                    32
+                  ],
+                  "background": "#FFFFFF",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 26,
+                      "fontColor": "#0B1220",
+                      "text": "section_generate_heading",
+                      "fontWeight": "bold"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_generate_body",
+                      "topMargin": 12
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 15,
+                      "fontWeight": "semibold",
+                      "fontColor": "accent",
+                      "tapBackground": "#F3F4F6",
+                      "onClick": "@{onNavigateBranchTests}",
+                      "text": "section_generate_link"
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 16,
+                      "fontColor": "#475467",
+                      "text": "section_generate_gaps",
+                      "topMargin": 24
+                    },
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 12,
+                      "fontSize": 15,
+                      "fontWeight": "semibold",
+                      "fontColor": "accent",
+                      "tapBackground": "#F3F4F6",
+                      "onClick": "@{onNavigateContractGaps}",
+                      "text": "section_generate_gaps_link"
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_branch_contracts_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    32,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "guides_branch_contracts_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 3,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        {
+                          "cell": "cells/next_step_card"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_branch_contracts_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    32,
+                    32
+                  ],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "guides_branch_contracts_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [
+                24,
+                16,
+                24,
+                16
+              ],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "guides_branch_contracts_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [
+                    24,
+                    32,
+                    0,
+                    32
+                  ],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        {
+                          "id": "toc_what",
+                          "label": "toc_row_what",
+                          "anchor": "section_what",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_example",
+                          "label": "toc_row_example",
+                          "anchor": "section_example",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_conditions",
+                          "label": "toc_row_conditions",
+                          "anchor": "section_conditions",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_when",
+                          "label": "toc_row_when",
+                          "anchor": "section_when",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_then",
+                          "label": "toc_row_then",
+                          "anchor": "section_then",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_scoped",
+                          "label": "toc_row_scoped",
+                          "anchor": "section_scoped",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_validate",
+                          "label": "toc_row_validate",
+                          "anchor": "section_validate",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_render",
+                          "label": "toc_row_render",
+                          "anchor": "section_render",
+                          "level": 1
+                        },
+                        {
+                          "id": "toc_generate",
+                          "label": "toc_row_generate",
+                          "anchor": "section_generate",
+                          "level": 1
+                        }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

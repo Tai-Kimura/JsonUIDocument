@@ -1,0 +1,172 @@
+# ApiMock - Mocking APIs in tests
+
+## Overview
+
+Guides > Mocking APIs in tests. Seven sections + TOC + next-reads. How jsonui-test mocks a backend for tests: mock definition files generated from OpenAPI (*.mock.json, one per operationId, multiple scenarios), `mock generate` (+ --check drift), `mock serve` (local server + /__jsonui__/panel control panel, 127.0.0.1 bind + per-launch token + Host/DNS-rebind + path-traversal hardening, CLI-only / not MCP), per-test scenario selection (root `mocks` + `setMocks` step; screen per-file, flow per-transition), and driver MockClient integration (mockServerURL / mockServerUrl + mockToken; admin API /__jsonui__/scenario-set + /__jsonui__/reset with X-JsonUI-Token). mock.schema.json is editor/doc-only.
+
+| | |
+|---|---|
+| Layout File | `guides/api-mock` |
+| Created | 2026-07-09 |
+| Updated | 2026-09-30 |
+
+## Screen Structure
+
+### UI Components
+
+| Component | ID | Platform | Description | Initial State | Notes |
+|---|---|---|---|---|---|
+| View | `guides_api_mock_root` | - | - | - | - |
+| &nbsp;&nbsp;↳ Scroll | `guides_api_mock_scroll` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_api_mock_header` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_api_mock_content_with_rail` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_api_mock_body_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_what` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_files` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_generate` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_checks` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_serve` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_scenarios` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_drivers` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_api_mock_next` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Collection | `guides_api_mock_next_collection` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_api_mock_footer` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_api_mock_rail_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `guides_api_mock_toc_wrap` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ TableOfContents | `-` | - | - | - | - |
+
+### Layout Structure
+
+```
+guides_api_mock_root
+└── guides_api_mock_scroll
+```
+
+## Data Flow
+
+```mermaid
+flowchart TD
+    VIEW --> VM
+```
+
+### ViewModel
+
+#### Methods
+
+| Signature | Platforms | Description |
+|---|---|---|
+| `onAppear()` | all | Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_testing -> /guides/testing, next_cli -> /reference/cli-commands). Each row's titleKey / descriptionKey is resolved through StringManager with the guides_api_mock_ namespace prefix. |
+| `onNavigate(url: String)` | all | Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /guides/testing, /reference/cli-commands. |
+
+#### Vars
+
+| Declaration | Flags | Platforms | Description |
+|---|---|---|---|
+| `var nextReadLinks: Array(NextReadLink)` | observable | all | Two closing 'read next' cards pointing at /guides/testing and /reference/cli-commands. Seeded by onAppear and re-seeded by mountLanguage. |
+
+## State Management
+
+### UI Data Variables
+
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `-` | Two closing cards: /guides/testing (the test DSL) + /reference/cli-commands (the mock subcommands). | - |
+
+### View-local Event Handlers
+
+_Handlers kept inside the View layer. ViewModel public API lives under `dataFlow.viewModel`._
+
+| Handler | Description | Notes |
+|---|---|---|
+| `onAppear` | Seed nextReadLinks. | - |
+| `onNavigate` | Client-side navigation. | - |
+| `onNavigateGuides` |  | - |
+
+## User Actions
+
+| Action | Processing | Destination | Notes |
+|---|---|---|---|
+| Tap a TOC entry | TOC-internal scroll. | - | - |
+| Tap a NextReadLink card | onNavigate(url). | - | - |
+
+## Validation
+
+## Transitions
+
+| Condition | Destination | Notes |
+|---|---|---|
+| url is spec-mapped | Target screen or tab | - |
+
+## Related Files
+
+| Type | File Path | Notes |
+|---|---|---|
+| Layout | `docs/screens/layouts/guides/api-mock.json` | - |
+| ViewModel | `jsonui-doc-web/src/viewmodels/guides/ApiMockViewModel.ts` | - |
+| View | `jsonui-doc-web/src/app/guides/api-mock/page.tsx` | - |
+
+## Notes
+
+- Live Guides entry (added 2026-07-09 for the test-tooling doc pass). Added to ChromeViewModel NAV_CATALOG guides + GuidesIndexViewModel CATALOG.
+- Six sections: (1) what API mocks are, (2) mock definition files (*.mock.json, multi-scenario) with a code example, (3) mock generate (+ --check drift / MCP test_mock_generate), (4) mock serve + control panel + hardening (CLI-only), (5) per-test scenario selection (root mocks + setMocks; screen per-file / flow per-transition) with a code example, (6) driver MockClient + admin API.
+- Companion to /guides/testing (the test DSL) and /reference/test-tooling (the support matrix + ownership table). Sample data is neutral (products / items) per public-repo hygiene.
+- 2026-07-30 — new section 4 'Contract checks', and sections 5-7 renumbered. Three claims on the page had gone stale with the upstream mock-contract work: generation no longer 'skips existing files' (it clears and rewrites <mockDir>/generated/, while hand-written files live outside it and overlay per scenario), --check no longer compares only method and path (it matches scenario bodies against the schema for their status code — types, required including nested and array elements, enum, nullable respected — and identifies scenarios by route, not filename), and neither check has to be invoked by hand (jsonui-test validate runs the contract check and regenerates generated/ when missing or older than the swagger). New on the page: request-side validation in mock serve, on by default, which records violations and exits non-zero without rejecting the request. Escape hatches documented: --no-mock-check, mock.validateRequests=false, --no-validate-requests, per-scenario skipRequestValidation.
+- The same edits landed on the pages that repeat the claim: guides_testing.section_cli_bullet_mock, tools_mcp.tool_test_mock_generate_role, reference_cli_commands.section_test_tools_body. docs/data/cli-commands.json gained jsonui-test mock generate / mock serve entries and --no-mock-check on validate, so the catalogue on /reference/cli-commands carries the flags too.
+- 2026-08-31 — section_files_body corrected. The overlay paragraph describes the thin-overlay shape (a hand-written file carrying only the scenarios its tests drive, routine ones filling in from the generated side). Measured on a fixture with one hand-written overlay carrying a single scenario and no activeScenario: mock generate prints '1 route(s) overlaid by hand-written mock(s)', keeps the generated copy, and raises no activeScenario error.
+- 2026-08-31 — while editing section_files_body, removed a literal '**シナリオ単位**' from its JA text. Prose Labels print markdown verbatim on this site, so the asterisks were reaching the screen; it had survived because probes read the EN rendering and the earlier sweep classified this file's remaining '**' as glob patterns without separating the JA case.
+- 2026-08-31 — section_files_body extended for the mock route index union and the stale-generated visibility. The union is published through the observable that shows which index answered: with a generated half declaring default/empty/error_403 and an overlay declaring only two_items, a name in neither errors with available: ['default','empty','error_403','two_items']. Getting the check to fire took two corrections to the fixture, both recorded because they are the kind of thing that reads as 'the check found nothing': a screen test's mocks block belongs at the file root (inside a case it is silently 'Unknown case key: mocks'), and without mock.swagger declared the run prints 'Unchecked mocks: N' and compares nothing. An earlier attempt reported no difference purely because of those two, and the full output — not the grepped lines — is what said so. Stale-generated visibility: a stale body in the generated half of a route with NO overlay warns and the summary separates the halves; exit stays 0, which is why the published sentence says the exit code cannot see it.
+- 2026-08-31 — the limitation block now names its command and states what the other one does. The paragraph already said 'mock generate --check', but a reader who gates on jsonui-test validate would reasonably expect the same warning there. Measured on a tree where only the generated half is stale: validate prints Result: PASSED, exits 0, and leaves the file unchanged, while a drifted hand-written body on the same tree stops it with [BODY] Mock contract drift. Published as an absence that proves nothing — the warning is not in validate's output and its absence is not evidence the generated half is fresh. The mechanism was NOT published: one run printed 'Regenerated 2 mock file(s)' which suggested validate refreshes generated/ first, but re-staling the file and re-running left it byte-identical, so the regeneration hypothesis did not survive its own check and only the observable behaviour is stated.
+- 2026-08-31 — the mechanism behind validate's silence is now published, after being measured here rather than taken from the upstream lane that offered it. The observable is the generated file's md5, not the result line: with the swagger untouched, editing a generated body and running validate leaves the hash identical and prints no Regenerated line; touching the swagger and running the same command prints 'Regenerated 2 mock file(s)' and changes the hash. Both runs print Result: PASSED. That is the reverse of the hypothesis dropped one edit earlier — validate does not refresh a content-stale tree, it refreshes on the swagger's mtime — so a stale generated body survives indefinitely while the swagger is unchanged. Worth recording that the earlier hypothesis was not merely unproven but backwards, and that the run that suggested it had simply followed a swagger write. [2026-09-03 addendum: the line carries a reason suffix — `Regenerated N mock file(s) into mocks/generated/ — <why>` — so the quotation above is a substring of the real output, not the whole line. The measurement it records still stands; only the transcript is abridged.]
+- 2026-08-31 — the limitation block is replaced wholesale, which is what keeping it to one block was for. Five arms measured here, of which two were shot in both sort directions on purpose because the upstream lane reported them once: hand-written drift under a tag sorting before 'generated' and again after it, both [BODY] + exit 1; generated-only drift in both directions, [WARN] + exit 0 both times; both halves broken in both directions, [BODY] and [WARN] together with exit 1. The two-halves-at-once arm is the one that distinguishes 'the index sees both' from 'the index sees one at a time and both single arms happened to hit', and it also pins the weights staying per-file. Fifth arm: jsonui-test validate carries a standing 'mock contract: 6 scenario(s) compared, 1 generated body(ies) stale' line, and prints the compared count even with nothing stale — measured both ways, because a denominator that only appears when something is wrong is not a denominator. The published text keeps the mtime fact, which the fix does not change.
+- 2026-09-01 — the quoted denominator line leads with the total and closes the buckets. On this lane's own fixture it prints 'mock contract: 7 scenario(s) — 6 compared, 1 not compared (no JSON body), 1 generated body(ies) stale'. Enumerating the tree confirms seven scenarios exist and all seven carry a body, so the uncomparable one is uncomparable on the contract side: the swagger declares that status with no response schema. Worth having as a worked example because a bucket line that does not close on the total reads as though the printed buckets were the whole. Published as the general point, since the same shape is what made this page's earlier '0 endpoint declarations, zero warnings' worth qualifying as an empty denominator.
+- 2026-09-01 — removed four markdown bolds this lane had just written into the JA of section_files_body. This site prints Prose Label markdown verbatim, and the rule has been enforced on other people's text on this very page; writing it anyway is worth recording rather than quietly fixing. It was caught by the probe, not by review — the JA arm added after the last incident is what found it, on its first outing where the new text was Japanese. The EN arm was clean, which is exactly the blind spot that let the earlier ones live for months.
+- 2026-09-01 — the serve route-identity item, deferred twice, is measured and published for the half that reproduced. Fixture: swagger declares /api/items/{item_id}; the hand-written mock declares /api/items/{id}. The server prints 'loaded 1 endpoint(s)' and '1 hand-written mock(s) overlay the generated tree:' naming the file; mock generate reports '1 route(s) overlaid'. Published as the startup-line check plus an explicit statement that the answering-registration question was not settled here, rather than describing a failure from the outside. Fifth time today that a fixture's incidental choices decided which direction was observable.
+- 2026-09-01 — a correction from measurement. The denominator quote's uncompared bucket names its kind: 'no response body declared' (a debt — the status is declared, the payload contract is missing, which is this fixture's 403) versus 'declared non-JSON response' (a correct silence). The published caveat that the second label reports what the contract says rather than what the endpoint returns is kept, because a framework that defaults its declared content type to JSON while streaming a file lands in the debt bucket — a limitation stated where its scope is, per this page's own habit.
+- 2026-09-01 — the denominator's unit is now named on the page, after an upstream thread where two lanes' counts disagreed and turned out to be the same set in different units (operations vs scenarios). Enumerated this lane's own fixture to publish the composition rather than the claim: 3 files, 2 operations, 7 scenarios — listItems contributing 3 generated plus 2 hand-written, listOthers contributing 2 — which is what the line's 7 counts. Published because a total that looks large next to an endpoint count reads as a defect otherwise, and because this page has now spent three edits on the same lesson: a number without its unit gets read in the reader's unit.
+- 2026-09-01 — the closure is against the scenarios generation produces. Measured with the fixture state asserted immediately before and after every run: deleting the same-status variant prints 'empty: generation produces this scenario (status 200), and this file does not have it' and exits 1, and adding a scenario generation does not produce prints 'handmade: generation does not produce this scenario (status 200), and the next mock generate will drop it' and exits 1. Both were filed from this lane. The published sentences name the scenario rather than the status because status-shaped wording stated something false in the delete case — the status was still served by another scenario — and that was caught by shooting the true case and the false case side by side rather than accepting the one that fired. Not published, and filed instead: the same deletion is order-dependent under `jsonui-test validate`. On a tree where validate has not run yet it silently regenerates the missing scenario and reports nothing, exit 0; once validate has run there, the same deletion reports 'not compared (declared but absent)' and exits 1. A fresh checkout — CI's condition — is the silent side. An intact-tree validate rewrites generated/ (mtimes advance, content identical), which is the mechanism as far as it could be established; forcing the mock file's mtime to 2030 did not change the outcome, so it is not simply that file's age, and the trigger is not identified. Nothing about it goes on the page until it is. This was first read as a shipped regression, because the local checkout reported it and the release did not; both behave identically and what differed was the tree's history before the measurement. Arms now print the scenario list immediately before and after each run rather than relying on the sequence of commands believed to have run.
+- 2026-09-01 — the classification footnote prints on the command each finding appears on. Measured on four fixtures, both commands each, raw output captured. `mock generate --check` opens with the same `mock contract:` denominator line and closes with a sentence carrying the uncompared count ('No drift in the 5 scenario(s) compared; 1 scenario(s) were not compared') rather than a bare all-clear, so the sentence saying validate carries a standing denominator 'instead' was rewritten. The footnote's first line branches per command: 'are not counted in Warnings:' on validate, 'do not fail this check:' on --check, which has no warnings counter. The no-status class prints its sentence on --check and only there. Two predictions did not hold and are recorded because they say what the footnote is not: validate still prints its own footnote for the two classes it can reach, and validate's note that misnamed files and optional-field omissions appear only in --check is still printed and still true.
+- 2026-09-01 (correction, same day) — the first version of the sentence above said --check 'closes with a sentence that carries the uncompared count rather than a bare all-clear'. That was generalised from one fixture which happened to have an uncompared scenario, and it was published before being checked against a fixture without one. Re-measured on three: with nothing uncompared and nothing stale the closing line is still the old unconditional 'No drift: mocks are in sync with swagger.'; an uncompared scenario gives the compared/not-compared sentence; a stale generated body gives a third form naming the refresh command. The claim is data-dependent, not a version fact. Also measured while correcting it: the closing line's 'not compared' counts only findings listed above it, while the denominator's 'not compared' bucket is wider — the pristine fixture prints '1 not compared (no response body declared)' on the contract line and the bare all-clear underneath, so the two lines disagree by construction and neither is wrong. The failure here was the one this page keeps documenting in other people's tools: a conclusion whose real subject was one fixture, published with the subject of a release.
+- 2026-09-01 — `skipRequestValidation`, a scenario key the mock server honours at serve time, is registered with the validator. Measured on one fixture, the key asserted on disk as a control before each run: Warnings: 0. Negative control: a one-character variant (`skipRequestValidationn`) still warns, so the unknown-key check was narrowed, not switched off. Upstream measured zero occurrences of this key across its own corpus; that counts usage, not exposure — this site was publishing the recommendation regardless.
+- 2026-09-01 — the mock scenario vocabulary has two warnings that leave the run at exit 0. Measured on one scenario carrying both a bare `undeclaredStatus: true` and a `headers` key, each asserted on disk as a control: Warnings: 2, Result: PASSED and captured exit 0. The `undeclaredStatus` warning is the more useful of the two because being ignored would otherwise be silent, which is what cost readers time. Second finding, from the exposure check rather than the release: the editor's `mock.schema.json` is a distributed COPY declaring additionalProperties:false, so it marks unknown keys invalid while the CLI only warns — and a stale copy marks a NEWLY ADDED key invalid, giving an author a red squiggle on a correct declaration. `skipRequestValidation`, which this page recommends, is exactly that case. The page says to check the copy's date and re-sync rather than delete the key. Exposure check run before writing any of this: of six identifiers, three were exposed and one hit (`headers` in learn_what_is_jsonui) was unrelated English prose about layout headers — the name flagged it and the content cleared it, which is why the check has two stages.
+- 2026-09-03 — inventory of published quotations of tool output, prompted by an upstream notice that assumed the note above was published prose (it is not; this ledger is internal). The site quotes tool output in 7 published string keys (summary/Result lines, [WARN]/[NOTE] levels, two checkmark transcripts) and in 8 CodeBlocks across 8 layout files. Nothing checks any of them against the real output — the read-stamp mechanism covers CLI reference cards only. When a release changes an output line, those 15 places are the exposure, and the way to keep them honest is to re-measure them during that release's uptake.
+- 2026-09-30 — The scenario-switch example used `{ "setMocks": ... }` / `{ "tap": ... }` shorthand the schema refuses and lacked metadata; rewritten and validated with jsonui-cli 1.9.5. --update-default is described as the merge it is (mock/generate.py update_default: adds missing required fields, refreshes source, never overwrites) with --dry-run. The runner config fields are mockServerURL (iOS) / mockServerUrl (Android, Web) + mockToken, not `token`. Seven sections, not six.
+
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

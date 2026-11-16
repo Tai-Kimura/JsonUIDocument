@@ -1,0 +1,50 @@
+{
+  "component": "GradientView",
+  "description": {
+    "en": "View with a linear gradient background. For simple 2-stop gradients, the `gradient` attribute on a regular View is sufficient — use GradientView when `locations` (multi-stop control) is needed.",
+    "ja": "線形グラデーション背景を持つ View。2 色の単純なグラデーションなら通常の View の `gradient` 属性で十分、`locations`（多段 stop 制御）が必要なときに GradientView を使う。"
+  },
+  "usage": {
+    "en": "Use GradientView for hero banners, card overlays, and any background needing 3+ color stops or precise stop positions. For flat colors, prefer `background` on a View.",
+    "ja": "ヒーローバナー、カードオーバーレイ、3 色以上の stop や精密な位置指定が必要な背景に使う。単色背景は View の `background` を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Sunset 3-stop", "ja": "3 色のサンセット" },
+      "language": "json",
+      "code": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#FBBF24\", \"#F59E0B\", \"#EF4444\"],\n  \"locations\": [0.0, 0.6, 1.0],\n  \"gradientDirection\": \"horizontal\",\n  \"width\": \"matchParent\",\n  \"height\": 120\n}"
+    },
+    {
+      "title": { "en": "Vertical hero", "ja": "垂直ヒーロー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"GradientView\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"width\": \"matchParent\",\n  \"height\": 200\n}"
+    }
+  ],
+  "attributes": {
+    "orientation": {
+      "summary": {
+        "en": "How the children stack inside the gradient: vertical (the default, a column) or horizontal (Web, rjui). Not the gradient's direction — that is gradientDirection.",
+        "ja": "グラデーションの中で子要素を並べる向き。vertical（既定、縦に積む）か horizontal。Web（rjui）。グラデーションの向きではありません（それは gradientDirection）。"
+      }
+    },
+    "gradient": {
+      "note": {
+        "en": "Array of 2+ color strings. Colors are distributed evenly unless `locations` is provided.",
+        "ja": "2 色以上の配列。`locations` 未指定で均等配分。"
+      }
+    },
+    "gradientDirection": {
+      "note": {
+        "en": "`Vertical` (the default and the fallback) / `Horizontal` / `Oblique`, written as declared: a value is its declared spelling, case and all, so `horizontal` is an undeclared spelling that the build names and that draws the Vertical fallback. There are no numeric degrees. Measured on the web build: `horizontal` drew the Vertical fallback, `to bottom`, and the build names it ('did you mean 'Horizontal'?'); `Horizontal` drew `to right`.",
+        "ja": "`Vertical`（既定値でありフォールバック）/ `Horizontal` / `Oblique` を、宣言どおりの綴りで書く: 値は大文字小文字まで宣言どおりの綴りなので、`horizontal` は宣言に無い綴りとしてビルドが名指し、Vertical のフォールバックで描かれる。度数の指定は無い。web のビルドで実測: `horizontal` は Vertical のフォールバック `to bottom` になり、ビルドが名指す（'did you mean 'Horizontal'?'）。`Horizontal` は `to right`。"
+      }
+    },
+    "locations": {
+      "note": {
+        "en": "Array of 0.0–1.0 values, same length as `gradient`. Each entry is the position where that color peaks.",
+        "ja": "0.0〜1.0 の配列、`gradient` と同じ長さ。各 stop はその色がピークとなる位置。"
+      }
+    }
+  },
+  "relatedComponents": ["View", "Blur"]
+}

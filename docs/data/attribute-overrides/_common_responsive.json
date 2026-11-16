@@ -1,0 +1,83 @@
+{
+  "category": "responsive",
+  "description": {
+    "en": "Responsive attributes pick attribute values based on the host's size class and orientation. The same Layout JSON renders differently on iPhone, iPad, and split-screen.",
+    "ja": "レスポンシブ属性はホストの size class と orientation に応じて属性値を切り替えます。同じ Layout JSON が iPhone / iPad / 分割画面で別の表示になる。"
+  },
+  "attributes": {
+    "platform": {
+      "summary": {
+        "en": "Platform gate on a node, two forms. String (`\"platform\": \"ios\"`, comma lists like `\"ios,android\"`, legacy language tokens like `\"swift\"` / `\"compose\"` / `\"react\"` also accepted): `jui build` drops the node entirely on non-matching platforms at distribution time. Object (`\"platform\": {\"ios\": {…}, \"web\": {…}}`): per-platform attribute overrides merged into the node — the target platform's map wins, other platforms use the base values. The key is consumed at build time and never reaches the generated code. Note: a `platforms` ARRAY is valid only on the layout ROOT, where it whitelists which platforms the whole screen ships to — an array on a child node is ignored.",
+        "ja": "ノードのプラットフォームゲート。2 形式ある。文字列（`\"platform\": \"ios\"`、`\"ios,android\"` のカンマ区切り、`\"swift\"` / `\"compose\"` / `\"react\"` 等のレガシー言語トークンも受理）: `jui build` が配布時に、マッチしないプラットフォームではノードを丸ごと削除する。オブジェクト（`\"platform\": {\"ios\": {…}, \"web\": {…}}`）: プラットフォーム別の属性上書きをノードにマージ — 対象プラットフォームの map が勝ち、他は base 値のまま。キーはビルド時に消費され、生成コードには残らない。注意: 配列の `platforms` はレイアウトの**ルート限定**（画面全体の配布先ホワイトリスト）— 子ノードに配列を書いても無視される。"
+      },
+      "examples": [
+        { "language": "json", "code": "{ \"type\": \"Image\", \"srcName\": \"ios_screenshot\", \"platform\": \"ios\" }" },
+        { "language": "json", "code": "{\n  \"type\": \"View\",\n  \"height\": 200,\n  \"platform\": {\n    \"ios\": { \"height\": 220 },\n    \"web\": { \"height\": \"100vh\", \"maxWidth\": 1200 }\n  }\n}" },
+        { "language": "json", "code": "{ \"type\": \"View\", \"platforms\": [\"web\"], \"child\": [ ] }  // root only: screen ships to web alone" }
+      ]
+    },
+    "responsive": {
+      "summary": {
+        "en": "Object whose keys are size-class names (`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `medium-landscape` / `regular-landscape`) or window-width conditions (`minWidth:N` — the window is at least N wide; `maxWidth:N` — narrower than N), and whose values are attribute overrides. One key wins, alone: the first in priority order that holds (composite keys, then landscape, then regular > medium > compact; among width conditions the smallest maxWidth, else the largest minWidth). Only its overrides go onto the base — the other keys add nothing. A block holds size classes or width conditions, never both (`jui build` refuses the mix).",
+        "ja": "キーが size class 名（`compact` / `medium` / `regular` / `landscape` / `compact-landscape` / `medium-landscape` / `regular-landscape`）またはウィンドウ幅の条件（`minWidth:N` — 幅が N 以上、`maxWidth:N` — N 未満）、値が属性上書きのオブジェクト。勝つキーは 1 本だけ: 優先順で最初に成立するもの（複合キー、次に landscape、次に regular > medium > compact。幅の条件では成立する最小の maxWidth、無ければ最大の minWidth）。ベースに当たるのはその 1 本の上書きだけで、他のキーは何も足さない。1 つのブロックに size class と幅の条件は混ぜられない（`jui build` が拒否する）。"
+      },
+      "examples": [
+        {
+          "language": "json",
+          "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"spacing\": 8,\n  \"responsive\": {\n    \"regular\": { \"orientation\": \"horizontal\", \"spacing\": 24 },\n    \"landscape\": { \"spacing\": 16 },\n    \"regular-landscape\": { \"orientation\": \"horizontal\", \"spacing\": 32 }\n  }\n}"
+        },
+        {
+          "language": "json",
+          "code": "{\n  \"type\": \"Collection\",\n  \"columnCount\": 1,\n  \"responsive\": {\n    \"medium\": { \"columnCount\": 2 },\n    \"regular\": { \"columnCount\": 3 }\n  }\n}"
+        }
+      ],
+      "platformDiff": {
+        "react": "Tailwind のブレークポイントの variant で描く。size class だけのブロックは範囲の重ならないクラス: compact がデフォルト、medium が `md:max-lg:`（768–1023px）、regular が `lg:`（1024px 以上）。landscape 系のキーを持つブロックは、各キーを、そのキーが勝つ窓だけに絞った media variant で出す（`landscape:` / `portrait:` と幅の帯の組み合わせ。例: 上の 1 つ目の例では、regular が `portrait:lg:`、landscape が `landscape:max-lg:`、regular-landscape が `landscape:lg:`）。variant のクラスはベースのクラスより後に来るので、勝つキーの上書きが必ず勝つ。幅の条件は各キーが勝つ範囲に絞った `min-[Npx]:` / `max-[Npx]:`（max は N 未満）。描ける上書きは orientation・spacing・gravity・fontSize・fontWeight・fontColor・textAlign・background・cornerRadius・flexWrap・width・height・minWidth / maxWidth / minHeight / maxHeight・weight・padding / paddings と各辺・margins と各辺・zIndex・visibility・hidden・clipToBounds・opacity。それ以外の鍵も、上書きを混ぜた部品がクラスを足すだけなら描く（Collection の columns・lineSpacing・columnSpacing・itemSpacing、枠の色・太さ・線の種類、枠を消す borderWidth 0、相対配置の align・center）。運べない鍵（offsetX / offsetY、上書きの値そのものが束縛のもの、ベースのクラスを取り去るもの、inline の style やマークアップを変えるもの）は、`jui build` が `View 'hero': responsive 'landscape' sets 'offsetX', which is not drawn on web — …` の形の WARN で、型・id・size class・鍵・理由を名指しする。ベースが束縛（`@{...}`）で size class が上書きする属性は、値を `--jui-sc-<性質>` に置いてクラスで読むので、size class の上書きが勝つ（上書きされない束縛は inline style のまま）。",
+        "swift_swiftui": "`@Environment(\\.horizontalSizeClass)` + `verticalSizeClass` で判定（iOS に medium は無く、medium は compact と同じ条件）。幅の条件はライブラリの `SJUIWindowWidth`（scene の幅、pt）で判定。Generated モードでは responsive を持つコンポーネントを `@ViewBuilder` 関数に抽出して型チェックタイムアウトを回避。",
+        "swift_uikit": "size class 変化時に layout constraint を切り替える既存パターンに統合。",
+        "kotlin_compose": "`LocalWindowInfo.current.containerSize` で判定: 幅を dp にして 600 / 840 で compact / medium / regular、縦横の比較で landscape、幅の条件も同じ幅で判定（Dynamic モードの width の class は `WindowSizeClass`）。Generated モードでは呼び出し箇所にその場の `if` / `else` を出す（`@Composable` の wrapper ではない）ので、呼び出し元の `Row` / `Column` / `Box` のスコープと `data` / `viewModel` をそのまま使える。",
+        "kotlin_xml": "別解像度向けには `res/layout-<qualifier>/` の従来パターンを推奨。`responsive` ブロック自体は Compose 専用。"
+      }
+    }
+  },
+  "size_classes": {
+    "_description": {
+      "en": "Seven size-class keys recognized by the resolver: the width classes (compact/medium/regular), landscape, and each width class combined with landscape. A block may instead use window-width conditions (`minWidth:N` / `maxWidth:N`), never both kinds at once.",
+      "ja": "リゾルバが認識する 7 種類の size class キー: width の class（compact/medium/regular）、landscape、各 width の class と landscape の組み合わせ。ブロックは代わりにウィンドウ幅の条件（`minWidth:N` / `maxWidth:N`）を使うこともでき、両方を混ぜることはできない。"
+    },
+    "compact": {
+      "en": "Narrow width. iPhone portrait, foldable inner display closed, web < 768px.",
+      "ja": "狭い width。iPhone portrait、折畳デバイス閉、web < 768px。"
+    },
+    "medium": {
+      "en": "Tablet portrait, split-screen iPad, foldable inner display open. Web ≈768–1023px. iOS falls back to compact (no native medium class).",
+      "ja": "タブレット portrait、iPad split-screen、折畳デバイス展開時。Web ≈768–1023px。iOS は medium が無いので compact にフォールバック。"
+    },
+    "regular": {
+      "en": "Wide width. iPad landscape full-screen, web ≥1024px.",
+      "ja": "広い width。iPad landscape フル画面、web ≥1024px。"
+    },
+    "landscape": {
+      "en": "The window is wider than tall (any width). Web: orientation media query; Android: containerSize; iOS: vertical size class compact — an iPhone turned sideways.",
+      "ja": "ウィンドウが縦より横に長い（width 軸は問わない）。Web はメディアクエリの orientation、Android は containerSize、iOS は vertical size class が compact — 横にした iPhone。"
+    },
+    "compact-landscape": {
+      "en": "Composite of compact width AND landscape. Higher priority than either single key.",
+      "ja": "compact width AND landscape の複合キー。単独キーより優先。"
+    },
+    "medium-landscape": {
+      "en": "Composite of medium width AND landscape. Higher priority than either single key. On iOS (no medium width) it holds where compact-landscape does.",
+      "ja": "medium width AND landscape の複合キー。単独キーより優先。iOS（medium の width が無い）では compact-landscape と同じ条件で成立。"
+    },
+    "regular-landscape": {
+      "en": "Composite of regular width AND landscape. Higher priority than either single key.",
+      "ja": "regular width AND landscape の複合キー。単独キーより優先。"
+    }
+  },
+  "priority": {
+    "_description": {
+      "en": "Resolution when several keys hold: the first in regular-landscape > medium-landscape > compact-landscape > landscape > regular > medium > compact wins alone, else the base attributes. Width conditions: the smallest maxWidth that holds, else the largest minWidth.",
+      "ja": "複数のキーが成立するときの解決: regular-landscape > medium-landscape > compact-landscape > landscape > regular > medium > compact で最初に成立する 1 本だけが勝ち、無ければベース属性。幅の条件では成立する最小の maxWidth、無ければ最大の minWidth。"
+    }
+  }
+}

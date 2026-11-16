@@ -1,0 +1,3369 @@
+{
+  "component": "NetworkImage",
+  "kebab": "network-image",
+  "aliasOf": null,
+  "title": "NetworkImage",
+  "description": {
+    "en": "Image loaded from a URL with automatic caching, placeholder, and error handling.",
+    "ja": "URL から自動ロードされる画像。キャッシュ・プレースホルダ・エラー時フォールバックを備える。"
+  },
+  "usage": {
+    "en": "Use NetworkImage for all user-generated or CDN-hosted images. Always provide `placeholder` or `defaultImage` — the first frame is always the placeholder. The common attribute surface — `onClick`, `style`, `testId`, `tag` — is directly declarable (web) and forwarded to the root element of every render branch (image / placeholder / loading / fallback), so the click target and test hooks survive load-state transitions; a wrapper View around the image is not needed for tap handling. An app can draw its own loading indicator over the image: register a renderer under a name (iOS NetworkImageLoadingRenderers.register, Android KjuiLoadingRenderers.register) and write that name in `loadingRenderer`; `loadingDelay`, `transitionDuration` and `onLoadStateChange` go with it (see the attributes below). The web has no renderer and draws `placeholder`; it takes `transitionDuration` and `onLoadStateChange`. On Android every NetworkImage is generated as KotlinJsonUI's KjuiNetworkImage instead of coil's AsyncImage, with the state images passed as resource ids. On iOS, tapping an image that failed to load loads it again at once. A missing src (null, \"\", only whitespace, or a binding that hands one of them) draws defaultImage on all three platforms, makes no request and tells nothing to onLoadStateChange or a renderer; a src that comes back is reported afresh. iOS and Android retry by one rule: a 5xx, a 408, a 429 or a dropped connection is tried again after 2 s and once more after 4 s, while anything else that is not the image fails at once — any other 4xx, a 304 nobody asked for, a host that cannot be found, a 2xx whose body is not an image. On Android the retries are KjuiImageLoaderFactory's, so an app that does not install the factory gets none. The web is the browser's img.",
+    "ja": "ユーザー生成や CDN ホストの画像すべてに使う。最初のフレームは必ずプレースホルダになるため、`placeholder` または `defaultImage` を常に指定する。common 属性面 — `onClick`・`style`・`testId`・`tag` — は（web）直宣言でき、全レンダ分岐（本画像 / プレースホルダ / ロード中 / フォールバック）のルート要素へ転送されるため、ロード状態が遷移してもクリックターゲットとテストフックが生き残ります。タップ処理のために View で包む回避策は不要です。 アプリが自分の読み込み中の表示を画像の上に描けます。描き手を名前で登録し（iOS は NetworkImageLoadingRenderers.register、Android は KjuiLoadingRenderers.register）、その名前を `loadingRenderer` に書きます。`loadingDelay`・`transitionDuration`・`onLoadStateChange` も合わせて使えます（下の属性を参照）。web には描き手が無く、`placeholder` を描きます。web が読むのは `transitionDuration` と `onLoadStateChange` です。Android では、すべての NetworkImage を coil の AsyncImage ではなく KotlinJsonUI の KjuiNetworkImage として生成し、状態ごとの画像はリソース id で渡します。iOS では、読み込みに失敗した画像を押すと、すぐ読み直します。 src が無いとき（null、\"\"、空白だけ、またはそれらを渡す binding）は 3 面とも defaultImage を描き、読みに行かず、onLoadStateChange にも描き手にも何も知らせません。src が戻ると改めて知らせます。 iOS と Android は同じ決まりでやり直す。5xx・408・429・接続が切れたときは、2 秒後にもう一度、さらに 4 秒後にもう一度読む。それ以外で画像でないものは、すぐ失敗にする。408・429 以外の 4xx、頼んでいない 304、見つからない host、本文が画像でない 2xx がそれに当たる。Android のやり直しは KjuiImageLoaderFactory が行うので、それを入れていないアプリではやり直さない。web はブラウザの img のまま。"
+  },
+  "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "0",
+  "statOptional": "20",
+  "statEvents": "1",
+  "statRequiredText": {
+    "en": "0 required",
+    "ja": "必須 0"
+  },
+  "statOptionalText": {
+    "en": "20 optional",
+    "ja": "任意 20"
+  },
+  "statEventsText": {
+    "en": "1 events",
+    "ja": "イベント 1"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            },
+            {
+              "id": "cat_event",
+              "label": {
+                "en": "Event",
+                "ja": "イベント"
+              },
+              "anchorUrl": "#section-event"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_url",
+              "name": "url",
+              "anchorId": "attr-url",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "source",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (alias, binding supported).",
+                "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Absolute or protocol-relative URL. Empty, null or only whitespace shows `defaultImage` (or `placeholder` if set). Changes trigger re-download (cache-aware).",
+                "ja": "絶対 URL または protocol-relative URL。空・null・空白だけでは `defaultImage`（未設定なら `placeholder`）を表示。変更時は再ダウンロード（キャッシュ参照あり）。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_defaultImage",
+              "name": "defaultImage",
+              "anchorId": "attr-defaultImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Default image name.",
+                "ja": "デフォルトで表示する画像名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Local image shown when `url` is empty, null, or resolves to a placeholder-eligible state. Prefer over `placeholder` for consistency.",
+                "ja": "`url` が空・null・プレースホルダ相当の状態のとき表示するローカル画像。一貫性のため `placeholder` よりこちらを優先。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_loadingImage",
+              "name": "loadingImage",
+              "anchorId": "attr-loadingImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Loading image name.",
+                "ja": "ロード中に表示する画像名。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Local image shown during the fetch. Skeletons and shimmer PNGs work well here.",
+                "ja": "fetch 中に表示するローカル画像。スケルトン画像や shimmer の PNG を使うとよい。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_errorImage",
+              "name": "errorImage",
+              "anchorId": "attr-errorImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Error image name.",
+                "ja": "ロード失敗時に表示する画像名。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Displayed on fetch failure (4xx, 5xx, network error). Defaults to `defaultImage` if omitted.",
+                "ja": "fetch 失敗時（4xx / 5xx / ネットワークエラー）に表示。省略時は `defaultImage` を使う。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_placeholder",
+              "name": "placeholder",
+              "anchorId": "attr-placeholder",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Placeholder image name (alias for hint).",
+                "ja": "プレースホルダ（`hint` のエイリアス）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Alias for `loadingImage`. Kept for compatibility; prefer `loadingImage` + `defaultImage` split.",
+                "ja": "`loadingImage` のエイリアス。互換のために残存。`loadingImage` + `defaultImage` の分離指定を推奨。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_contentMode",
+              "name": "contentMode",
+              "anchorId": "attr-contentMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "fit",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "fill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "left",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "right",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_7",
+                          "label": "AspectFill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_8",
+                          "label": "AspectFit",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_9",
+                          "label": "Center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Content mode (binding supported).",
+                "ja": "画像のコンテントモード。`aspectFit` / `aspectFill` / `scaleToFill` など（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Same as Image.contentMode — `aspectFit` / `aspectFill` / `fill` / `center`. On iOS, SwiftJsonUI does NetworkImage's crop, and a cropped NetworkImage takes touches only inside its frame, in generated code and Dynamic mode alike.",
+                "ja": "Image.contentMode と同じ。`aspectFit` / `aspectFill` / `fill` / `center`。iOS では、NetworkImage の切り取りは SwiftJsonUI が行い、切り取られた NetworkImage は、生成コードでも Dynamic でも枠の内側でだけタッチを受ける。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_cachePolicy",
+              "name": "cachePolicy",
+              "anchorId": "attr-cachePolicy",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Cache policy.",
+                "ja": "キャッシュポリシー。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "`memory` / `disk` / `both` (default) / `none`. `disk` persists across app launches.",
+                "ja": "`memory` / `disk` / `both`（デフォルト）/ `none`。`disk` はアプリ再起動後も保持。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_timeout",
+              "name": "timeout",
+              "anchorId": "attr-timeout",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Download timeout in seconds.",
+                "ja": "ダウンロードのタイムアウト（秒）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Fetch timeout in seconds. Default 30. On timeout, `errorImage` is shown.",
+                "ja": "fetch タイムアウト（秒）。デフォルト 30。タイムアウト時は `errorImage` が表示される。"
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_hint",
+              "name": "hint",
+              "anchorId": "attr-hint",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Placeholder image name (primary).",
+                "ja": "プレースホルダー画像名（正準）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_alt",
+              "name": "alt",
+              "anchorId": "attr-alt",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "accessibilityLabel",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "al_1",
+                          "label": "contentDescription",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Alt text for accessibility.",
+                "ja": "スクリーンリーダー用の代替テキスト。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Accessibility description for the rendered image. Localizable: a registered strings.json key resolves through StringManager just like `text` / `hint`. The `url` itself is never resolved through the string table.",
+                "ja": "描画される画像のアクセシビリティ説明文。ローカライズ対象: 登録済み strings.json キーは `text` / `hint` と同じく StringManager 経由で解決される。`url` 自体は文字列テーブルを通らない。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_loading",
+              "name": "loading",
+              "anchorId": "attr-loading",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "lazy",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "eager",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Loading behavior.",
+                "ja": "ロードストラテジ（`lazy` / `eager`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_circle",
+              "name": "circle",
+              "anchorId": "attr-circle",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Clips the image to a circle; cornerRadius is then not applied (rjui network_image_converter).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_headers",
+              "name": "headers",
+              "anchorId": "attr-headers",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "HTTP headers for the image request (Coil 3: httpHeaders(NetworkHeaders) on ImageRequest.Builder).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": {
+                "en": "✓ (Compose mode only)",
+                "ja": "✓（Compose モードのみ）"
+              },
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "object",
+              "required": ""
+            },
+            {
+              "id": "attr_loadingDelay",
+              "name": "loadingDelay",
+              "anchorId": "attr-loadingDelay",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Milliseconds a read must take before the loadingRenderer is put on, 0 to 2000. Default 200, and read only when loadingRenderer is written. A read that ends sooner shows the image with no renderer at all. iOS and Android only.",
+                "ja": "loadingRenderer を置くまでに読み込みがかかる時間（ms、0〜2000）。既定は 200 で、loadingRenderer を書いたときだけ読む。それより早く終わった読み込みは、描き手を一度も出さずに画像を見せる。iOS と Android だけ。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_loadingRenderer",
+              "name": "loadingRenderer",
+              "anchorId": "attr-loadingRenderer",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "The name of a loading renderer the app registered: on iOS with NetworkImageLoadingRenderers.register, on Android with KjuiLoadingRenderers.register. The renderer is a native drawer laid over the image's frame while the image is read from disk or the network, put on only once the read has taken longer than loadingDelay, and it alone is told the bytes received (the ViewModel is not, so the screen is not redrawn by the progress). While a renderer is named, placeholder, hint, loadingImage and the built-in spinner are not drawn for the loading state; errorImage and defaultImage keep their states. An image the memory cache already holds is drawn at once, with no renderer. Absent, \"\" (a binding may hand \"\" to turn it off) or a name nothing registered draws the loading state as it does without a renderer. iOS and Android only: the web generator passes nothing, and the web draws placeholder. The renderer is told the response and the bytes only for the image's own response, a 2xx or a 304 answering a conditional request. A redirect is followed and the answer it ends at decides; a 4xx or 5xx goes from requesting to failed with no progress. An error page's body is not counted as progress, and a 404 whose body is an image fails too. A load that is retried — a 5xx, a 408, a 429 or a dropped connection — tells the renderer retrying before each of the two waits (2 s, then 4 s) and requesting again after it, the bytes received starting again from 0; anything else that is not the image goes to failed with no retry. On Android this holds only with KjuiImageLoaderFactory installed.",
+                "ja": "アプリが登録した、読み込み中の描き手の名前。iOS は NetworkImageLoadingRenderers.register、Android は KjuiLoadingRenderers.register で登録する。描き手は、画像をディスクやネットワークから読んでいる間だけ画像の枠の上に重ねるネイティブの描画で、読み込みが loadingDelay より長くかかったときだけ置かれる。届いたバイト数を知らされるのは描き手だけで、ViewModel には届かないので、進み具合で画面が描き直されることはない。描き手の名前を書いている間は、読み込み中に placeholder・hint・loadingImage・組み込みのくるくるを描かない。errorImage と defaultImage はそれぞれの状態で描く。メモリのキャッシュにある画像は、描き手なしですぐ描く。書かない、\"\"（binding で \"\" を渡せば消せる）、登録の無い名前のときは、読み込み中を描き手が無いときと同じに描く。iOS と Android だけ。web の generator は何も渡さず、web は placeholder を描く。描き手に応答とバイト数を知らせるのは、画像そのものの応答（2xx と、条件付きで頼んだ 304）のときだけ。転送はたどり、行き着いた応答で決める。4xx・5xx は、進み具合なしで requesting から failed になる。エラーページの本文は進み具合に数えず、本文が画像の 404 も失敗になる。やり直す読み込み（5xx・408・429・接続が切れた）では、2 回の待ち（2 秒、次に 4 秒）の前ごとに描き手へ retrying を、待ちの後に改めて requesting を知らせ、届いたバイト数は 0 から数え直す。それ以外で画像でないものは、やり直さずに failed になる。Android では KjuiImageLoaderFactory を入れているときだけこうなる。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_renderingMode",
+              "name": "renderingMode",
+              "anchorId": "attr-renderingMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "original",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "template",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Rendering mode.",
+                "ja": "画像のレンダリングモード（テンプレート／原画など）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_size",
+              "name": "size",
+              "anchorId": "attr-size",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Width and height in dp when width and height are not given (Android, kjui).",
+                "ja": "width と height が無いときの幅と高さ（dp）。Android（kjui）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_src",
+              "name": "src",
+              "anchorId": "attr-src",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (binding supported).",
+                "ja": "画像の URL（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_transitionDuration",
+              "name": "transitionDuration",
+              "anchorId": "attr-transitionDuration",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Milliseconds of the fade into the loaded image or the error image, 0 to 1000. Default 240 when a loadingRenderer was found at run time, otherwise 0, which shows the image at once; a written value fades with or without a renderer. An image the memory cache already holds (on the web, one the browser already holds) is never faded. On the web it is a CSS opacity transition on the img, ease-out, and the generator brings a value over 1000 down to 1000 with a warning.",
+                "ja": "読み込んだ画像やエラー画像へのフェードの長さ（ms、0〜1000）。実行時に loadingRenderer が見つかったときの既定は 240、ほかは 0 で、すぐ見せる。書いた値は描き手の有無にかかわらずフェードする。メモリのキャッシュにある画像（web ではブラウザが持っている画像）はフェードしない。web では img の CSS の opacity の transition（ease-out）で、generator は 1000 を超える値を警告付きで 1000 にする。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "gone",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_onLoadStateChange",
+              "name": "onLoadStateChange",
+              "anchorId": "attr-onLoadStateChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "A binding to a function, such as @{onImageState}, called on the main thread with \"loading\", \"loaded\" or \"failed\" when the image's load state changes, and only on a change. An image the memory cache already holds calls \"loaded\" alone. The handler may take nothing, the state, or the view id and the state. Progress is not sent here. On the web \"loading\" comes when src is set, then \"loaded\" or \"failed\" from the img's load and error events. While there is no src (null, \"\" or only whitespace) nothing is called, and a src that comes back starts again from \"loading\". While a load is retried (a 5xx, a 408, a 429 or a dropped connection, after 2 s and after 4 s, on iOS and Android) the state stays \"loading\", and \"failed\" comes once the last try fails.",
+                "ja": "@{onImageState} のような関数の binding。画像の読み込みの状態が変わったときだけ、main で \"loading\"・\"loaded\"・\"failed\" を渡して呼ぶ。メモリのキャッシュにある画像は \"loaded\" だけを呼ぶ。受け手は引数なし、状態だけ、view の id と状態、のどれでもよい。進み具合はここに来ない。web では src を入れたときに \"loading\"、その後 img の load・error のイベントで \"loaded\" か \"failed\"。src が無い間（null・\"\"・空白だけ）は何も呼ばず、src が戻ると改めて \"loading\" から呼ぶ。読み込みをやり直している間（iOS と Android で、5xx・408・429・接続が切れたときに 2 秒後と 4 秒後）も状態は \"loading\" のままで、最後の試みが失敗したときに \"failed\" を呼ぶ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "visible",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_event",
+      "label": {
+        "en": "Event",
+        "ja": "イベント"
+      },
+      "anchor": "section-event",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Avatar with default",
+                "ja": "デフォルト画像付きアバター"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{user.avatarUrl}\",\n  \"defaultImage\": \"avatar_default\",\n  \"errorImage\": \"avatar_error\",\n  \"width\": 48,\n  \"height\": 48,\n  \"cornerRadius\": 24\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Tappable image (no wrapper View)",
+                "ja": "タップ可能な画像（View で包まない）"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{item.imageUrl}\",\n  \"placeholder\": \"image_placeholder\",\n  \"onClick\": \"@{onImageTap}\",\n  \"testId\": \"main_image\",\n  \"width\": \"matchParent\",\n  \"height\": 240\n}",
+              "note": {
+                "en": "`onClick` and `testId` ride on the image itself and keep working while the placeholder or fallback is showing — the handler and hook are forwarded to whichever branch is rendered.",
+                "ja": "`onClick` と `testId` は画像そのものに載り、プレースホルダやフォールバック表示中も効き続けます — ハンドラとフックは描画中の分岐へ転送されます。"
+              },
+              "noteVisibility": "visible",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{item.imageUrl}\",\n  \"placeholder\": \"image_placeholder\",\n  \"onClick\": \"@{onImageTap}\",\n  \"testId\": \"main_image\",\n  \"width\": \"matchParent\",\n  \"height\": 240\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{item.imageUrl}\",\n  \"placeholder\": \"image_placeholder\",\n  \"onClick\": \"@{onImageTap}\",\n  \"testId\": \"main_image\",\n  \"width\": \"matchParent\",\n  \"height\": 240\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "anchorId": "example-3",
+              "title": {
+                "en": "Full-bleed with loading state",
+                "ja": "ロード中インジケータ付きの全幅画像"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{post.imageUrl}\",\n  \"loadingImage\": \"image_skeleton\",\n  \"width\": \"matchParent\",\n  \"height\": 240,\n  \"contentMode\": \"aspectFill\"\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{post.imageUrl}\",\n  \"loadingImage\": \"image_skeleton\",\n  \"width\": \"matchParent\",\n  \"height\": 240,\n  \"contentMode\": \"aspectFill\"\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{post.imageUrl}\",\n  \"loadingImage\": \"image_skeleton\",\n  \"width\": \"matchParent\",\n  \"height\": 240,\n  \"contentMode\": \"aspectFill\"\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "anchorId": "example-4",
+              "title": {
+                "en": "With cache policy",
+                "ja": "キャッシュポリシー指定"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{productImageUrl}\",\n  \"cachePolicy\": \"both\",\n  \"timeout\": 10,\n  \"width\": 200,\n  \"height\": 200\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{productImageUrl}\",\n  \"cachePolicy\": \"both\",\n  \"timeout\": 10,\n  \"width\": 200,\n  \"height\": 200\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{productImageUrl}\",\n  \"cachePolicy\": \"both\",\n  \"timeout\": 10,\n  \"width\": 200,\n  \"height\": 200\n}",
+              "required": ""
+            },
+            {
+              "id": "example_5",
+              "anchorId": "example-5",
+              "title": {
+                "en": "With a loading renderer",
+                "ja": "読み込み中の描き手付き"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{item.imageUrl}\",\n  \"placeholder\": \"image_placeholder\",\n  \"loadingRenderer\": \"progress_ring\",\n  \"loadingDelay\": 200,\n  \"transitionDuration\": 240,\n  \"onLoadStateChange\": \"@{onImageState}\",\n  \"width\": \"matchParent\",\n  \"height\": 240\n}",
+              "note": {
+                "en": "progress_ring is a name the app registered at start-up (iOS NetworkImageLoadingRenderers.register, Android KjuiLoadingRenderers.register). A read under 200 ms shows the image with no renderer. The web draws placeholder and takes the fade and the state handler.",
+                "ja": "progress_ring は、アプリが起動時に登録した名前（iOS は NetworkImageLoadingRenderers.register、Android は KjuiLoadingRenderers.register）。200 ms 未満で終わる読み込みは、描き手を出さずに画像を見せる。web は placeholder を描き、フェードと状態の受け手を使う。"
+              },
+              "noteVisibility": "visible",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{item.imageUrl}\",\n  \"placeholder\": \"image_placeholder\",\n  \"loadingRenderer\": \"progress_ring\",\n  \"loadingDelay\": 200,\n  \"transitionDuration\": 240,\n  \"onLoadStateChange\": \"@{onImageState}\",\n  \"width\": \"matchParent\",\n  \"height\": 240\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"NetworkImage\",\n  \"url\": \"@{item.imageUrl}\",\n  \"placeholder\": \"image_placeholder\",\n  \"loadingRenderer\": \"progress_ring\",\n  \"loadingDelay\": 200,\n  \"transitionDuration\": 240,\n  \"onLoadStateChange\": \"@{onImageState}\",\n  \"width\": \"matchParent\",\n  \"height\": 240\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_url",
+              "name": "url",
+              "anchorId": "attr-url",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "source",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (alias, binding supported).",
+                "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Absolute or protocol-relative URL. Empty, null or only whitespace shows `defaultImage` (or `placeholder` if set). Changes trigger re-download (cache-aware).",
+                "ja": "絶対 URL または protocol-relative URL。空・null・空白だけでは `defaultImage`（未設定なら `placeholder`）を表示。変更時は再ダウンロード（キャッシュ参照あり）。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_defaultImage",
+              "name": "defaultImage",
+              "anchorId": "attr-defaultImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Default image name.",
+                "ja": "デフォルトで表示する画像名。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Local image shown when `url` is empty, null, or resolves to a placeholder-eligible state. Prefer over `placeholder` for consistency.",
+                "ja": "`url` が空・null・プレースホルダ相当の状態のとき表示するローカル画像。一貫性のため `placeholder` よりこちらを優先。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_loadingImage",
+              "name": "loadingImage",
+              "anchorId": "attr-loadingImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Loading image name.",
+                "ja": "ロード中に表示する画像名。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Local image shown during the fetch. Skeletons and shimmer PNGs work well here.",
+                "ja": "fetch 中に表示するローカル画像。スケルトン画像や shimmer の PNG を使うとよい。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_errorImage",
+              "name": "errorImage",
+              "anchorId": "attr-errorImage",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Error image name.",
+                "ja": "ロード失敗時に表示する画像名。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Displayed on fetch failure (4xx, 5xx, network error). Defaults to `defaultImage` if omitted.",
+                "ja": "fetch 失敗時（4xx / 5xx / ネットワークエラー）に表示。省略時は `defaultImage` を使う。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_placeholder",
+              "name": "placeholder",
+              "anchorId": "attr-placeholder",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Placeholder image name (alias for hint).",
+                "ja": "プレースホルダ（`hint` のエイリアス）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Alias for `loadingImage`. Kept for compatibility; prefer `loadingImage` + `defaultImage` split.",
+                "ja": "`loadingImage` のエイリアス。互換のために残存。`loadingImage` + `defaultImage` の分離指定を推奨。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_contentMode",
+              "name": "contentMode",
+              "anchorId": "attr-contentMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "fit",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "fill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "left",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "right",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_7",
+                          "label": "AspectFill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_8",
+                          "label": "AspectFit",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_9",
+                          "label": "Center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Content mode (binding supported).",
+                "ja": "画像のコンテントモード。`aspectFit` / `aspectFill` / `scaleToFill` など（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Same as Image.contentMode — `aspectFit` / `aspectFill` / `fill` / `center`. On iOS, SwiftJsonUI does NetworkImage's crop, and a cropped NetworkImage takes touches only inside its frame, in generated code and Dynamic mode alike.",
+                "ja": "Image.contentMode と同じ。`aspectFit` / `aspectFill` / `fill` / `center`。iOS では、NetworkImage の切り取りは SwiftJsonUI が行い、切り取られた NetworkImage は、生成コードでも Dynamic でも枠の内側でだけタッチを受ける。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_cachePolicy",
+              "name": "cachePolicy",
+              "anchorId": "attr-cachePolicy",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Cache policy.",
+                "ja": "キャッシュポリシー。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "`memory` / `disk` / `both` (default) / `none`. `disk` persists across app launches.",
+                "ja": "`memory` / `disk` / `both`（デフォルト）/ `none`。`disk` はアプリ再起動後も保持。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_timeout",
+              "name": "timeout",
+              "anchorId": "attr-timeout",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Download timeout in seconds.",
+                "ja": "ダウンロードのタイムアウト（秒）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Fetch timeout in seconds. Default 30. On timeout, `errorImage` is shown.",
+                "ja": "fetch タイムアウト（秒）。デフォルト 30。タイムアウト時は `errorImage` が表示される。"
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_hint",
+              "name": "hint",
+              "anchorId": "attr-hint",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Placeholder image name (primary).",
+                "ja": "プレースホルダー画像名（正準）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_alt",
+              "name": "alt",
+              "anchorId": "attr-alt",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "accessibilityLabel",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "al_1",
+                          "label": "contentDescription",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Alt text for accessibility.",
+                "ja": "スクリーンリーダー用の代替テキスト。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Accessibility description for the rendered image. Localizable: a registered strings.json key resolves through StringManager just like `text` / `hint`. The `url` itself is never resolved through the string table.",
+                "ja": "描画される画像のアクセシビリティ説明文。ローカライズ対象: 登録済み strings.json キーは `text` / `hint` と同じく StringManager 経由で解決される。`url` 自体は文字列テーブルを通らない。"
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_loading",
+              "name": "loading",
+              "anchorId": "attr-loading",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "lazy",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "eager",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Loading behavior.",
+                "ja": "ロードストラテジ（`lazy` / `eager`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_circle",
+              "name": "circle",
+              "anchorId": "attr-circle",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Clips the image to a circle; cornerRadius is then not applied (rjui network_image_converter).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_headers",
+              "name": "headers",
+              "anchorId": "attr-headers",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "HTTP headers for the image request (Coil 3: httpHeaders(NetworkHeaders) on ImageRequest.Builder).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": {
+                "en": "✓ (Compose mode only)",
+                "ja": "✓（Compose モードのみ）"
+              },
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "object",
+              "required": ""
+            },
+            {
+              "id": "attr_loadingDelay",
+              "name": "loadingDelay",
+              "anchorId": "attr-loadingDelay",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Milliseconds a read must take before the loadingRenderer is put on, 0 to 2000. Default 200, and read only when loadingRenderer is written. A read that ends sooner shows the image with no renderer at all. iOS and Android only.",
+                "ja": "loadingRenderer を置くまでに読み込みがかかる時間（ms、0〜2000）。既定は 200 で、loadingRenderer を書いたときだけ読む。それより早く終わった読み込みは、描き手を一度も出さずに画像を見せる。iOS と Android だけ。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_loadingRenderer",
+              "name": "loadingRenderer",
+              "anchorId": "attr-loadingRenderer",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "The name of a loading renderer the app registered: on iOS with NetworkImageLoadingRenderers.register, on Android with KjuiLoadingRenderers.register. The renderer is a native drawer laid over the image's frame while the image is read from disk or the network, put on only once the read has taken longer than loadingDelay, and it alone is told the bytes received (the ViewModel is not, so the screen is not redrawn by the progress). While a renderer is named, placeholder, hint, loadingImage and the built-in spinner are not drawn for the loading state; errorImage and defaultImage keep their states. An image the memory cache already holds is drawn at once, with no renderer. Absent, \"\" (a binding may hand \"\" to turn it off) or a name nothing registered draws the loading state as it does without a renderer. iOS and Android only: the web generator passes nothing, and the web draws placeholder. The renderer is told the response and the bytes only for the image's own response, a 2xx or a 304 answering a conditional request. A redirect is followed and the answer it ends at decides; a 4xx or 5xx goes from requesting to failed with no progress. An error page's body is not counted as progress, and a 404 whose body is an image fails too. A load that is retried — a 5xx, a 408, a 429 or a dropped connection — tells the renderer retrying before each of the two waits (2 s, then 4 s) and requesting again after it, the bytes received starting again from 0; anything else that is not the image goes to failed with no retry. On Android this holds only with KjuiImageLoaderFactory installed.",
+                "ja": "アプリが登録した、読み込み中の描き手の名前。iOS は NetworkImageLoadingRenderers.register、Android は KjuiLoadingRenderers.register で登録する。描き手は、画像をディスクやネットワークから読んでいる間だけ画像の枠の上に重ねるネイティブの描画で、読み込みが loadingDelay より長くかかったときだけ置かれる。届いたバイト数を知らされるのは描き手だけで、ViewModel には届かないので、進み具合で画面が描き直されることはない。描き手の名前を書いている間は、読み込み中に placeholder・hint・loadingImage・組み込みのくるくるを描かない。errorImage と defaultImage はそれぞれの状態で描く。メモリのキャッシュにある画像は、描き手なしですぐ描く。書かない、\"\"（binding で \"\" を渡せば消せる）、登録の無い名前のときは、読み込み中を描き手が無いときと同じに描く。iOS と Android だけ。web の generator は何も渡さず、web は placeholder を描く。描き手に応答とバイト数を知らせるのは、画像そのものの応答（2xx と、条件付きで頼んだ 304）のときだけ。転送はたどり、行き着いた応答で決める。4xx・5xx は、進み具合なしで requesting から failed になる。エラーページの本文は進み具合に数えず、本文が画像の 404 も失敗になる。やり直す読み込み（5xx・408・429・接続が切れた）では、2 回の待ち（2 秒、次に 4 秒）の前ごとに描き手へ retrying を、待ちの後に改めて requesting を知らせ、届いたバイト数は 0 から数え直す。それ以外で画像でないものは、やり直さずに failed になる。Android では KjuiImageLoaderFactory を入れているときだけこうなる。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onLoadStateChange",
+              "name": "onLoadStateChange",
+              "anchorId": "attr-onLoadStateChange",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "A binding to a function, such as @{onImageState}, called on the main thread with \"loading\", \"loaded\" or \"failed\" when the image's load state changes, and only on a change. An image the memory cache already holds calls \"loaded\" alone. The handler may take nothing, the state, or the view id and the state. Progress is not sent here. On the web \"loading\" comes when src is set, then \"loaded\" or \"failed\" from the img's load and error events. While there is no src (null, \"\" or only whitespace) nothing is called, and a src that comes back starts again from \"loading\". While a load is retried (a 5xx, a 408, a 429 or a dropped connection, after 2 s and after 4 s, on iOS and Android) the state stays \"loading\", and \"failed\" comes once the last try fails.",
+                "ja": "@{onImageState} のような関数の binding。画像の読み込みの状態が変わったときだけ、main で \"loading\"・\"loaded\"・\"failed\" を渡して呼ぶ。メモリのキャッシュにある画像は \"loaded\" だけを呼ぶ。受け手は引数なし、状態だけ、view の id と状態、のどれでもよい。進み具合はここに来ない。web では src を入れたときに \"loading\"、その後 img の load・error のイベントで \"loaded\" か \"failed\"。src が無い間（null・\"\"・空白だけ）は何も呼ばず、src が戻ると改めて \"loading\" から呼ぶ。読み込みをやり直している間（iOS と Android で、5xx・408・429・接続が切れたときに 2 秒後と 4 秒後）も状態は \"loading\" のままで、最後の試みが失敗したときに \"failed\" を呼ぶ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_renderingMode",
+              "name": "renderingMode",
+              "anchorId": "attr-renderingMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "original",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "template",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Rendering mode.",
+                "ja": "画像のレンダリングモード（テンプレート／原画など）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_size",
+              "name": "size",
+              "anchorId": "attr-size",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Width and height in dp when width and height are not given (Android, kjui).",
+                "ja": "width と height が無いときの幅と高さ（dp）。Android（kjui）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_src",
+              "name": "src",
+              "anchorId": "attr-src",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Image URL (binding supported).",
+                "ja": "画像の URL（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_transitionDuration",
+              "name": "transitionDuration",
+              "anchorId": "attr-transitionDuration",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Milliseconds of the fade into the loaded image or the error image, 0 to 1000. Default 240 when a loadingRenderer was found at run time, otherwise 0, which shows the image at once; a written value fades with or without a renderer. An image the memory cache already holds (on the web, one the browser already holds) is never faded. On the web it is a CSS opacity transition on the img, ease-out, and the generator brings a value over 1000 down to 1000 with a warning.",
+                "ja": "読み込んだ画像やエラー画像へのフェードの長さ（ms、0〜1000）。実行時に loadingRenderer が見つかったときの既定は 240、ほかは 0 で、すぐ見せる。書いた値は描き手の有無にかかわらずフェードする。メモリのキャッシュにある画像（web ではブラウザが持っている画像）はフェードしない。web では img の CSS の opacity の transition（ease-out）で、generator は 1000 を超える値を警告付きで 1000 にする。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_image",
+              "name": "Image",
+              "hint": "",
+              "url": "/reference/components/image"
+            },
+            {
+              "id": "related_indicator",
+              "name": "Indicator",
+              "hint": "",
+              "url": "/reference/components/indicator"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

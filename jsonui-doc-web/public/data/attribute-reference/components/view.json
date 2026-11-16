@@ -1,0 +1,3639 @@
+{
+  "component": "View",
+  "kebab": "view",
+  "aliasOf": null,
+  "title": "View",
+  "description": {
+    "en": "Generic container that arranges child components vertically or horizontally. The most-used component — every JsonUI screen has a View at the root of each layout segment.",
+    "ja": "子要素を垂直または水平に並べる汎用コンテナ。最も多用され、あらゆる JsonUI 画面の各セクションのルートに存在する。"
+  },
+  "usage": {
+    "en": "Use View whenever you need to group multiple components. Choose `orientation` (vertical/horizontal). For scrollable content use ScrollView; for dynamic lists use Collection.",
+    "ja": "複数の要素をまとめたいとき常に使う。`orientation` で方向を決める（vertical / horizontal）。スクロールが必要なら ScrollView、動的リストなら Collection を使う。"
+  },
+  "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/title\", \"fontSize\": 24 },\n    { \"type\": \"Label\", \"text\": \"@string/subtitle\", \"fontSize\": 16 },\n    { \"type\": \"Button\", \"text\": \"@string/action\", \"onClick\": \"@{onAction}\" }\n  ]\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "0",
+  "statOptional": "21",
+  "statEvents": "5",
+  "statRequiredText": {
+    "en": "0 required",
+    "ja": "必須 0"
+  },
+  "statOptionalText": {
+    "en": "21 optional",
+    "ja": "任意 21"
+  },
+  "statEventsText": {
+    "en": "5 events",
+    "ja": "イベント 5"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            },
+            {
+              "id": "cat_alignment",
+              "label": {
+                "en": "Alignment",
+                "ja": "配置"
+              },
+              "anchorUrl": "#section-alignment"
+            },
+            {
+              "id": "cat_event",
+              "label": {
+                "en": "Event",
+                "ja": "イベント"
+              },
+              "anchorUrl": "#section-event"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_orientation",
+              "name": "orientation",
+              "anchorId": "attr-orientation",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Stack orientation (default: zstack).",
+                "ja": "スタックの向き（既定: zstack）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`vertical` (default) / `horizontal`. Switches child layout axis. For grid layouts use Collection with `columnCount`.",
+                "ja": "`vertical`（デフォルト）/ `horizontal`。子要素の配置軸を決める。グリッドは Collection に `columnCount` を指定。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_direction",
+              "name": "direction",
+              "anchorId": "attr-direction",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "topToBottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "bottomToTop",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "leftToRight",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "rightToLeft",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "none",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Layout direction.",
+                "ja": "レイアウト方向。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_child",
+              "name": "child",
+              "anchorId": "attr-child",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child component(s): an array of nodes, or a single node as shorthand for a one-element array (declared as `acceptsSingle` in the attribute SSoT).",
+                "ja": "子コンポーネント: ノードの配列、または 1 要素の配列の省略形としての単一ノード（属性 SSoT に `acceptsSingle` として宣言）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Array of child components. Order determines layout order. A single node is accepted as a one-element array. For dynamic repetition from a bound array, use Collection instead of `child`.",
+                "ja": "子要素の配列。単一ノードは 1 要素の配列として受け付ける。順序がレイアウト順序を決定。バインドされた配列からの動的繰り返しは `child` ではなく Collection を使う。"
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_spacing",
+              "name": "spacing",
+              "anchorId": "attr-spacing",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Space between children (binding supported).",
+                "ja": "子要素間のスペース（binding 可）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (SwiftUI mode only)",
+                "ja": "✓（SwiftUI モードのみ）"
+              },
+              "platformAndroidLabel": {
+                "en": "✓ (Compose mode only)",
+                "ja": "✓（Compose モードのみ）"
+              },
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fixed gap between children along the main axis. Simpler alternative to using `distribution: spaceBetween`.",
+                "ja": "主軸方向の子要素間の固定ギャップ。`distribution: spaceBetween` より単純な指定。"
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_flexWrap",
+              "name": "flexWrap",
+              "anchorId": "attr-flexWrap",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "nowrap",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "wrap",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "wrap-reverse",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Flex wrap behavior.",
+                "ja": "Flex の折り返し挙動。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Web only, and a string rather than a boolean: `nowrap` / `wrap` / `wrap-reverse`, emitted as the matching Tailwind class. Meaningful on a horizontal row, where `wrap` lets overflow fall onto the next line. A `responsive` override compiles the same way any other attribute does, so a row can wrap on narrow screens and stay on one line above the breakpoint. The value was declared before it was implemented — until 2026-07-29 the web converter dropped it silently, so a layout that asked to wrap simply did not, without a warning.",
+                "ja": "Web 専用で、値は boolean ではなく文字列です — `nowrap` / `wrap` / `wrap-reverse` が対応する Tailwind クラスとして出力されます。効くのは horizontal の行で、`wrap` を指定すると溢れた子が次の行に落ちます。`responsive` での上書きも他の属性と同じ形でコンパイルされるので、狭い画面だけ折り返して、ブレークポイント以上では 1 行に保つ、という書き方ができます。なおこの値は実装より先に宣言されていました — 2026-07-29 までは web のコンバータが黙って捨てていたため、折り返しを指定しても警告なしに効きませんでした。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_gradient",
+              "name": "gradient",
+              "anchorId": "attr-gradient",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient colors.",
+                "ja": "グラデーションの色配列。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Array of 2+ color strings. Use `gradientDirection` to control direction. For multi-stop or radial gradients, use a dedicated GradientView.",
+                "ja": "2 色以上の配列。方向は `gradientDirection` で指定。多段 stop や放射状グラデは GradientView を使う。"
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_gradientDirection",
+              "name": "gradientDirection",
+              "anchorId": "attr-gradientDirection",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "Vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "Horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "Oblique",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "LeftToRight",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "TopToBottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "Diagonal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "RightToLeft",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_7",
+                          "label": "BottomToTop",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient direction.",
+                "ja": "グラデーションの方向。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "iOS only (the View declaration is platform swift; Compose and web read GradientView's). `Vertical` (the fallback) / `Horizontal` / `Oblique`, with `LeftToRight`, `TopToBottom` and `Diagonal` as aliases of those three, and `RightToLeft` / `BottomToTop` as reversed directions of their own. Written as declared: a value is its declared spelling, case and all, so `horizontal` is undeclared and draws the Vertical fallback. There are no numeric degrees. From the declaration; this site draws no gradient on iOS.",
+                "ja": "iOS のみ（View の宣言は platform swift。Compose と web は GradientView のものを読む）。`Vertical`（フォールバック）/ `Horizontal` / `Oblique` と、それらの別名 `LeftToRight` / `TopToBottom` / `Diagonal`、そして逆向きの `RightToLeft` / `BottomToTop`。宣言どおりの綴りで書く: 値は大文字小文字まで宣言どおりの綴りなので、`horizontal` は宣言に無い綴りとして Vertical のフォールバックで描かれる。度数の指定は無い。宣言の記述で、このサイトは iOS でグラデーションを描かない。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_locations",
+              "name": "locations",
+              "anchorId": "attr-locations",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient color stop locations.",
+                "ja": "グラデーション色の停止位置（0.0〜1.0 の配列）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_draggable",
+              "name": "draggable",
+              "anchorId": "attr-draggable",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Make this view draggable.",
+                "ja": "この View をドラッグ可能にする。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Enables drag-and-drop. Used with the `onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` handlers.",
+                "ja": "ドラッグ&ドロップを有効化。`onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` ハンドラと組み合わせて使う。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_safeAreaInsetPositions",
+              "name": "safeAreaInsetPositions",
+              "anchorId": "attr-safeAreaInsetPositions",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Safe area edges.",
+                "ja": "セーフエリアインセット対象エッジ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilityLabel",
+              "name": "accessibilityLabel",
+              "anchorId": "attr-accessibilityLabel",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "contentDescription",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "What a screen reader says for this View when the View is one button to it: a View with a tap of its own (`onClick`). A strings.json key or text, localized like `text`, or a binding. A View that taps nothing is not one element to a screen reader, and the name is not written (measured on web: `aria-label` on a View with `onClick`, nothing on one without). Also spelled `contentDescription`.",
+                "ja": "スクリーンリーダーにとってこの View が 1 つのボタンのとき（View 自身にタップ `onClick` があるとき）に読み上げる名前です。strings.json のキーか文字（`text` と同じようにローカライズされます）、または binding を書きます。何もタップしない View はスクリーンリーダーにとって 1 つの要素ではないので、名前は書かれません（Web で実測: `onClick` のある View には `aria-label`、無い View には何も出ませんでした）。`contentDescription` とも書けます。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilityLiveRegion",
+              "name": "accessibilityLiveRegion",
+              "anchorId": "attr-accessibilityLiveRegion",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "polite",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "assertive",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "off",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Reads what this View holds out whenever it changes, without moving focus: `polite` waits for the screen reader to finish, `assertive` interrupts it, `off` (or leaving it out) reads nothing. Web writes `role` and `aria-live` on the View, Android `liveRegion`. iOS has no live region and a View holds no one text to announce, so on iOS it does nothing, and the build does not warn because one layout serves all three platforms (measured: nothing is written for it on iOS). To be read out on iOS too, put it on the Label whose text changes.",
+                "ja": "この View の中身が変わるたびに、フォーカスを動かさずに読み上げます。`polite` はスクリーンリーダーが読み終わるのを待ち、`assertive` は割り込み、`off`（または書かない）は何も読みません。Web は View に `role` と `aria-live` を、Android は `liveRegion` を書きます。iOS には live region が無く、View には読み上げる 1 つの文が無いので、iOS では何もしません。1 つのレイアウトを 3 つのプラットフォームで使うので、build も警告しません（実測: iOS では何も書かれませんでした）。iOS でも読み上げたいときは、文が変わる Label に付けてください。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Why the surface is narrower — iOS: iOS has no live region: VoiceOver is told of a change by an announcement of a text, and a View holds no one text to announce (which of its texts, and when, would be a guess no other platform makes). Put accessibilityLiveRegion on the Label whose text changes; the build does not name it here, because one layout is written for all three platforms.",
+                "ja": "対応面が狭い理由 — iOS: iOS has no live region: VoiceOver is told of a change by an announcement of a text, and a View holds no one text to announce (which of its texts, and when, would be a guess no other platform makes). Put accessibilityLiveRegion on the Label whose text changes; the build does not name it here, because one layout is written for all three platforms."
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilitySelected",
+              "name": "accessibilitySelected",
+              "anchorId": "attr-accessibilitySelected",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Tells screen readers this control is the selected one (iOS the selected trait, Android semantics selected, web aria-pressed): true or a binding. false tells nothing. Takes effect on a Button, and on a View or IconLabel whose onClick makes it one button; elsewhere the validator warns. Radio, CheckBox, Switch, Segment, TabView and SelectBox say their own state. See /guides/screen-readers.",
+                "ja": "このコントロールが選ばれていることをスクリーンリーダーに伝える（iOS は selected の trait、Android は semantics の selected、web は aria-pressed）。true か binding。false は何も伝えない。効くのは Button と、onClick で 1 つのボタンになる View・IconLabel で、それ以外では検査が警告する。Radio・CheckBox・Switch・Segment・TabView・SelectBox は自分の状態を伝える。/guides/screen-readers を参照。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_children",
+              "name": "children",
+              "anchorId": "attr-children",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child components (alias for `child`): an array of nodes, or a single node as shorthand for a one-element array.",
+                "ja": "子コンポーネント（`child` のエイリアス）: ノードの配列、または 1 要素の配列の省略形としての単一ノード。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_highlighted",
+              "name": "highlighted",
+              "anchorId": "attr-highlighted",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "View highlighted state.",
+                "ja": "View のハイライト状態。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "gone",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_distribution",
+              "name": "distribution",
+              "anchorId": "attr-distribution",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "fill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "fillEqually",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "equalSpacing",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "equalCentering",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child distribution mode for stacks.",
+                "ja": "スタック内での子要素の配分モード。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (SwiftUI mode only)",
+                "ja": "✓（SwiftUI モードのみ）"
+              },
+              "platformAndroidLabel": {
+                "en": "✓ (Compose mode only)",
+                "ja": "✓（Compose モードのみ）"
+              },
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Main-axis distribution for stacks, and the four values fall into two families (all three platforms agree): `fill` / `fillEqually` distribute the children's sizes — children grow from their content to fill the axis, equally in the `fillEqually` case — while `equalSpacing` / `equalCentering` distribute the gaps between children whose sizes stay content-driven. A child's own size wins over that growth only when it is a number: a child whose width (in a vertical stack, its height) is `wrapContent` grows with the others.",
+                "ja": "スタックの主軸方向の配分。4 値は 2 系統に分かれます（3 プラットフォーム一致）— `fill` / `fillEqually` は子のサイズを配る系（子が content から伸びて軸を埋める。`fillEqually` は均等に）、`equalSpacing` / `equalCentering` は隙間を配る系（子のサイズは content のまま）。子自身のサイズがその伸長より優先されるのは数値のときだけで、width（縦のスタックでは height）が `wrapContent` の子は他の子と一緒に伸びます。"
+              },
+              "type": "string",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "visible",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_onDragStart",
+              "name": "onDragStart",
+              "anchorId": "attr-onDragStart",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when drag starts — @{handlerName}.",
+                "ja": "ドラッグ開始時に呼ばれるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onDragEnter",
+              "name": "onDragEnter",
+              "anchorId": "attr-onDragEnter",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when a dragged item enters this view — @{handlerName}.",
+                "ja": "ドラッグ要素がこの View に入ったときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onDragOver",
+              "name": "onDragOver",
+              "anchorId": "attr-onDragOver",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called while a dragged item hovers over this view — @{handlerName}.",
+                "ja": "ドラッグ要素がこの View の上にある間呼ばれ続けるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onDragLeave",
+              "name": "onDragLeave",
+              "anchorId": "attr-onDragLeave",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when a dragged item leaves this view — @{handlerName}.",
+                "ja": "ドラッグ要素がこの View から離れたときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onDrop",
+              "name": "onDrop",
+              "anchorId": "attr-onDrop",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when an item is dropped onto this view — @{handlerName}.",
+                "ja": "ドロップされたときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "visible",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_alignment",
+      "label": {
+        "en": "Alignment",
+        "ja": "配置"
+      },
+      "anchor": "section-alignment",
+      "level": 1
+    },
+    {
+      "id": "toc_event",
+      "label": {
+        "en": "Event",
+        "ja": "イベント"
+      },
+      "anchor": "section-event",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Vertical stack",
+                "ja": "垂直スタック"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/title\", \"fontSize\": 24 },\n    { \"type\": \"Label\", \"text\": \"@string/subtitle\", \"fontSize\": 16 },\n    { \"type\": \"Button\", \"text\": \"@string/action\", \"onClick\": \"@{onAction}\" }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/title\", \"fontSize\": 24 },\n    { \"type\": \"Label\", \"text\": \"@string/subtitle\", \"fontSize\": 16 },\n    { \"type\": \"Button\", \"text\": \"@string/action\", \"onClick\": \"@{onAction}\" }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/title\", \"fontSize\": 24 },\n    { \"type\": \"Label\", \"text\": \"@string/subtitle\", \"fontSize\": 16 },\n    { \"type\": \"Button\", \"text\": \"@string/action\", \"onClick\": \"@{onAction}\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Horizontal with weight",
+                "ja": "水平 + weight で中央を伸ばす"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Image\", \"source\": \"avatar\", \"width\": 40, \"height\": 40 },\n    { \"type\": \"Label\", \"text\": \"@{userName}\", \"weight\": 1 },\n    { \"type\": \"Label\", \"text\": \"@{timestamp}\", \"fontColor\": \"#9CA3AF\" }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Image\", \"source\": \"avatar\", \"width\": 40, \"height\": 40 },\n    { \"type\": \"Label\", \"text\": \"@{userName}\", \"weight\": 1 },\n    { \"type\": \"Label\", \"text\": \"@{timestamp}\", \"fontColor\": \"#9CA3AF\" }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Image\", \"source\": \"avatar\", \"width\": 40, \"height\": 40 },\n    { \"type\": \"Label\", \"text\": \"@{userName}\", \"weight\": 1 },\n    { \"type\": \"Label\", \"text\": \"@{timestamp}\", \"fontColor\": \"#9CA3AF\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "anchorId": "example-3",
+              "title": {
+                "en": "Card with background and corners",
+                "ja": "背景色 + 角丸のカード"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"background\": \"#F3F4F6\",\n  \"cornerRadius\": 12,\n  \"paddings\": [16, 16, 16, 16],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/card_body\" }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"View\",\n  \"background\": \"#F3F4F6\",\n  \"cornerRadius\": 12,\n  \"paddings\": [16, 16, 16, 16],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/card_body\" }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"background\": \"#F3F4F6\",\n  \"cornerRadius\": 12,\n  \"paddings\": [16, 16, 16, 16],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/card_body\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "anchorId": "example-4",
+              "title": {
+                "en": "Conditional show/hide",
+                "ja": "条件付き表示"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{errorVisibility}\",\n  \"background\": \"#FEE2E2\",\n  \"paddings\": [12, 12, 12, 12],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{errorMessage}\", \"fontColor\": \"#991B1B\" }\n  ]\n}",
+              "note": {
+                "en": "No expressions inside `@{…}` — derive the value in the ViewModel: `get errorVisibility() { return this.hasError ? \"visible\" : \"gone\"; }`.",
+                "ja": "`@{…}` の中に式は書けない — ViewModel 側で導出する: `get errorVisibility() { return this.hasError ? \"visible\" : \"gone\"; }`。"
+              },
+              "noteVisibility": "visible",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{errorVisibility}\",\n  \"background\": \"#FEE2E2\",\n  \"paddings\": [12, 12, 12, 12],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{errorMessage}\", \"fontColor\": \"#991B1B\" }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{errorVisibility}\",\n  \"background\": \"#FEE2E2\",\n  \"paddings\": [12, 12, 12, 12],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{errorMessage}\", \"fontColor\": \"#991B1B\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_5",
+              "anchorId": "example-5",
+              "title": {
+                "en": "Linear gradient background",
+                "ja": "線形グラデーション背景"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"View\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"paddings\": [24, 24, 24, 24]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"View\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"paddings\": [24, 24, 24, 24]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"View\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"paddings\": [24, 24, 24, 24]\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_orientation",
+              "name": "orientation",
+              "anchorId": "attr-orientation",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Stack orientation (default: zstack).",
+                "ja": "スタックの向き（既定: zstack）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`vertical` (default) / `horizontal`. Switches child layout axis. For grid layouts use Collection with `columnCount`.",
+                "ja": "`vertical`（デフォルト）/ `horizontal`。子要素の配置軸を決める。グリッドは Collection に `columnCount` を指定。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_direction",
+              "name": "direction",
+              "anchorId": "attr-direction",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "topToBottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "bottomToTop",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "leftToRight",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "rightToLeft",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "none",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Layout direction.",
+                "ja": "レイアウト方向。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_child",
+              "name": "child",
+              "anchorId": "attr-child",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child component(s): an array of nodes, or a single node as shorthand for a one-element array (declared as `acceptsSingle` in the attribute SSoT).",
+                "ja": "子コンポーネント: ノードの配列、または 1 要素の配列の省略形としての単一ノード（属性 SSoT に `acceptsSingle` として宣言）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Array of child components. Order determines layout order. A single node is accepted as a one-element array. For dynamic repetition from a bound array, use Collection instead of `child`.",
+                "ja": "子要素の配列。単一ノードは 1 要素の配列として受け付ける。順序がレイアウト順序を決定。バインドされた配列からの動的繰り返しは `child` ではなく Collection を使う。"
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_distribution",
+              "name": "distribution",
+              "anchorId": "attr-distribution",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "fill",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "fillEqually",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "equalSpacing",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "equalCentering",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child distribution mode for stacks.",
+                "ja": "スタック内での子要素の配分モード。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (SwiftUI mode only)",
+                "ja": "✓（SwiftUI モードのみ）"
+              },
+              "platformAndroidLabel": {
+                "en": "✓ (Compose mode only)",
+                "ja": "✓（Compose モードのみ）"
+              },
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Main-axis distribution for stacks, and the four values fall into two families (all three platforms agree): `fill` / `fillEqually` distribute the children's sizes — children grow from their content to fill the axis, equally in the `fillEqually` case — while `equalSpacing` / `equalCentering` distribute the gaps between children whose sizes stay content-driven. A child's own size wins over that growth only when it is a number: a child whose width (in a vertical stack, its height) is `wrapContent` grows with the others.",
+                "ja": "スタックの主軸方向の配分。4 値は 2 系統に分かれます（3 プラットフォーム一致）— `fill` / `fillEqually` は子のサイズを配る系（子が content から伸びて軸を埋める。`fillEqually` は均等に）、`equalSpacing` / `equalCentering` は隙間を配る系（子のサイズは content のまま）。子自身のサイズがその伸長より優先されるのは数値のときだけで、width（縦のスタックでは height）が `wrapContent` の子は他の子と一緒に伸びます。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_spacing",
+              "name": "spacing",
+              "anchorId": "attr-spacing",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Space between children (binding supported).",
+                "ja": "子要素間のスペース（binding 可）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (SwiftUI mode only)",
+                "ja": "✓（SwiftUI モードのみ）"
+              },
+              "platformAndroidLabel": {
+                "en": "✓ (Compose mode only)",
+                "ja": "✓（Compose モードのみ）"
+              },
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Fixed gap between children along the main axis. Simpler alternative to using `distribution: spaceBetween`.",
+                "ja": "主軸方向の子要素間の固定ギャップ。`distribution: spaceBetween` より単純な指定。"
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_flexWrap",
+              "name": "flexWrap",
+              "anchorId": "attr-flexWrap",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "nowrap",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "wrap",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "wrap-reverse",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Flex wrap behavior.",
+                "ja": "Flex の折り返し挙動。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Web only, and a string rather than a boolean: `nowrap` / `wrap` / `wrap-reverse`, emitted as the matching Tailwind class. Meaningful on a horizontal row, where `wrap` lets overflow fall onto the next line. A `responsive` override compiles the same way any other attribute does, so a row can wrap on narrow screens and stay on one line above the breakpoint. The value was declared before it was implemented — until 2026-07-29 the web converter dropped it silently, so a layout that asked to wrap simply did not, without a warning.",
+                "ja": "Web 専用で、値は boolean ではなく文字列です — `nowrap` / `wrap` / `wrap-reverse` が対応する Tailwind クラスとして出力されます。効くのは horizontal の行で、`wrap` を指定すると溢れた子が次の行に落ちます。`responsive` での上書きも他の属性と同じ形でコンパイルされるので、狭い画面だけ折り返して、ブレークポイント以上では 1 行に保つ、という書き方ができます。なおこの値は実装より先に宣言されていました — 2026-07-29 までは web のコンバータが黙って捨てていたため、折り返しを指定しても警告なしに効きませんでした。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_gradient",
+              "name": "gradient",
+              "anchorId": "attr-gradient",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient colors.",
+                "ja": "グラデーションの色配列。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Array of 2+ color strings. Use `gradientDirection` to control direction. For multi-stop or radial gradients, use a dedicated GradientView.",
+                "ja": "2 色以上の配列。方向は `gradientDirection` で指定。多段 stop や放射状グラデは GradientView を使う。"
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_gradientDirection",
+              "name": "gradientDirection",
+              "anchorId": "attr-gradientDirection",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "Vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "Horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "Oblique",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "LeftToRight",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_4",
+                          "label": "TopToBottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_5",
+                          "label": "Diagonal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_6",
+                          "label": "RightToLeft",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_7",
+                          "label": "BottomToTop",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient direction.",
+                "ja": "グラデーションの方向。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "iOS only (the View declaration is platform swift; Compose and web read GradientView's). `Vertical` (the fallback) / `Horizontal` / `Oblique`, with `LeftToRight`, `TopToBottom` and `Diagonal` as aliases of those three, and `RightToLeft` / `BottomToTop` as reversed directions of their own. Written as declared: a value is its declared spelling, case and all, so `horizontal` is undeclared and draws the Vertical fallback. There are no numeric degrees. From the declaration; this site draws no gradient on iOS.",
+                "ja": "iOS のみ（View の宣言は platform swift。Compose と web は GradientView のものを読む）。`Vertical`（フォールバック）/ `Horizontal` / `Oblique` と、それらの別名 `LeftToRight` / `TopToBottom` / `Diagonal`、そして逆向きの `RightToLeft` / `BottomToTop`。宣言どおりの綴りで書く: 値は大文字小文字まで宣言どおりの綴りなので、`horizontal` は宣言に無い綴りとして Vertical のフォールバックで描かれる。度数の指定は無い。宣言の記述で、このサイトは iOS でグラデーションを描かない。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_locations",
+              "name": "locations",
+              "anchorId": "attr-locations",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Gradient color stop locations.",
+                "ja": "グラデーション色の停止位置（0.0〜1.0 の配列）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_draggable",
+              "name": "draggable",
+              "anchorId": "attr-draggable",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Make this view draggable.",
+                "ja": "この View をドラッグ可能にする。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Enables drag-and-drop. Used with the `onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` handlers.",
+                "ja": "ドラッグ&ドロップを有効化。`onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` ハンドラと組み合わせて使う。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_onDragStart",
+              "name": "onDragStart",
+              "anchorId": "attr-onDragStart",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when drag starts — @{handlerName}.",
+                "ja": "ドラッグ開始時に呼ばれるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onDragEnter",
+              "name": "onDragEnter",
+              "anchorId": "attr-onDragEnter",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when a dragged item enters this view — @{handlerName}.",
+                "ja": "ドラッグ要素がこの View に入ったときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onDragOver",
+              "name": "onDragOver",
+              "anchorId": "attr-onDragOver",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called while a dragged item hovers over this view — @{handlerName}.",
+                "ja": "ドラッグ要素がこの View の上にある間呼ばれ続けるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onDragLeave",
+              "name": "onDragLeave",
+              "anchorId": "attr-onDragLeave",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when a dragged item leaves this view — @{handlerName}.",
+                "ja": "ドラッグ要素がこの View から離れたときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onDrop",
+              "name": "onDrop",
+              "anchorId": "attr-onDrop",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Handler called when an item is dropped onto this view — @{handlerName}.",
+                "ja": "ドロップされたときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_safeAreaInsetPositions",
+              "name": "safeAreaInsetPositions",
+              "anchorId": "attr-safeAreaInsetPositions",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Safe area edges.",
+                "ja": "セーフエリアインセット対象エッジ。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilityLabel",
+              "name": "accessibilityLabel",
+              "anchorId": "attr-accessibilityLabel",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "visible",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "al_0",
+                          "label": "contentDescription",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "What a screen reader says for this View when the View is one button to it: a View with a tap of its own (`onClick`). A strings.json key or text, localized like `text`, or a binding. A View that taps nothing is not one element to a screen reader, and the name is not written (measured on web: `aria-label` on a View with `onClick`, nothing on one without). Also spelled `contentDescription`.",
+                "ja": "スクリーンリーダーにとってこの View が 1 つのボタンのとき（View 自身にタップ `onClick` があるとき）に読み上げる名前です。strings.json のキーか文字（`text` と同じようにローカライズされます）、または binding を書きます。何もタップしない View はスクリーンリーダーにとって 1 つの要素ではないので、名前は書かれません（Web で実測: `onClick` のある View には `aria-label`、無い View には何も出ませんでした）。`contentDescription` とも書けます。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilityLiveRegion",
+              "name": "accessibilityLiveRegion",
+              "anchorId": "attr-accessibilityLiveRegion",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "polite",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "assertive",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "off",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Reads what this View holds out whenever it changes, without moving focus: `polite` waits for the screen reader to finish, `assertive` interrupts it, `off` (or leaving it out) reads nothing. Web writes `role` and `aria-live` on the View, Android `liveRegion`. iOS has no live region and a View holds no one text to announce, so on iOS it does nothing, and the build does not warn because one layout serves all three platforms (measured: nothing is written for it on iOS). To be read out on iOS too, put it on the Label whose text changes.",
+                "ja": "この View の中身が変わるたびに、フォーカスを動かさずに読み上げます。`polite` はスクリーンリーダーが読み終わるのを待ち、`assertive` は割り込み、`off`（または書かない）は何も読みません。Web は View に `role` と `aria-live` を、Android は `liveRegion` を書きます。iOS には live region が無く、View には読み上げる 1 つの文が無いので、iOS では何もしません。1 つのレイアウトを 3 つのプラットフォームで使うので、build も警告しません（実測: iOS では何も書かれませんでした）。iOS でも読み上げたいときは、文が変わる Label に付けてください。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Why the surface is narrower — iOS: iOS has no live region: VoiceOver is told of a change by an announcement of a text, and a View holds no one text to announce (which of its texts, and when, would be a guess no other platform makes). Put accessibilityLiveRegion on the Label whose text changes; the build does not name it here, because one layout is written for all three platforms.",
+                "ja": "対応面が狭い理由 — iOS: iOS has no live region: VoiceOver is told of a change by an announcement of a text, and a View holds no one text to announce (which of its texts, and when, would be a guess no other platform makes). Put accessibilityLiveRegion on the Label whose text changes; the build does not name it here, because one layout is written for all three platforms."
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_accessibilitySelected",
+              "name": "accessibilitySelected",
+              "anchorId": "attr-accessibilitySelected",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Tells screen readers this control is the selected one (iOS the selected trait, Android semantics selected, web aria-pressed): true or a binding. false tells nothing. Takes effect on a Button, and on a View or IconLabel whose onClick makes it one button; elsewhere the validator warns. Radio, CheckBox, Switch, Segment, TabView and SelectBox say their own state. See /guides/screen-readers.",
+                "ja": "このコントロールが選ばれていることをスクリーンリーダーに伝える（iOS は selected の trait、Android は semantics の selected、web は aria-pressed）。true か binding。false は何も伝えない。効くのは Button と、onClick で 1 つのボタンになる View・IconLabel で、それ以外では検査が警告する。Radio・CheckBox・Switch・Segment・TabView・SelectBox は自分の状態を伝える。/guides/screen-readers を参照。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_children",
+              "name": "children",
+              "anchorId": "attr-children",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child components (alias for `child`): an array of nodes, or a single node as shorthand for a one-element array.",
+                "ja": "子コンポーネント（`child` のエイリアス）: ノードの配列、または 1 要素の配列の省略形としての単一ノード。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_highlighted",
+              "name": "highlighted",
+              "anchorId": "attr-highlighted",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "View highlighted state.",
+                "ja": "View のハイライト状態。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_safe_area_view",
+              "name": "SafeAreaView",
+              "hint": "",
+              "url": "/reference/components/safe-area-view"
+            },
+            {
+              "id": "related_scroll_view",
+              "name": "ScrollView",
+              "hint": "",
+              "url": "/reference/components/scroll-view"
+            },
+            {
+              "id": "related_collection",
+              "name": "Collection",
+              "hint": "",
+              "url": "/reference/components/collection"
+            },
+            {
+              "id": "related_gradient_view",
+              "name": "GradientView",
+              "hint": "",
+              "url": "/reference/components/gradient-view"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

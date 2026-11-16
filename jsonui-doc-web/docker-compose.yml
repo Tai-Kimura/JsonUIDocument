@@ -1,0 +1,19 @@
+services:
+  web:
+    build:
+      # Build context is the repo root so prebuild scripts can read
+      # ../docs/ and ../tests/. See Dockerfile header for details.
+      context: ..
+      dockerfile: jsonui-doc-web/Dockerfile
+    container_name: jsonui-doc-web
+    ports:
+      - "4321:80"
+    mem_limit: 256m
+    mem_reservation: 64m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "--tries=1", "http://127.0.0.1:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

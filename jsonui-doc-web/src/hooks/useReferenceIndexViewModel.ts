@@ -1,0 +1,33 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { ReferenceIndexData, createReferenceIndexData } from "@/generated/data/ReferenceIndexData";
+import { ReferenceIndexViewModel } from "@/viewmodels/ReferenceIndexViewModel";
+
+const LANGUAGE_EVENT = "jsonui:languagechange";
+
+export function useReferenceIndexViewModel(router: AppRouterInstance) {
+  const [data, setData] = useState<ReferenceIndexData>(createReferenceIndexData());
+  const dataRef = useRef(data);
+  dataRef.current = data;
+
+  const vmRef = useRef<ReferenceIndexViewModel | null>(null);
+  if (!vmRef.current) {
+    vmRef.current = new ReferenceIndexViewModel(
+      router,
+      () => dataRef.current,
+      setData,
+    );
+  }
+
+  useEffect(() => {
+    vmRef.current?.mountLanguage();
+    if (typeof window === "undefined") return;
+    const onLang = () => vmRef.current?.mountLanguage();
+    window.addEventListener(LANGUAGE_EVENT, onLang);
+    return () => window.removeEventListener(LANGUAGE_EVENT, onLang);
+  }, []);
+
+  return { data, viewModel: vmRef.current };
+}

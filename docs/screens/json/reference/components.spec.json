@@ -1,0 +1,149 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Components",
+    "displayName": "Component reference",
+    "description": "Reference > Component reference. Overview page. Four sections + TOC + next-reads. Generated via /tmp/gen-reference.js.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "reference/components",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_attributes -> /reference/attributes, next_custom_components -> /guides/custom-components) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the reference_components_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /reference/attributes, /guides/custom-components."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /reference/attributes and /guides/custom-components. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen or tab",
+      "description": "v1 destinations: /, /reference/attributes, /guides/custom-components."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/reference/components.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/reference/ComponentsViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/reference/components/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Live Reference entry. Flip REFERENCE_ENTRIES row for 'components' to 'live' in HomeViewModel when shipping.",
+    "v1 is hand-authored overview. Auto-generation from the upstream artifact is a future pass.",
+    "2026-09-04, twelfth gate: partial-ranges. A string `partialAttributes[].range` that does not occur in the text it decorates is skipped at runtime with no error and no warning - the link or emphasis is simply absent. This site is bilingual and the match happens per locale, so the shape that matters is asymmetric: reword a phrase in one language and the link keeps working in the other, which no instrument here could see. The build is silent by design, and the live coverage probe checks that the STRING reaches the page - it still does, with the link missing from inside it. The check compares every literal range against its text in both languages: 20 ranges across 103 layouts, all present today. Proven red by rewording one Japanese sentence and leaving the English alone, which is exactly the asymmetric case. It refuses a scan that finds no ranges at all, and prints what it does not check - where a link points, whether onclick is wired, array ranges, and ranges given as bindings or strings keys, whose text is not knowable before runtime.",
+    "2026-09-04, one fact added to the Label reference, and a gap next to it. A string `partialAttributes[].range` may be a strings KEY, which resolves to that key's text in the current locale before the search, on iOS (textPattern: StringManager), Android (stringResource) and web. Measured here first: all 20 ranges on this site are URL literals, not keys, so the generated tree is unaffected (decoy-checked; the discriminator is the presence of convert_string_key(range) in the vendored converter, never the VERSION stamp). The gap: Button carries the same attribute but renders only the shared one-line description with its note hidden, so a reader there had no route to any of this. It now carries a pointer to the Label reference rather than a copy, which would drift."
+  ]
+}

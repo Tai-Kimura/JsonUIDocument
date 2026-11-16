@@ -1,0 +1,235 @@
+{
+  "component": "Collection",
+  "description": {
+    "en": "Virtualized list/grid for dynamic arrays. Renders only visible items. Supports vertical/horizontal lists, multi-column grids, section headers, paging, and lazy loading.",
+    "ja": "動的配列を仮想化して描画するリスト／グリッド。可視範囲のみ描画。垂直／水平リスト、複数カラムグリッド、セクションヘッダ、ページング、遅延読み込みに対応。"
+  },
+  "usage": {
+    "en": "Use Collection for any list bound to a dynamic array (search results, feeds, product grids). Each row is rendered by a cell file referenced in `sections[].cell`.",
+    "ja": "動的配列にバインドされる任意のリスト（検索結果、フィード、商品グリッド）に使う。各行は `sections[].cell` で参照する cell ファイルが描画する。"
+  },
+  "examples": [
+    {
+      "title": {
+        "en": "Simple vertical list",
+        "ja": "単純な垂直リスト"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{users}\",\n  \"cellIdProperty\": \"id\",\n  \"sections\": [ { \"cell\": \"cells/user_row\" } ]\n}"
+    },
+    {
+      "title": {
+        "en": "2-column grid",
+        "ja": "2 カラムグリッド"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columnCount\": 2,\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}"
+    },
+    {
+      "title": {
+        "en": "Sectioned with headers",
+        "ja": "ヘッダ付きセクション"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{sectionedMessages}\",\n  \"headerClasses\": [\"cells/date_header\"],\n  \"cellClasses\": [\"cells/message_row\"],\n  \"sections\": [\n    {\n      \"header\": \"cells/date_header\",\n      \"cell\": \"cells/message_row\"\n    }\n  ]\n}"
+    },
+    {
+      "title": {
+        "en": "Horizontal carousel",
+        "ja": "水平カルーセル"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{featuredProducts}\",\n  \"orientation\": \"horizontal\",\n  \"horizontalScroll\": true,\n  \"sections\": [ { \"cell\": \"cells/product_card\" } ]\n}"
+    },
+    {
+      "title": {
+        "en": "Infinite scroll (load more)",
+        "ja": "無限スクロール"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{articles}\",\n  \"onItemAppear\": \"@{onItemAppear}\",\n  \"sections\": [ { \"cell\": \"cells/article_row\" } ]\n}",
+      "note": {
+        "en": "The ViewModel inspects `onItemAppear` item index and triggers a fetch when within N rows of the end.",
+        "ja": "ViewModel 側で `onItemAppear` のインデックスを見て、末尾から N 行以内なら fetch を発火する。"
+      }
+    },
+    {
+      "title": {
+        "en": "Eager mode for heavy cells",
+        "ja": "重い cell に eager モード"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{messages}\",\n  \"lazy\": \"eager\",\n  \"sections\": [ { \"cell\": \"cells/markdown_message\" } ]\n}",
+      "note": {
+        "en": "`lazy: \"eager\"` keeps the ScrollView but renders all rows up front. Trade memory for smoother scrolling when each cell does expensive layout (markdown, attributed text, image decoding) and LazyVStack's re-evaluation causes hitches.",
+        "ja": "`lazy: \"eager\"` は ScrollView を維持しつつ全行を先に描画する。markdown／attributed text／画像デコードなど 1 セルの計算が重く LazyVStack の再評価で hitches が出る場合、メモリと引き換えにスクロールを滑らかにする。"
+      }
+    },
+    {
+      "title": {
+        "en": "None mode (parent already scrolls)",
+        "ja": "親が既にスクロール（none モード）"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"ScrollView\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"Header\" },\n    {\n      \"type\": \"Collection\",\n      \"items\": \"@{shortList}\",\n      \"lazy\": \"none\",\n      \"sections\": [ { \"cell\": \"cells/row\" } ]\n    },\n    { \"type\": \"Label\", \"text\": \"Footer\" }\n  ]\n}",
+      "note": {
+        "en": "`lazy: \"none\"` skips the inner scroll container so the Collection contributes only its rows to the parent ScrollView. Required pattern when a Collection sits inline in a vertically-scrolling page (composes correctly with sibling sections and the page footer).",
+        "ja": "`lazy: \"none\"` で内側のスクロールコンテナを省略し、Collection は行だけを親 ScrollView に提供する。ページ全体の縦スクロール内に Collection を埋め込むときの定石（兄弟セクションやフッタと正しく合成される）。"
+      }
+    },
+    {
+      "title": {
+        "en": "Mode bound to ViewModel state",
+        "ja": "モードを ViewModel の状態にバインド"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{rows}\",\n  \"lazy\": \"@{collectionMode}\",\n  \"sections\": [ { \"cell\": \"cells/row\" } ]\n}",
+      "note": {
+        "en": "`lazy` accepts a binding so the wrapper can switch between `'lazy'` / `'eager'` / `'none'` at runtime without the parent recreating the Collection. Use this to escape LazyVStack on demand without losing scroll position.",
+        "ja": "`lazy` は binding 可能で、親が Collection を再生成しない形で `'lazy'` / `'eager'` / `'none'` を実行時に切り替えられる。スクロール位置を失わず必要なときだけ LazyVStack を抜けられる。"
+      }
+    },
+    {
+      "title": {
+        "en": "Column count bound to ViewModel state",
+        "ja": "カラム数を ViewModel の状態にバインド"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"Collection\",\n  \"items\": \"@{photos}\",\n  \"columns\": \"@{gridColumnCount}\",\n  \"itemSpacing\": 8,\n  \"lineSpacing\": 8,\n  \"sections\": [ { \"cell\": \"cells/photo_card\" } ]\n}",
+      "note": {
+        "en": "`columns` accepts `@{prop}` so a tablet master/detail can drop from 5 columns to 3 when the detail pane opens — the grid stays the same component (LazyVGrid / LazyVerticalGrid / div.grid) and recomposes with the new column count. Literal int (`columns: 5`) takes the static grid path; binding forces the multi-column grid path even if the runtime value resolves to 1, so layout structure stays stable across changes.",
+        "ja": "`columns` は `@{prop}` を受け取れるので、tablet master/detail で detail pane を開いたとき 5 列 → 3 列に動的に切替えられる（同じコンポーネント — LazyVGrid / LazyVerticalGrid / div.grid — のまま新しい列数で recompose）。literal int（`columns: 5`）は静的 grid path、binding は runtime 値が 1 に解決されてもマルチカラム grid path を強制するため、列数変更でレイアウト構造が崩れない。"
+      }
+    }
+  ],
+  "attributes": {
+    "scrollAnchor": {
+      "note": {
+        "en": "`top` / `center` / `bottom` (default): where the `scrollTo` target lands along the scroll axis. On a horizontal Collection they mean start, centre and end in reading direction. It may be a binding, so each request can choose its own anchor. It is read when the `scrollTo` value changes, so set it in the same update as the `scrollTo` value, or before. Changing the anchor alone scrolls nothing, and a landing already in flight keeps the anchor it started with. A bound value other than top, center or bottom lands as bottom, with a warning in debug builds. The target is the cell as the Collection lays it out, so with `cellHeight` taller than the content it is the whole cell, not its content. Read from the attribute definitions and the web generator, not measured here.",
+        "ja": "`top` / `center` / `bottom`（既定）: `scrollTo` の行き先がスクロール方向のどこに着くか。横向きの Collection では、読む方向での先頭・中央・末尾を指す。binding にでき、要求ごとに anchor を選べる。anchor は `scrollTo` の値が変わった時点で読まれるので、`scrollTo` の値と同じ更新か、それより前に変える。anchor だけを変えても何もスクロールせず、着地中のスクロールは始めたときの anchor のまま。top / center / bottom 以外の値は bottom として着き、debug ビルドでは警告が出る。行き先は Collection が並べるセルなので、`cellHeight` が内容より高ければ内容ではなくセル全体になる。属性定義と web の generator を読んだもので、こちらでは未測定。"
+      }
+    },
+    "scrollAnimated": {
+      "note": {
+        "en": "Boolean, default `true`. A binding decides per run: the scroll animates only when the bound value is true, and an unset bound value jumps without animation. The generators on all three platforms read a binding this way. Read from the attribute definitions, not measured here.",
+        "ja": "Boolean、既定 `true`。binding にすると実行時に決まる: 値が true のときだけアニメーションし、値が未設定ならアニメーションせずに飛ぶ。3 プラットフォームの generator はこの読み方をする。属性定義を読んだもので、こちらでは未測定。"
+      }
+    },
+    "items": {
+      "summary": {
+        "en": "Data source binding.",
+        "ja": "データソースへの binding。"
+      },
+      "note": {
+        "en": "Bound to a ViewModel array. Each element must have a stable identifier (see `cellIdProperty`) for efficient reconciliation.",
+        "ja": "ViewModel の配列にバインド。各要素は安定した ID（`cellIdProperty` 参照）を持つ必要があり、これで差分更新される。"
+      }
+    },
+    "cellIdProperty": {
+      "note": {
+        "en": "Key name to use as the stable identifier. There is no default: without it, a cell is known by its place in the list (index), on iOS and web alike. Required for correct reordering animations and minimal re-renders. In iOS generated code, the data a cell receives has `cellId` rewritten to `<its cellId, else this property's value, else its place>_<hash of its content>`, so a cell whose key stays fixed redraws when its data changes, while the list still knows the cell by the raw key. A cell that reads `data[\"cellId\"]` as the item's identity sees that suffixed form, so read this property's field instead. Android redraws such a cell too. With `autoChangeTrackingId` the data has this form as well.",
+        "ja": "安定 ID として使うキー名。既定値は無く、指定しなければセルはリスト内の位置（index）で識別される（iOS も web も同じ）。並び替えアニメーションと最小再描画のために必須。iOS の生成コードでは、セルが受け取る data の `cellId` が `<そのセルの cellId、無ければこのプロパティの値、無ければ位置>_<内容のハッシュ>` に書き換えられる。そのため、key が固定のままデータが変わったセルも描き直される。リストはそのセルを元の key で識別したまま。`data[\"cellId\"]` を項目の ID として読むセルには、この接尾辞付きの形が見えるので、このプロパティのフィールドを読むこと。Android も描き直す。`autoChangeTrackingId` を使う場合も、data はこの形になる。"
+      }
+    },
+    "sections": {
+      "note": {
+        "en": "Array of section definitions. Each has `cell` (required), plus optional `header` / `footer` / `itemsProperty`. For a flat single-section list, use one entry.",
+        "ja": "セクション定義の配列。`cell`（必須）に加え `header` / `footer` / `itemsProperty` が任意。フラットな単一セクションなら 1 要素でよい。"
+      }
+    },
+    "cellClasses": {
+      "note": {
+        "en": "Array of cell layout paths. Used when a section uses multiple cell types conditionally (e.g., sponsored vs organic). With `items` and no `sections`, a single cellClass renders every item; two or more need `sections[].cell` to assign them, and declaring several without sections is refused: `2 cellClasses declared without sections — only the first would render`, the screen is not generated, and the build exits 1 (measured).",
+        "ja": "cell レイアウトパスの配列。セクションが条件によって複数種の cell を使う場合（例: スポンサーと通常）に使う。 `items` があって `sections` が無い場合、単一の cellClass が全ての item を描画します。2 つ以上なら `sections[].cell` で割り当てが要り、sections 無しで複数宣言すると拒否されます: `2 cellClasses declared without sections — only the first would render` が出て、その画面は生成されず build は exit 1（実測）。"
+      }
+    },
+    "columnCount": {
+      "note": {
+        "en": "Default 1 (list). Accepts responsive object `{ xs: 1, md: 2, lg: 3 }` for breakpoint-based columns.",
+        "ja": "デフォルト 1（リスト）。`{ xs: 1, md: 2, lg: 3 }` オブジェクトでレスポンシブ指定可。"
+      }
+    },
+    "itemSpacing": {
+      "note": {
+        "en": "Cross-axis spacing between cells (between columns in a grid).",
+        "ja": "交差軸方向のセル間隔（グリッドではカラム間）。"
+      }
+    },
+    "lineSpacing": {
+      "note": {
+        "en": "Main-axis spacing between cells (between rows in a list).",
+        "ja": "主軸方向のセル間隔（リストでは行間）。"
+      }
+    },
+    "lazy": {
+      "note": {
+        "en": "Three modes (string enum): `'lazy'` (default) virtualizes via LazyVStack/LazyColumn — use for unbounded or long lists. `'eager'` renders all rows inside a non-lazy ScrollView+VStack/Column — use when LazyVStack re-evaluation hurts performance for heavy cells (markdown, attributed text, large images). `'none'` skips the scroll container entirely — use only when the parent is already scrollable. Bindings (`@{mode}`) are resolved at runtime so toggling preserves view identity. Legacy boolean is accepted: `true` → `'lazy'`, `false` → `'none'`. Sticky headers and paging require `'lazy'`. With `layout: 'flow'` the Collection scrolls inside its own bounds whenever lazy is in effect (`'lazy'` or `'eager'`); `'none'` is the only value that leaves scrolling to the parent.",
+        "ja": "3 種類のモード（string enum）：`'lazy'`（既定）は LazyVStack/LazyColumn で仮想化（長い／無限リストに使う）。`'eager'` は ScrollView+VStack/Column で全行を非 lazy に描画（重い cell — markdown・attributed text・大きな画像など — で LazyVStack の再評価が遅い場合に使う）。`'none'` はスクロールコンテナを持たない（親が既にスクロール可能な場合のみ使う）。binding（`@{mode}`）は実行時解決されるためモード切替で view identity が保たれる。レガシー boolean も互換：`true` → `'lazy'`、`false` → `'none'`。sticky header / paging は `'lazy'` 必須。 `layout: 'flow'` では lazy が効いていれば（`'lazy'` か `'eager'`）Collection は自分の bounds の中でスクロールし、スクロールを親に任せる値は `'none'` だけ。"
+      }
+    },
+    "orientation": {
+      "note": {
+        "en": "`vertical` (default) / `horizontal`. Horizontal collections are typically carousels.",
+        "ja": "`vertical`（デフォルト）/ `horizontal`。水平 Collection は通常カルーセル用途。"
+      }
+    },
+    "paging": {
+      "note": {
+        "en": "`true` snaps to cell or page boundaries. Often combined with `columnCount: 1` + full-width cells for page-sized content. A page on the web is the pager's width even when the cell is narrower, with the cell in the middle of it. Android and iOS also draw one cell to a page.",
+        "ja": "`true` でセルまたはページ境界にスナップ。`columnCount: 1` + 全幅 cell と組み合わせてページ単位のコンテンツに使う。 web の 1 ページは、セルがそれより狭くてもページャの幅になり、セルはその真ん中に置かれる。Android と iOS も 1 ページに 1 セルを描く。"
+      }
+    },
+    "onItemAppear": {
+      "note": {
+        "en": "Fired when a cell becomes visible. Use for analytics impressions or infinite-scroll triggers.",
+        "ja": "セルが可視になったとき発火。アナリティクスの impression や無限スクロールのトリガーに使う。"
+      }
+    },
+    "onValueChange": {
+      "note": {
+        "en": "Fires when the current paged position changes — by a swipe, a scrollTo or a `currentPage` write — with the new page. It is not called when the pager first appears — in generated code on iOS, Android and web, and in Dynamic mode. The aliases `onValueChanged` and `onPageChanged` are the same attribute. Only meaningful when `paging: true`.",
+        "ja": "paged 位置が変わったとき、新しいページを引数に発火する — スワイプ・scrollTo・`currentPage` への書き込みのいずれでも。pager が最初に表示されたときには呼ばれない — iOS・Android・web の生成コードと Dynamic モードで。別名の `onValueChanged` と `onPageChanged` は同じ 1 つの属性。`paging: true` のときのみ意味を持つ。"
+      }
+    },
+    "headerClasses": {
+      "note": {
+        "en": "Cell layout paths for section headers. Must match the number of sections that have headers.",
+        "ja": "セクションヘッダ用 cell レイアウトパス。ヘッダを持つセクション数と一致する必要がある。"
+      }
+    },
+    "footerClasses": {
+      "note": {
+        "en": "Cell layout paths for section footers.",
+        "ja": "セクションフッタ用 cell レイアウトパス。"
+      }
+    },
+    "keyboardAvoidance": {
+      "note": {
+        "en": "Same semantics as ScrollView — auto-scroll so the focused input is above the keyboard.",
+        "ja": "ScrollView と同じ。フォーカス中の入力要素がキーボード上に来るよう自動スクロール。"
+      }
+    },
+    "contentInsetAdjustmentBehavior": {
+      "note": {
+        "en": "`automatic` / `never` / `scrollableAxes` / `always`: whether the content clears the safe area (the system bars). On iOS the system adjusts by default and `never` stops it. On Android (kjui and KotlinJsonUI Dynamic) `always` / `automatic` pad the content by the safe area, `scrollableAxes` only on the scroll axis, and `never` or no declaration by nothing. That padding is only the part of the safe area the Collection's own frame overlaps, as on iOS, so inside a SafeAreaView or below a header it is 0. The web draws no safe area for it; `never` writes `scroll-p-0`. Read from kjui's CollectionComponent (`rememberSafeAreaOverlap()`) and from rjui's converter; the drawing on a device is jsonui-cli's word.",
+        "ja": "`automatic` / `never` / `scrollableAxes` / `always`: 内容がセーフエリア（システムバー）を避けるかどうか。iOS は既定でシステムが調整し、`never` で止まる。Android（kjui と KotlinJsonUI Dynamic）は、`always` / `automatic` でセーフエリアの分、`scrollableAxes` でスクロール方向の分だけ内容に余白を足し、`never` か宣言なしなら足さない。その余白はCollection 自身の枠がセーフエリアと重なる分だけ（iOS と同じ）。SafeAreaView の内側やヘッダーの下では 0。web はセーフエリアを描かず、`never` で `scroll-p-0` を書く。kjui の CollectionComponent（`rememberSafeAreaOverlap()`）を、rjui の converter とあわせて読んだもの。端末での描かれ方は jsonui-cli の言葉。"
+      }
+    },
+    "cellWidth": {
+      "note": {
+        "en": "A fixed width for every cell, in pt / dp / px, applied after the cell is built, so it overrides the width the cell layout asked for. On Android kjui writes it on every route but paging: the lazy list, `lazy: none`, a vertical Collection whose height is wrapContent, a `lazy: none` grid, a horizontal `lazy: none` Collection and a flow. On a paging Collection the cell is drawn at this size in the middle of its page: kjui puts the cell in a box of the declared size centred in the page, and the web generator puts the cell's size wrapper in the middle of a page-wide snap child. iOS's generated pager and SwiftJsonUI's Dynamic mode centre the cell too. Read from kjui's CollectionComponent with cellWidth 123 and cellHeight 77 on each route and on the pager (kjui with 123 / 77, rjui's CollectionConverter with 150 / 40).",
+        "ja": "すべてのセルの決まった幅（pt / dp / px）。セルを組み立てた後に当てるので、セルの layout が求めた幅より優先される。Android では、kjui が paging 以外のすべての経路で書く。lazy のリスト、`lazy: none`、高さが wrapContent の縦の Collection、`lazy: none` のグリッド、横の `lazy: none` の Collection、flow。paging の Collection では、セルをこの大きさでページの真ん中に描く。kjui は、書いた大きさの箱にセルを入れてページの真ん中に置く。web の generator は、セルの大きさの包みを、ページ幅のスナップの子の真ん中に置く。iOS の生成コードのページと SwiftJsonUI の Dynamic も真ん中に置く。kjui の CollectionComponent に cellWidth 123・cellHeight 77 を渡して経路ごとと paging で読んだもの（kjui は 123 / 77、rjui の CollectionConverter は 150 / 40）。"
+      }
+    },
+    "cellHeight": {
+      "note": {
+        "en": "A fixed height for every cell, in pt / dp / px, applied after the cell is built, so it overrides the height the cell layout asked for. On Android kjui writes it on every route but paging: the lazy list, `lazy: none`, a vertical Collection whose height is wrapContent, a `lazy: none` grid, a horizontal `lazy: none` Collection and a flow. On a paging Collection the cell is drawn at this size in the middle of its page: kjui puts the cell in a box of the declared size centred in the page, and the web generator puts the cell's size wrapper in the middle of a page-wide snap child. iOS's generated pager and SwiftJsonUI's Dynamic mode centre the cell too. Read from kjui's CollectionComponent with cellWidth 123 and cellHeight 77 on each route and on the pager (kjui with 123 / 77, rjui's CollectionConverter with 150 / 40).",
+        "ja": "すべてのセルの決まった高さ（pt / dp / px）。セルを組み立てた後に当てるので、セルの layout が求めた高さより優先される。Android では、kjui が paging 以外のすべての経路で書く。lazy のリスト、`lazy: none`、高さが wrapContent の縦の Collection、`lazy: none` のグリッド、横の `lazy: none` の Collection、flow。paging の Collection では、セルをこの大きさでページの真ん中に描く。kjui は、書いた大きさの箱にセルを入れてページの真ん中に置く。web の generator は、セルの大きさの包みを、ページ幅のスナップの子の真ん中に置く。iOS の生成コードのページと SwiftJsonUI の Dynamic も真ん中に置く。kjui の CollectionComponent に cellWidth 123・cellHeight 77 を渡して経路ごとと paging で読んだもの（kjui は 123 / 77、rjui の CollectionConverter は 150 / 40）。"
+      }
+    }
+  },
+  "relatedComponents": [
+    "ScrollView",
+    "View"
+  ]
+}

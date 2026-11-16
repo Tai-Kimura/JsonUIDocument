@@ -1,0 +1,136 @@
+# SpecTextsFiles - Long prose: texts files
+
+## Overview
+
+Spec article — prose fields (description / notes / intent / purpose / processing / handling / rule / meaning / note / reason, and a transition's condition) that point into a YAML texts file with {"md": "key"} and render as Markdown. Covers the paired-file rule and named files (relative, .texts.yaml only), dotted key paths, how the text renders on generated pages (plain-text fallback without markdown-it-py), the rules jsonui-doc validate enforces (measured output), how every reader receives the text (read_spec_file returns {md, text}; jsonui-test refuses an unresolved reference; search_specs does not search texts-file text), and when to keep prose inline.
+
+| | |
+|---|---|
+| Layout File | `spec/texts-files` |
+| Created | 2026-09-28 |
+| Updated | 2026-09-30 |
+
+## Screen Structure
+
+### UI Components
+
+| Component | ID | Platform | Description | Initial State | Notes |
+|---|---|---|---|---|---|
+| View | `spec_texts_files_root` | - | - | - | - |
+| &nbsp;&nbsp;↳ Scroll | `spec_texts_files_scroll` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `spec_texts_files_header` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `spec_texts_files_body` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_why` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_reference` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_yaml` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_rendering` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_rules` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_readers` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_when_not` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `spec_texts_files_next` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Collection | `spec_texts_files_next_collection` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `spec_texts_files_footer` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+
+### Layout Structure
+
+```
+spec_texts_files_root
+└── spec_texts_files_scroll
+```
+
+## Data Flow
+
+```mermaid
+flowchart TD
+    VIEW[SpecTextsFilesView] --> VM[SpecTextsFilesViewModel]
+    VM -- nextReadLinks --> VIEW
+```
+
+### ViewModel
+
+#### Methods
+
+| Signature | Platforms | Description |
+|---|---|---|
+| `onAppear()` | all | Seed nextReadLinks from the two follow-up entries. |
+| `onNavigate(url: String)` | all | router.push. |
+
+#### Vars
+
+| Declaration | Flags | Platforms | Description |
+|---|---|---|---|
+| `var nextReadLinks: Array(NextReadLink)` | observable | all | Closing cards. |
+
+## State Management
+
+### UI Data Variables
+
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | [NextReadLink] | `[]` | Follow-up cards. | - |
+
+### View-local Event Handlers
+
+_Handlers kept inside the View layer. ViewModel public API lives under `dataFlow.viewModel`._
+
+| Handler | Description | Notes |
+|---|---|---|
+| `onAppear` | Seed nextReadLinks. | - |
+| `onNavigate` | Client-side navigation. | - |
+| `onNavigateSpec` |  | - |
+
+## User Actions
+
+| Action | Processing | Destination | Notes |
+|---|---|---|---|
+| Tap a NextReadLink card | onNavigate(url). | - | - |
+| Tap the breadcrumb | onNavigateSpec() → /spec. | - | - |
+
+## Validation
+
+## Transitions
+
+| Condition | Destination | Notes |
+|---|---|---|
+| url is /spec/anatomy or /spec/validation-and-drift | Target spec screen | - |
+
+## Related Files
+
+| Type | File Path | Notes |
+|---|---|---|
+| Layout | `docs/screens/layouts/spec/texts-files.json` | - |
+| ViewModel | `jsonui-doc-web/src/viewmodels/spec/TextsFilesViewModel.ts` | - |
+| View | `jsonui-doc-web/src/app/spec/texts-files/page.tsx` | - |
+
+## Notes
+
+- 2026-09-29 — re-measured for the widened fields and stricter validation (jsonui-cli 7e4c183f through 4f99e2bf): the accepted fields include purpose / processing / handling / rule / meaning / note / reason (not under harnessConditions / canonicalDivergence) and condition (transitions only); a named file must be relative and end in .texts.yaml; an empty file part and YAML merge keys are refused; PyYAML / markdown-it-py are needed only by a spec with a reference; jsonui-test refuses an unresolved reference; a unit page without markdown-it-py falls back to plain text with one warning. The validate block was re-run, one defect per run, with no collateral warning (the fixture's other references stay in use).
+- The site's own specs do not use texts files yet. The toolchain at the deploy pin accepts them; none has been moved.
+- 2026-09-30 — the readers section says read_spec_file expands texts-file references. search_specs' role line on /tools/mcp says it does not search texts-file text, as this page does.
+
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

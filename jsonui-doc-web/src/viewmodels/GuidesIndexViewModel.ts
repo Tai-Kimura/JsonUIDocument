@@ -1,0 +1,103 @@
+// ViewModel for GuidesIndex (category index).
+//
+// Hand-authored — rjui's hook generator hasn't emitted a base for this
+// yet. Simple seeder: builds the `articles` CollectionDataSource from a
+// static catalog that mirrors ChromeViewModel's NAV_CATALOG for the same
+// category so the sidebar and the index stay in lockstep.
+
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { GuidesIndexData } from "@/generated/data/GuidesIndexData";
+import { CollectionDataSource } from "@/generated/data/CollectionDataSource";
+import { StringManager } from "@/generated/StringManager";
+
+interface ArticleCell {
+  id: string;
+  titleKey: string;
+  descriptionKey: string;
+  readTimeKey: string;
+  statusKey: string;
+  statusBackground: string;
+  statusColor: string;
+  cardOpacity: number;
+  url: string;
+  platforms: string;
+  platformsVisibility: "visible" | "gone";
+  onNavigate: () => void;
+}
+
+const CATALOG: ReadonlyArray<{ id: string; url: string; titleKey: string; platforms?: string }> = [
+  { id: "writing-your-first-spec", url: "/guides/writing-your-first-spec", titleKey: "guides_writing_your_first_spec_title" },
+  { id: "writing-layouts", url: "/guides/writing-layouts", titleKey: "guides_writing_layouts_title" },
+  { id: "navigation", url: "/guides/navigation", titleKey: "guides_navigation_title" },
+  { id: "testing", url: "/guides/testing", titleKey: "guides_testing_title" },
+  { id: "api-mock", url: "/guides/api-mock", titleKey: "guides_api_mock_title" },
+  { id: "localization", url: "/guides/localization", titleKey: "guides_localization_title" },
+  { id: "colors", url: "/guides/colors", titleKey: "guides_colors_title" },
+  { id: "web-framework-adapters", url: "/guides/web-framework-adapters", titleKey: "guides_web_framework_adapters_title" },
+  { id: "custom-components", url: "/guides/custom-components", titleKey: "guides_custom_components_title" },
+  { id: "developer-menu", url: "/guides/developer-menu", titleKey: "guides_developer_menu_title", platforms: "iOS · Android" },
+  { id: "verifying-implementation-against-docs", url: "/guides/verifying-implementation-against-docs", titleKey: "guides_verifying_implementation_against_docs_title" },
+  { id: "branch-contracts", url: "/guides/branch-contracts", titleKey: "guides_branch_contracts_title" },
+  { id: "branch-tests", url: "/guides/branch-tests", titleKey: "guides_branch_tests_title" },
+  { id: "contract-gaps", url: "/guides/contract-gaps", titleKey: "guides_contract_gaps_title" },
+  { id: "unit-contracts", url: "/guides/unit-contracts", titleKey: "guides_unit_contracts_title" },
+  { id: "initial-state", url: "/guides/initial-state", titleKey: "guides_initial_state_title" },
+  { id: "canonical-marks", url: "/guides/canonical-marks", titleKey: "guides_canonical_marks_title" },
+  { id: "screen-readers", url: "/guides/screen-readers", titleKey: "guides_screen_readers_title" },
+  { id: "text-size", url: "/guides/text-size", titleKey: "guides_text_size_title" }
+];
+
+export class GuidesIndexViewModel {
+  protected router: AppRouterInstance;
+  protected _getData: () => GuidesIndexData;
+  protected _setData: (d: GuidesIndexData | ((p: GuidesIndexData) => GuidesIndexData)) => void;
+
+  get data(): GuidesIndexData { return this._getData(); }
+
+  constructor(
+    router: AppRouterInstance,
+    getData: () => GuidesIndexData,
+    setData: (d: GuidesIndexData | ((p: GuidesIndexData) => GuidesIndexData)) => void,
+  ) {
+    this.router = router;
+    this._getData = getData;
+    this._setData = setData;
+    this.onAppear();
+  }
+
+  updateData = (updates: Partial<GuidesIndexData>) => {
+    this._setData((prev) => ({ ...prev, ...updates }));
+  };
+
+  setVars = (vars: Partial<GuidesIndexData>) => { this.updateData(vars); };
+
+  onAppear = () => {
+    this.updateData({
+      articles: new CollectionDataSource([{ cells: { data: this.buildArticles((k) => StringManager.getDefaultString(k)) } }]),
+    });
+  };
+
+  mountLanguage = (): void => {
+    this.updateData({
+      articles: new CollectionDataSource([{ cells: { data: this.buildArticles((k) => StringManager.getString(k)) } }]),
+    });
+  };
+
+  private buildArticles = (lookup: (key: string) => string): ArticleCell[] =>
+    CATALOG.map((e) => ({
+      id: e.id,
+      titleKey: lookup(e.titleKey),
+      descriptionKey: lookup(e.titleKey.replace(/_title$/, "_lead")),
+      readTimeKey: "",
+      statusKey: "",
+      statusBackground: "#DCFCE7",
+      statusColor: "#166534",
+      cardOpacity: 1,
+      url: e.url,
+      platforms: e.platforms ?? "",
+      platformsVisibility: e.platforms ? "visible" : "gone",
+      onNavigate: () => this.navigate(e.url),
+    }));
+
+  navigate = (url: string): void => { this.router.push(url); };
+}

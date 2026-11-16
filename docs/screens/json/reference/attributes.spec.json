@@ -1,0 +1,158 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "Attributes",
+    "displayName": "Attribute reference",
+    "description": "Reference > Attribute reference. Overview page. Four sections + TOC + next-reads. Generated via /tmp/gen-reference.js.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "reference/attributes",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-04-23"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_components -> /reference/components, next_json_schema -> /reference/json-schema) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the reference_attributes_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /reference/components, /reference/json-schema."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /reference/components and /reference/json-schema. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen or tab",
+      "description": "v1 destinations: /, /reference/components, /reference/json-schema."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/reference/attributes.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/reference/AttributesViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/reference/attributes/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Live Reference entry. Flip REFERENCE_ENTRIES row for 'attributes' to 'live' in HomeViewModel when shipping.",
+    "v1 is hand-authored overview. Auto-generation from the upstream artifact is a future pass.",
+    "2026-09-01 — taking up the `alert` attribute exposed that this page drops any attribute the SSoT declares but docs/data/attribute-categories.json does not name. Page assembly filters with categoryMap[k] === category, so an unmapped attribute matches no category and is published nowhere, with the build still green. Measured: after sync_tool at the pin the vendored definitions carried `alert` and the generated runtime data mentioned it in zero files, while its sibling `confirmationDialog` was present — that contrast is the only reason the absence was legible. build-attribute-reference.ts now reports SSoT attributes missing from the map and exits 1, the mirror of the check that already existed for overrides missing from the SSoT. On its first run it found two more nobody had noticed: `offsetX` and `offsetY`, declared and published nowhere. Both are post-layout positional offsets whose own declaration compares them to leftMargin ('absolute, not RTL-mirroring'), so they are mapped to spacing rather than layout or alignment. `alert` is mapped to state beside confirmationDialog. Verified with a decoy: removing `alert` from the map again makes the build exit 1 and name it. Note what was checked and what was not — the declaration's shape is measured here (five properties against confirmationDialog's six, `titleVisibility` absent), while its stated reason for existing, that .confirmationDialog omits the cancel role in a regular size class, is an iOS runtime claim this lane has no way to reproduce and is published as the declaration's own words, not as a measurement.",
+    "2026-09-04 - the shared definitions give `items` a per-component contract, and this site does not inherit it: regenerating the attribute reference against the new definitions changed 0 files, because the description here is the site's own copy and is keyed by attribute name alone. Written by hand into the per-component notes instead. SelectBox and Radio entries are data, not strings keys — measured on the web face, a key registered in strings.json and written as an item renders as the key text. Radio gains an items note, including that `items` with `group` emits the whole group from one node.",
+    "2026-09-04 - the Segment items page is rewritten because the shape it documented has no source. It described `{ label?, icon?, value }` with three examples, one of them icon-only. Traced: the declaration carries no element type; no converter on any face reads `label` or `icon` from an entry (the rjui one interpolates the entry itself, which is where the Ruby hash in the generated JSX came from); and the wording dates from this site's first commit, 2026-05-07, untouched since. So the documentation invented it and the declaration was right. Both examples now use string arrays, the icon-only example is deleted because Segment declares nine attributes and `icon` is not one of them, and the note says the attribute is static — Segment's items declare no binding, where SelectBox, Radio and Collection declare `[array, binding]`.",
+    "2026-09-04 - correcting my own measurement from earlier the same day. I reported that a Segment entry naming a strings key does not resolve on the web face, and treated the declaration's 'resolved at render time on every face' as unconfirmed here. The fixture was malformed: I wrote the scratch project's strings file language-first, `{en: {section: {key: value}}}`, where the resolver reads section-first, `{section: {key: {en, ja}}}`. Nothing could resolve, so all three components looked alike and the one that differs was invisible. Re-measured with the file shaped correctly: Segment compiles a registered key to the string manager accessor `{$s.sampleOptA}`, while SelectBox renders `opt_a` and Radio renders `opt_a`. The declaration is right on all three counts, and the page now says so with the accessor quoted. A broken fixture does not report itself; it reports agreement.",
+    "2026-09-04 - the Segment items contract is enforceable, and the page's dated clause is retired. Measured on eight element shapes on the web face plus object and binding on iOS and Android. Object, array and null elements cost their element and raise one warning naming the index; strings, booleans and numbers survive, and the boolean renders as `true`.",
+    "2026-09-05 - the item contracts are uniform, so two notes here are rewritten from a three-face measurement rather than from the announcement. A Segment given a binding for `items` is refused on web, iOS and Android alike: the screen is not generated and the build exits 1, with `--allow-partial` as the opt-out. Confirmed here: the iOS view is absent entirely. Collection's cellClasses gains the rule the declaration states — one cellClass with `items` renders every item, several need `sections[].cell`, and declaring several without sections is refused with `only the first would render`.",
+    "2026-09-07 - a bound colour inside `partialAttributes` resolves at runtime on the web face, and the Label note says so. Measured over one fixture: `fontColor: \"@{accent}\"` compiles to `style: { color: ColorManager.resolveColor(data.accent) }`, with no colors.json warning. Two earlier arms had to be thrown away first, and neither failed — both reported the two versions as agreeing. The first exported JSONUI_CLI_PATH and took that for a choice of toolchain. It is not one: only `sync_tool` reads that variable, while `jui build` resolves the web generator by walking up from the build directory for a vendored `rjui_tools` and otherwise falling back to the install on PATH, which auto-updates. Both arms had run the same toolchain, and its version was the newer one. The second vendored the tag tree with a plain copy, which lands a 47-byte stub where the 159KB attribute definitions belong, because that file is produced at sync time and not shipped in the tree; the build then reported every attribute of every component as unknown. The arm now vendors with `sync_tool` and prints two controls read back from disk — the converter's hash and the size of the definitions — before it reports anything. rjui does not read a `background` inside `partialAttributes`, since the declaration has none; that needed no change here: no page puts a background there, and of the site's 20 partial entries across 13 layouts, which use only `range`, `fontColor`, `underline` and `onclick`, none carries a binding.",
+    "2026-10-02 — attribute reference sources rewritten: Label `text` (description and note) and the Label example 'String interpolation' (now `@{totalLabel}`); TextView 'Character counter' example (`@{bio.length}/160` → `@{bioCounter}`); Web 'Embed URL' example (URL with an embedded binding → `@{embedUrl}`); `shared_data` and `data` summaries carry the include overlay and the data-name type-conflict warning; `onClick` gains a note on binding-bare-event; Collection's `onValueChange` note says it does not fire when the pager first appears (support 2's answer: on Collection, `onPageChanged` and `onValueChanged` are aliases of `onValueChange`, so the sentence belongs on that one attribute; the name-keyed `onPageChanged` description reaches no page, and TabView, which shares the alias name, was outside the ruling). jsonui-cli has binding-mixed-text (WARNING, fails under --strict): an SSoT-declared attribute whose value contains `@{` but is not one whole `@{...}`. The user's ruling (2026-10-02) is that a sentence is assembled in the ViewModel and passed as one binding, because a layout-assembled sentence cannot be localized as one string and puts logic in the JSON.",
+    "2026-10-02 — TabView `onValueChange` note: called only when the selection changes, not at first display and not on a re-tap of the selected tab (user ruling 2026-10-02, 'only when the value changes', relayed by the orchestrator; first display measured on every path). Aligned 2026-10-03 to the SSoT sentence: 'a tap on another tab', 'with the new index', and the aliases sharing one attribute; the clause 'a write of a different value to selectedIndex' is carried too. One callback per write on all five paths. Support 2 measured iOS codegen, Dynamic and web. Support 1 measured Android, relayed through support 2 (support 2 did not see those runs): on a fixture read at five points (after display / tap B / re-tap B / tap A / programmatic tab=1) → [] / [1] / [1] / [1, 0] / [1, 0, 1]. Support 1 also measured KotlinJsonUI. Nothing measured here. A write of the same value was not part of that measurement, so the sentence names a different value.",
+    "2026-10-03 — Image and NetworkImage contentMode notes gain the iOS touch area of a cropped image. Read here in the shipped tree: sjui converter_factory.rb `when 'Image', 'CircleImage'` → ImageConverter, and image_converter.rb HIT_SHAPE `.contentShape(Rectangle())` after every crop. NetworkImage and Dynamic Image are the orchestrator's reading of SwiftJsonUI. Dynamic CircleImage is deliberately not claimed. Nothing measured on a device here.",
+    "2026-10-04 — Collection cellIdProperty note: (1) 'Defaults to `id`' was false. Read in the shipped tree: sjui open_cell_foreach uses `enumerated() + id: \\.offset` without it, and rjui generate_section_content keys by `cellIndex`. The writing-layouts guide and the autoChangeTrackingId description already said index; this note was the one wrong sibling. (2) iOS generated code: sjui collection_converter.rb cell_data_arg (commit ddf7ff87) rewrites the data's cellId to CellIdGenerator.autoId — '<cellId, else cellIdProperty value, else place>_<hash>' — whether or not cellIdProperty is set, and passes autoChangeTrackingId data through unchanged. Read in the shipped tree, not measured on a device. Android is the orchestrator's word."
+  ]
+}

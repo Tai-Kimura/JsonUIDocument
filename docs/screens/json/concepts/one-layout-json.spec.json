@@ -1,0 +1,150 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "OneLayoutJson",
+    "displayName": "One Layout JSON per screen",
+    "description": "Essay: why a single Layout JSON drives SwiftUI, Jetpack Compose, and Next.js — and the constraints this choice imposes. Five H2 sections (2026-07 addition: normalization levels L0/L1/L2). ~6-min read. 2026-05 cross-link: a closing paragraph notes that the same one-source-of-truth principle applies to API data models — one OpenAPI schema drives generated DTOs and Domain scaffolds across all three platforms — and points the reader at /concepts/data-models-from-openapi.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "concepts/one-layout-json",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-07-07"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two follow-up essays."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[OneLayoutJsonView] --> VM[OneLayoutJsonViewModel]\n    VM -- nextReadLinks --> VIEW",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_why_spec_first -> /concepts/why-spec-first, next_viewmodel -> /concepts/viewmodel-owned-state) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the concepts_one_layout_json_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped concept URLs enumerated in transitions: /concepts, /concepts/viewmodel-owned-state, /concepts/why-spec-first."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /concepts/why-spec-first and /concepts/viewmodel-owned-state. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is a spec-mapped concept URL or /concepts",
+      "destination": "Target spec screen or tab",
+      "description": "v1 destinations: /concepts, /concepts/viewmodel-owned-state, /concepts/why-spec-first."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/concepts/one-layout-json.json",
+      "description": "Essay layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/concepts/OneLayoutJsonViewModel.ts",
+      "description": "Mirrors WhySpecFirstViewModel."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/concepts/one-layout-json/page.tsx",
+      "description": "Next.js route."
+    }
+  ],
+  "notes": [
+    "Third live essay. Flipping CONCEPTS_ENTRIES row 2 to 'live' is the last step.",
+    "One CodeBlock shows the same Layout JSON snippet alongside the three generated platform renderings (SwiftUI / Compose / React) in fold-out style — actually just three adjacent CodeBlocks with platform filenames.",
+    "2026-05 update (swagger-driven Data Models): the closing section (or a new short final paragraph after the existing §4) gains ONE paragraph noting that the same one-source-of-truth principle is now extended to API data models — one OpenAPI schema in docs/api/ drives generated DTOs and Domain scaffolds across all three platforms, with the same drift-elimination payoff as one Layout JSON. The paragraph ends with an inline link to /concepts/data-models-from-openapi. Body-copy change only inside the existing concepts_one_layout_json_section_*_body strings.",
+    "2026-07-07 — Normalization levels addition (Renderer SSoT rollout). Add new prose section `section_norm_levels` after `section_three_out` (H2 順序: one_source → three_out → norm_levels → constraints → wins). Heading: 'Normalization levels (L0 / L1 / L2)' / '正規化レベル (L0 / L1 / L2)'. Body describes: L0 = 作者が編集する原本 (`docs/screens/layouts/*.json`)、L1 = `jui build` が配布時にエイリアス→正準名の書き換えと `$jui: {normalized:'L1', schemaVersion:1}` marker 付与を行った形 (2026-07 以降 default 有効。各プラットフォームの codegen が消費)、L2 = runtime (hotloader / dynamic mode) が L1 に style merge + include 展開 + platform filter を適用した最終形。作者が編集するのは常に L0 — L1/L2 は自動生成なので手編集禁止 (`@generated` marker で保護)。`normalizeLayouts` の opt-out flag は `jui.config.json` の `\"normalizeLayouts\": false`。TOC row `toc_norm_levels` を追加、`section_three_out` と `section_constraints` の間位置に。",
+    "2026-07-07 — Add a small CodeBlock (JSON) to `section_norm_levels` showing the `$jui` marker: `{\"$jui\": {\"normalized\": \"L1\", \"schemaVersion\": 1}, \"type\": \"View\", ...}`. Language: json. Copyable: true."
+  ]
+}

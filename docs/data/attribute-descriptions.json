@@ -1,0 +1,1232 @@
+{
+  "_description": "Shared bilingual attribute descriptions. When an attribute's name appears here, the build script prefers the Lang2 entry over attribute_definitions.json's English-only `description`. Add entries as reference pages are audited — an unlisted attribute falls back to English. Hand-authored.",
+  "_consumed_by": "jsonui-doc-web/scripts/build-attribute-reference.ts — merge helpers (mergeComponent / mergeCategory) read this file at startup.",
+  "text": {
+    "en": "Text content (binding supported). The value is a literal, one whole `@{binding}`, or a strings key; text around a binding (`\"Total: @{count}\"`) is warned as `binding-mixed-text` — compose the string in the ViewModel and bind it. Plain text — markdown is not interpreted.",
+    "ja": "表示するテキスト。値はリテラル、1 つの `@{binding}`、または strings キー。前後に文字列が付いた束縛（`\"合計: @{count}\"`）は `binding-mixed-text` として警告されます — 文字列は ViewModel で組み立てて束縛してください。素のテキストで markdown は解釈しない。"
+  },
+  "fontSize": {
+    "en": "Font size (binding supported).",
+    "ja": "フォントサイズ（数値、binding 可）。"
+  },
+  "fontColor": {
+    "en": "Font color — hex string or color name from colors.json (binding supported).",
+    "ja": "フォント色。hex 文字列または `colors.json` のトークン名（binding 可）。"
+  },
+  "fontWeight": {
+    "en": "Font weight name ('regular', 'medium', 'semibold', 'bold', 'heavy', 'light') or numeric 100-900. Passed as the `weight` field of `FontSpec` to the host's `Configuration.Font.fontProvider`. Binding supported.",
+    "ja": "フォントウェイト。`regular` / `medium` / `semibold` / `bold` / `heavy` / `light` の文字列、または 100〜900 の数値。`FontSpec` の `weight` フィールドとして `Configuration.Font.fontProvider` に渡る（binding 可）。"
+  },
+  "fontFamily": {
+    "en": "Font family name (e.g., 'Noto Sans JP'). Passed as the `family` field of `FontSpec` to `Configuration.Font.fontProvider`. Coexists with `font` (weight) and `fontSize` in the same FontSpec, all 3 platforms (iOS / Android / Web) share this resolution path.",
+    "ja": "フォントファミリ名（例: `Noto Sans JP`）。`FontSpec` の `family` フィールドとして `Configuration.Font.fontProvider` に渡る。同じ FontSpec の中で `font`（weight）・`fontSize` と併存し、iOS / Android / Web の 3 プラットフォーム共通の解決経路を辿る。"
+  },
+  "font": {
+    "en": "Font weight name (regular/medium/semibold/bold/...) or shorthand font name. Passed as the `weight` field of `FontSpec` to `Configuration.Font.fontProvider` — combine with `fontFamily` for the family. Binding supported.",
+    "ja": "フォントウェイト名（`regular` / `medium` / `semibold` / `bold` ほか）またはフォント名の省略指定。`FontSpec` の `weight` フィールドとして `Configuration.Font.fontProvider` に渡る。`fontFamily` と組み合わせて family を指定（binding 可）。"
+  },
+  "textAlign": {
+    "en": "Text alignment (binding supported).",
+    "ja": "テキスト水平方向の寄せ。`Left` / `Center` / `Right`（binding 可）。"
+  },
+  "textVerticalAlign": {
+    "en": "Text vertical alignment.",
+    "ja": "テキストの垂直方向の寄せ。`Top` / `Center` / `Bottom`。"
+  },
+  "lines": {
+    "en": "Maximum number of lines (0 for unlimited) (binding supported).",
+    "ja": "最大行数。`0` で無制限（binding 可）。"
+  },
+  "lineHeight": {
+    "en": "Line height.",
+    "ja": "行の高さ（px）。React のみ対応、iOS/Android では `lineHeightMultiple` / `lineSpacing` を使う。"
+  },
+  "lineHeightMultiple": {
+    "en": "Line height multiplier (binding supported).",
+    "ja": "行高の倍率（1.0 = フォントサイズ通り、1.4 = 40% 増）。"
+  },
+  "lineSpacing": {
+    "en": "Spacing between rows.",
+    "ja": "行間スペース（px）。"
+  },
+  "lineBreakMode": {
+    "en": "Line break mode.",
+    "ja": "行の切り詰めモード。`Char` / `Clip` / `Word` / `Head` / `Middle` / `Tail`。"
+  },
+  "autoShrink": {
+    "en": "Enable auto-shrink.",
+    "ja": "幅不足時にフォントを自動縮小するか。"
+  },
+  "minimumScaleFactor": {
+    "en": "Minimum scale factor for auto-shrink (binding supported).",
+    "ja": "自動縮小時の最小スケール倍率（0.0〜1.0）。"
+  },
+  "underline": {
+    "en": "Underline styling (boolean for simple, object for styled).",
+    "ja": "下線スタイル。`true` で単純な下線、オブジェクトでスタイル指定。"
+  },
+  "strikethrough": {
+    "en": "Strikethrough styling (boolean for simple, object for styled).",
+    "ja": "取り消し線スタイル。`true` で単純、オブジェクトでスタイル指定。"
+  },
+  "textShadow": {
+    "en": "Text shadow configuration.",
+    "ja": "テキストの影（ドロップシャドウ）の設定。"
+  },
+  "textTransform": {
+    "en": "Text transformation.",
+    "ja": "テキスト変換。`uppercase` / `lowercase` / `capitalize`。"
+  },
+  "selectable": {
+    "en": "Whether text is selectable.",
+    "ja": "テキストをユーザーが選択できるか。"
+  },
+  "linkable": {
+    "en": "Auto-link bare http(s) URLs and phone numbers; markdown and relative paths are never linked.",
+    "ja": "裸の http(s) URL と電話番号を自動リンク化する。markdown と相対パスはリンクにしない。"
+  },
+  "edgeInset": {
+    "en": "Edge insets as array or pipe-separated string.",
+    "ja": "テキストの内側余白。配列または `top|left|bottom|right` 形式の文字列。"
+  },
+  "hint": {
+    "en": "Placeholder text when empty (primary).",
+    "ja": "空のときに表示されるプレースホルダ文字列。"
+  },
+  "hintColor": {
+    "en": "Placeholder color — hex string or color name from colors.json (binding supported).",
+    "ja": "プレースホルダ文字色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "hintFont": {
+    "en": "Placeholder font.",
+    "ja": "プレースホルダのフォント名。"
+  },
+  "hintFontSize": {
+    "en": "Placeholder font size.",
+    "ja": "プレースホルダのフォントサイズ。"
+  },
+  "hintAttributes": {
+    "en": "Hint styling attributes.",
+    "ja": "プレースホルダに適用するスタイル属性オブジェクト。"
+  },
+  "hintLineHeightMultiple": {
+    "en": "Placeholder line height multiplier.",
+    "ja": "プレースホルダの行高倍率。"
+  },
+  "hideOnFocused": {
+    "en": "Hide placeholder when focused.",
+    "ja": "フォーカス時にプレースホルダを非表示にする。"
+  },
+  "placeholder": {
+    "en": "Placeholder image name (alias for hint).",
+    "ja": "プレースホルダ（`hint` のエイリアス）。"
+  },
+  "prompt": {
+    "en": "Prompt text (primary).",
+    "ja": "ピッカーなどに表示するプロンプト文字列。"
+  },
+  "highlightColor": {
+    "en": "Highlight color — hex string or color name from colors.json (binding supported).",
+    "ja": "ハイライト時の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "hilightColor": {
+    "en": "Highlight color — hex string or color name from colors.json (typo alias).",
+    "ja": "ハイライト色（`highlightColor` のタイポ互換エイリアス）。"
+  },
+  "highlightAttributes": {
+    "en": "Highlight styling attributes when selected.",
+    "ja": "選択時に適用するハイライトスタイル属性。"
+  },
+  "disabledFontColor": {
+    "en": "Font color when disabled — hex string or color name from colors.json (binding supported).",
+    "ja": "無効時のフォント色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "tapBackground": {
+    "en": "Background when tapped — hex string or color name from colors.json.",
+    "ja": "タップ中（押下時）の背景色。hex または `colors.json` のトークン名。"
+  },
+  "highlightBackground": {
+    "en": "Background when highlighted — hex string or color name from colors.json.",
+    "ja": "ハイライト時の背景色。hex または `colors.json` のトークン名。"
+  },
+  "disabledBackground": {
+    "en": "Background color when disabled — hex string or color name from colors.json.",
+    "ja": "無効時の背景色。hex または `colors.json` のトークン名。"
+  },
+  "selected": {
+    "en": "Selected state (binding supported).",
+    "ja": "選択状態（binding 可）。"
+  },
+  "highlighted": {
+    "en": "View highlighted state.",
+    "ja": "View のハイライト状態。"
+  },
+  "enabled": {
+    "en": "Whether enabled (binding supported).",
+    "ja": "操作可能かどうか（binding 可）。`false` でタップ無効＋ disabled スタイル。"
+  },
+  "onClick": {
+    "en": "Tap handler — binding only (@{functionName}).",
+    "ja": "タップイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+  },
+  "onLongClick": {
+    "en": "Long-press handler — binding only (@{functionName}).",
+    "ja": "長押しイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+  },
+  "onBlur": {
+    "en": "Blur event handler.",
+    "ja": "フォーカスが外れたときのハンドラ。"
+  },
+  "onFocus": {
+    "en": "Focus event handler.",
+    "ja": "フォーカスが当たったときのイベントハンドラ。"
+  },
+  "onBeginEditing": {
+    "en": "Begin editing event handler.",
+    "ja": "編集開始時のイベントハンドラ。"
+  },
+  "onEndEditing": {
+    "en": "End editing event handler.",
+    "ja": "編集終了時のイベントハンドラ。"
+  },
+  "onTextChange": {
+    "en": "Text change handler. Fires only when the user edits the field (typing, paste, the clear button), never when the bound value is changed from elsewhere, such as the ViewModel's updateData or a test's initialState.",
+    "ja": "テキスト変更時のイベントハンドラ。ユーザーが入力欄を編集したとき（入力、貼り付け、消去ボタン）だけ発火し、ViewModel の updateData やテストの initialState など、外から束縛値が変わったときは発火しない。"
+  },
+  "onValueChange": {
+    "en": "Value change handler — binding only (@{functionName}).",
+    "ja": "値変更時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+  },
+  "onValueChanged": {
+    "en": "Value change handler (alias for onValueChange) — binding only (@{functionName}).",
+    "ja": "値変更時のイベントハンドラ（`onValueChange` のエイリアス）。binding のみ。"
+  },
+  "onTabChange": {
+    "en": "Tab change handler — binding only (@{functionName}).",
+    "ja": "タブ切替時のイベントハンドラ。binding のみ（`@{ハンドラ名}`）。"
+  },
+  "onToggle": {
+    "en": "Toggle handler function — alias for `onValueChange` on Switch. Receives the new Boolean. Binding only (@{handlerName}).",
+    "ja": "トグル切替時のイベントハンドラ。Switch では `onValueChange` のエイリアス。新しい Boolean を引数に発火。binding のみ（`@{ハンドラ名}`）。"
+  },
+  "onPageChanged": {
+    "en": "Called with the new page index (Int) when the user swipes to a different page.",
+    "ja": "ページングで別ページにスワイプしたときに、新しいページインデックス（Int）を引数に呼ばれる。"
+  },
+  "onItemAppear": {
+    "en": "Called with the cell index (Int) when a cell appears on screen. Use for pagination by checking index against total count in ViewModel.",
+    "ja": "セルが画面に現れたときにインデックス（Int）引数で呼ばれる。ViewModel で総件数と比較してページネーションに使う。"
+  },
+  "src": {
+    "en": "Image URL (binding supported).",
+    "ja": "画像の URL（binding 可）。"
+  },
+  "srcName": {
+    "en": "Image source name (alias, binding supported).",
+    "ja": "画像ソース名（`src` のエイリアス、binding 可）。"
+  },
+  "url": {
+    "en": "Image URL (alias, binding supported).",
+    "ja": "画像の URL（`src` のエイリアス、binding 可）。"
+  },
+  "alt": {
+    "en": "Alt text for accessibility.",
+    "ja": "スクリーンリーダー用の代替テキスト。"
+  },
+  "contentMode": {
+    "en": "Content mode (binding supported).",
+    "ja": "画像のコンテントモード。`aspectFit` / `aspectFill` / `scaleToFill` など（binding 可）。"
+  },
+  "renderingMode": {
+    "en": "Rendering mode.",
+    "ja": "画像のレンダリングモード（テンプレート／原画など）。"
+  },
+  "resize": {
+    "en": "Resize behavior.",
+    "ja": "画像のリサイズ挙動。"
+  },
+  "loading": {
+    "en": "Loading behavior.",
+    "ja": "ロードストラテジ（`lazy` / `eager`）。"
+  },
+  "loadingImage": {
+    "en": "Loading image name.",
+    "ja": "ロード中に表示する画像名。"
+  },
+  "errorImage": {
+    "en": "Error image name.",
+    "ja": "ロード失敗時に表示する画像名。"
+  },
+  "defaultImage": {
+    "en": "Default image name.",
+    "ja": "デフォルトで表示する画像名。"
+  },
+  "highlightSrc": {
+    "en": "Image when highlighted (binding supported).",
+    "ja": "ハイライト時の画像ソース（binding 可）。"
+  },
+  "highlightSrcName": {
+    "en": "Highlight image source name (binding supported).",
+    "ja": "ハイライト時の画像ソース名（binding 可）。"
+  },
+  "icon": {
+    "en": "Icon name.",
+    "ja": "アイコン名。"
+  },
+  "icon_off": {
+    "en": "Normal icon.",
+    "ja": "通常状態のアイコン。"
+  },
+  "icon_on": {
+    "en": "Selected icon.",
+    "ja": "選択状態のアイコン。"
+  },
+  "onSrc": {
+    "en": "Image source for checked state.",
+    "ja": "チェック状態の画像ソース。"
+  },
+  "selectedIcon": {
+    "en": "Selected icon name.",
+    "ja": "選択時のアイコン名。"
+  },
+  "selected_icon": {
+    "en": "Selected icon name (underscore alias).",
+    "ja": "選択時のアイコン名（スネークケースのエイリアス）。"
+  },
+  "iconMargin": {
+    "en": "Icon-text spacing.",
+    "ja": "アイコンとテキストの間隔。"
+  },
+  "iconPosition": {
+    "en": "Icon position relative to text.",
+    "ja": "アイコンのテキストに対する位置（`leading` / `trailing`）。"
+  },
+  "image": {
+    "en": "Leading icon, by asset name (binding supported).",
+    "ja": "先頭に置くアイコン。アセット名で指定（binding 可）。"
+  },
+  "label": {
+    "en": "Check label text (binding supported).",
+    "ja": "ラベルテキスト（binding 可）。"
+  },
+  "buttonType": {
+    "en": "HTML button type.",
+    "ja": "HTML の `<button type=\"...\">`（`button` / `submit` / `reset`）。React 専用。"
+  },
+  "checked": {
+    "en": "Switch state alias (binding for two-way).",
+    "ja": "チェック状態（双方向 binding）。`isOn` / `value` のエイリアス。"
+  },
+  "isOn": {
+    "en": "Switch state (binding for two-way).",
+    "ja": "スイッチ状態（双方向 binding）。"
+  },
+  "value": {
+    "en": "Switch state alias (binding for two-way).",
+    "ja": "スイッチ状態の値（双方向 binding）。"
+  },
+  "secure": {
+    "en": "Secure text entry for passwords (binding supported).",
+    "ja": "パスワード入力（文字を伏せる）（binding 可）。"
+  },
+  "maxLength": {
+    "en": "Maximum input length.",
+    "ja": "入力可能な最大文字数。"
+  },
+  "pattern": {
+    "en": "Input validation pattern.",
+    "ja": "入力検証用の正規表現パターン。"
+  },
+  "required": {
+    "en": "Required field validation.",
+    "ja": "必須フィールドのバリデーション。"
+  },
+  "editable": {
+    "en": "Enable/disable editing.",
+    "ja": "編集可能かどうか。"
+  },
+  "clearButtonMode": {
+    "en": "Clear button mode.",
+    "ja": "クリアボタンの表示モード。"
+  },
+  "returnKeyType": {
+    "en": "Return key type.",
+    "ja": "ソフトウェアキーボードのリターンキーの種類（`done` / `go` / `next` など）。"
+  },
+  "keyboardType": {
+    "en": "Keyboard type.",
+    "ja": "キーボード種別（`default` / `email` / `number` など）。"
+  },
+  "keyboardAppearance": {
+    "en": "Keyboard appearance: dark, light.",
+    "ja": "キーボードの外観（`light` / `dark`）。iOS のみ。"
+  },
+  "autocorrectionType": {
+    "en": "Auto-correction type.",
+    "ja": "自動校正の有効・無効。"
+  },
+  "autocapitalizationType": {
+    "en": "Auto-capitalization type.",
+    "ja": "自動大文字化のタイプ。"
+  },
+  "spellCheckingType": {
+    "en": "Spell checking type.",
+    "ja": "スペルチェックのタイプ。"
+  },
+  "contentType": {
+    "en": "Content type for autofill (binding supported).",
+    "ja": "オートフィル用のコンテンツタイプ（binding 可）。"
+  },
+  "input": {
+    "en": "Input type (includes 'allphabet' typo for backward compatibility).",
+    "ja": "入力タイプ。"
+  },
+  "inputType": {
+    "en": "Input type for Android.",
+    "ja": "Android 向け入力タイプ。"
+  },
+  "child": {
+    "en": "Child component(s): an array of nodes, or a single node as shorthand for a one-element array (declared as `acceptsSingle` in the attribute SSoT).",
+    "ja": "子コンポーネント: ノードの配列、または 1 要素の配列の省略形としての単一ノード（属性 SSoT に `acceptsSingle` として宣言）。"
+  },
+  "children": {
+    "en": "Child components (alias for `child`): an array of nodes, or a single node as shorthand for a one-element array.",
+    "ja": "子コンポーネント（`child` のエイリアス）: ノードの配列、または 1 要素の配列の省略形としての単一ノード。"
+  },
+  "orientation": {
+    "en": "Scroll orientation.",
+    "ja": "レイアウト方向。`vertical` / `horizontal`。"
+  },
+  "spacing": {
+    "en": "Space between children (binding supported).",
+    "ja": "子要素間のスペース（binding 可）。"
+  },
+  "alignment": {
+    "en": "Child alignment.",
+    "ja": "子要素の配置。"
+  },
+  "distribution": {
+    "en": "Child distribution mode for stacks.",
+    "ja": "スタック内での子要素の配分モード。"
+  },
+  "direction": {
+    "en": "Layout direction.",
+    "ja": "レイアウト方向。"
+  },
+  "columns": {
+    "en": "Number of columns.",
+    "ja": "カラム数。"
+  },
+  "cols": {
+    "en": "Number of visible columns.",
+    "ja": "表示カラム数。"
+  },
+  "rows": {
+    "en": "Number of visible rows.",
+    "ja": "表示行数。"
+  },
+  "columnCount": {
+    "en": "Number of columns for CSS grid.",
+    "ja": "CSS Grid のカラム数。"
+  },
+  "columnSpacing": {
+    "en": "Spacing between columns.",
+    "ja": "カラム間のスペース。"
+  },
+  "itemSpacing": {
+    "en": "Spacing between items (used for both grid spacing and list item spacing).",
+    "ja": "アイテム間のスペース（グリッド間隔・リスト間隔の両方に使う）。"
+  },
+  "items": {
+    "en": "List of items for normal picker (binding supported).",
+    "ja": "アイテム配列。通常ピッカーの選択肢など（binding 可）。"
+  },
+  "tabs": {
+    "en": "Array of tab configurations.",
+    "ja": "タブ設定の配列。"
+  },
+  "sections": {
+    "en": "Section-based configuration.",
+    "ja": "セクションベースの設定。"
+  },
+  "cellClasses": {
+    "en": "Cell class definitions.",
+    "ja": "セルクラスの定義。"
+  },
+  "headerClasses": {
+    "en": "Header class definitions.",
+    "ja": "ヘッダクラスの定義。"
+  },
+  "footerClasses": {
+    "en": "Footer class definitions.",
+    "ja": "フッタクラスの定義。"
+  },
+  "cellIdProperty": {
+    "en": "Cell data property key to use as unique ID for ForEach identity. When set, scrollTo uses String type instead of Int.",
+    "ja": "ForEach の identity に使うデータフィールド名。指定時は `scrollTo` の型が Int から String になる。"
+  },
+  "reorderable": {
+    "en": "Lets the user reorder the rows: long-press a row (or its reorderHandle), drag it within its section and release it; onReorder is then called. true, or a binding that turns it on only while it is true (an edit mode). Vertical single-column Collections only: a grid, horizontal or flow Collection does not reorder. The ViewModel moves the data. Set cellIdProperty too: without it the layout validator warns. Screen readers and keyboards get move up / move down actions. On iOS a stack-drawn Collection uses SwiftUI's reorderable from iOS 27 and the library's drag below it (jui build prints INFO [ios-reorder] when the app's minimum iOS is below 27).",
+    "ja": "行を並べ替えられるようにする。行（または reorderHandle）を長押しし、同じ section の中でドラッグして離すと onReorder が呼ばれる。true か、true の間だけ有効にする binding（編集モードなど）。縦 1 列の Collection だけで、グリッド・横向き・flow は並べ替えない。データを動かすのは ViewModel。cellIdProperty も指定する（無いとレイアウトの検査が警告する）。読み上げとキーボードには「上へ移動」「下へ移動」の操作が付く。iOS で stack として描かれる Collection は iOS 27 から SwiftUI の reorderable、それより前はライブラリのドラッグを使う（アプリの最低 iOS が 27 より下なら jui build が INFO [ios-reorder] を出す）。"
+  },
+  "onReorder": {
+    "en": "Called when a dragged row is released at a new place: `@{handler}` with (section, from, to) — Swift (Int, Int, Int) -> Void, Kotlin (Int, Int, Int) -> Unit, TypeScript (section: number, from: number, to: number) => void. to is the row's index after the move. Rows move within their own section only; a single-section Collection is section 0. Not called when the row is released where it started or outside the Collection. Move up / move down call it with to = from - 1 / from + 1.",
+    "ja": "ドラッグした行を新しい位置で離したときに呼ばれる。`@{handler}` で (section, from, to)。Swift は (Int, Int, Int) -> Void、Kotlin は (Int, Int, Int) -> Unit、TypeScript は (section: number, from: number, to: number) => void。to は移動した後の位置。行は自分の section の中でだけ動き、section が 1 つなら section は 0。元の位置や Collection の外で離したときは呼ばれない。「上へ移動」「下へ移動」は to = from - 1 / from + 1 で呼ぶ。"
+  },
+  "reorderHandle": {
+    "en": "The id of an element in the cell layout (a grip at the row's right edge, say). Only a long press on it picks the row up; the rest of the row keeps its taps. Without it, a long press anywhere on the row picks it up. On iOS a Collection with a handle uses the library's drag on every version.",
+    "ja": "cell レイアウトの中の要素の id（行の右端のつまみなど）。その要素の長押しでだけ行がつかめ、行の他の部分のタップはそのまま。指定しなければ行のどこを長押ししてもつかめる。iOS では handle のある Collection はどの版でもライブラリのドラッグを使う。"
+  },
+  "reorderLockedProperty": {
+    "en": "A key of the cell data: a row whose value for it is true cannot be picked up, and no other row can be moved past it (a divider row, say). Section headers and footers are not rows and never move. On iOS a Collection with locked rows uses the library's drag on every version.",
+    "ja": "cell データのキー。その値が true の行はつかめず、他の行もそれを越えて動かせない（区切りの行など）。section の header と footer は行ではないので動かない。iOS では固定した行のある Collection はどの版でもライブラリのドラッグを使う。"
+  },
+  "fontScaling": {
+    "en": "Whether this component's text follows the user's text size (iOS Dynamic Type, Android font scale, the browser's font size). Absent: the app default (true unless the app sets it). false: the declared fontSize is drawn at that size whatever the setting (web: px). With either this or maxFontScale and no fontSize, the component's default size is held to it. See /guides/text-size.",
+    "ja": "この部品の字が、使う人の文字の大きさ（iOS の Dynamic Type、Android のフォントの拡大率、ブラウザの文字の大きさ）に追従するか。書かなければアプリ全体の既定（アプリが変えなければ true）。false なら、設定にかかわらず書いた fontSize の大きさで描く（web は px）。fontSize が無くてもこれか maxFontScale を書けば、部品の既定の大きさがそれに従う。/guides/text-size を参照。"
+  },
+  "maxFontScale": {
+    "en": "The largest size this component's text is drawn at, as a multiple of its fontSize (1 or more). Counts only while the text follows (fontScaling true, declared or by the app default). Absent: the app default cap, or none. iOS rounds it down to a Dynamic Type step; the web draws the smaller of the rem size and fontSize × maxFontScale px. See /guides/text-size.",
+    "ja": "この部品の字を描く最大の大きさを、fontSize の何倍か（1 以上）で書く。字が追従しているとき（fontScaling が true。書いた値でもアプリ全体の既定でも）だけ効く。書かなければアプリ全体の既定の上限、それも無ければ上限なし。iOS は Dynamic Type の段に切り下げ、web は rem の大きさと fontSize × maxFontScale px の小さい方で描く。/guides/text-size を参照。"
+  },
+  "reorderFixedProperty": {
+    "en": "A key of the cell data: a row whose value for it is true cannot be picked up and has no move up / move down, but other rows are moved past it (unlike reorderLockedProperty). With a reorderHandle, a row whose handle is not drawn is fixed too. A row both locked and fixed is locked.",
+    "ja": "cell データのキー。その値が true の行はつかめず、「上へ移動」「下へ移動」も無いが、他の行はそれを越えて動く（reorderLockedProperty とは違う）。reorderHandle があるとき、つまみが描かれていない行も同じ扱い。両方に当たる行は reorderLockedProperty の扱い。"
+  },
+  "onReorderStart": {
+    "en": "Called when a row is picked up: `@{handler}` with (section, index), index being the row's place when picked up. A ViewModel that rebuilds its rows on a timer can hold the rebuild until onReorderEnd. Move up / move down call it just before their onReorder. On iOS, declaring it makes a stack-drawn Collection use the library's drag on every version.",
+    "ja": "行をつかんだときに呼ばれる。`@{handler}` で (section, index)。index はつかんだときの位置。一定の間隔で行を作り直す ViewModel は onReorderEnd まで作り直しを止められる。「上へ移動」「下へ移動」は onReorder の直前に呼ぶ。iOS では、書くと stack として描かれる Collection がどの版でもライブラリのドラッグを使う。"
+  },
+  "onReorderEnd": {
+    "en": "Called once when a drag that onReorderStart began is over: `@{handler}` with (section). It follows onReorder when the row moved, and comes alone when the row was let go where it started, outside the Collection, or the drag was cancelled because the rows changed.",
+    "ja": "onReorderStart で始まったドラッグが終わったときに 1 回呼ばれる。`@{handler}` で (section)。行が動いたときは onReorder の後、元の位置や Collection の外で離したとき、行が変わってドラッグが取り消されたときは単独で来る。"
+  },
+  "accessibilitySelected": {
+    "en": "Tells screen readers this control is the selected one (iOS the selected trait, Android semantics selected, web aria-pressed): true or a binding. false tells nothing. Takes effect on a Button, and on a View or IconLabel whose onClick makes it one button; elsewhere the validator warns. Radio, CheckBox, Switch, Segment, TabView and SelectBox say their own state. See /guides/screen-readers.",
+    "ja": "このコントロールが選ばれていることをスクリーンリーダーに伝える（iOS は selected の trait、Android は semantics の selected、web は aria-pressed）。true か binding。false は何も伝えない。効くのは Button と、onClick で 1 つのボタンになる View・IconLabel で、それ以外では検査が警告する。Radio・CheckBox・Switch・Segment・TabView・SelectBox は自分の状態を伝える。/guides/screen-readers を参照。"
+  },
+  "autoChangeTrackingId": {
+    "en": "When true (and cellIdProperty is set), the library auto-computes each cellId as '<primary>_<hash>' so differential updates work without a manual hashForCell helper. If cellIdProperty is missing, the build emits a warning and cells fall back to index-based identity.",
+    "ja": "`true`（かつ `cellIdProperty` 指定時）で `<primary>_<hash>` 形式の cellId を自動計算し、差分更新を hashForCell なしで動かす。`cellIdProperty` 未指定時は build warning が出てインデックスベース identity にフォールバック。"
+  },
+  "lazy": {
+    "en": "Outer container shape for the Collection. Accepts `'lazy'` (default), `'eager'`, `'none'`, or a binding `@{prop}`. `'lazy'` → ScrollView+LazyVStack/LazyHStack on iOS, LazyColumn/LazyRow on Android — virtualized cell rendering. `'eager'` → ScrollView+VStack/HStack on iOS, Column(verticalScroll)/Row(horizontalScroll) on Android — no virtualization, smooth scrolling for heavy cells (markdown / images / attributed text) where LazyVStack re-evaluation hurts. `'none'` → VStack/HStack only, no scroll container — use when the parent is already scrollable. Legacy boolean is accepted: `true` → 'lazy', `false` → 'none'. Bindings are resolved at runtime via the wrapper's mode parameter so toggling between modes preserves view identity. Sticky headers and paging require `'lazy'`. For `layout: 'flow'`, `'none'` is the only value that removes the Collection's own vertical scroll.",
+    "ja": "Collection 外側コンテナの形状。`'lazy'`（既定）／`'eager'`／`'none'`、または binding `@{プロパティ}` を受け付ける。`'lazy'` は ScrollView+LazyVStack/LazyHStack（iOS）・LazyColumn/LazyRow（Android）で仮想化レンダリング。`'eager'` は ScrollView+VStack/HStack（iOS）・Column(verticalScroll)/Row(horizontalScroll)（Android）で仮想化なし。重い cell（markdown / 画像 / attributed text）で LazyVStack の再評価が問題になる場合に使う。`'none'` は VStack/HStack のみでスクロールコンテナなし、親が既にスクロール可能なときに使う。レガシー boolean も互換維持：`true` → 'lazy'、`false` → 'none'。binding は wrapper の mode 引数経由で実行時解決されるため、モード切替時にも view identity を保つ。sticky header・paging は `'lazy'` 必須。 `layout: 'flow'` では、Collection 自身の縦スクロールを外す値は `'none'` だけ。"
+  },
+  "paging": {
+    "en": "Enable paging.",
+    "ja": "ページングを有効化する。"
+  },
+  "horizontalScroll": {
+    "en": "Enable horizontal scroll.",
+    "ja": "水平スクロールを有効化する。"
+  },
+  "scrollEnabled": {
+    "en": "Enable scrolling (binding supported).",
+    "ja": "スクロール可否（binding 可）。"
+  },
+  "showsHorizontalScrollIndicator": {
+    "en": "Show horizontal indicator.",
+    "ja": "水平スクロールインジケータの表示。"
+  },
+  "showsVerticalScrollIndicator": {
+    "en": "Show vertical indicator.",
+    "ja": "垂直スクロールインジケータの表示。"
+  },
+  "bounces": {
+    "en": "Enable bounce effect.",
+    "ja": "端でのバウンスエフェクトを有効化する。"
+  },
+  "decelerationRate": {
+    "en": "Deceleration rate.",
+    "ja": "スクロール減速レート。"
+  },
+  "scrollBehavior": {
+    "en": "Scroll behavior animation.",
+    "ja": "スクロールアニメーションの挙動。"
+  },
+  "scrollTo": {
+    "en": "Binding that requests a programmatic scroll. Its declared class decides what the value names: an `Int` is a cell's index, a `String` a cell's key, which is its cellId or else its `cellIdProperty` value. `cellIdProperty` does not decide this. A Collection with it may still declare an `Int`, and one without it a `String`, whose keys are then the cells' cellIds. A Collection hidden with `visibility: gone` and brought back takes a changed value as a request: the screen remembers the last value each Collection was drawn with, by its id, so a `scrollTo` written in the same update that brings it back runs. The value a Collection is first drawn with still scrolls nowhere, and a Collection with no id is not remembered. Declare the data field as that plain value, not as `PassthroughSubject<Int, Never>`: a Swift transport type in the data section fails the Kotlin build. Each platform delivers the request its own way.",
+    "ja": "プログラムからのスクロールを要求する binding。値が何を指すかは、宣言した型で決まる: `Int` ならセルのインデックス、`String` ならセルのキー（セルの cellId、無ければ `cellIdProperty` の値）。`cellIdProperty` の有無では決まらない。`cellIdProperty` のある Collection でも `Int` を宣言でき、無い Collection でも `String` を宣言できる。その場合のキーはセルの cellId。`visibility: gone` で消して戻した Collection では、変わった値が要求になる: 画面が Collection ごとに（id で）最後に描いた値を覚えているので、戻すのと同じ更新で書いた `scrollTo` は実行される。最初に描かれた値では今もスクロールせず、id の無い Collection は覚えられない。data のフィールドはその素の値として宣言し、`PassthroughSubject<Int, Never>` にはしない。Swift の転送型を data セクションに書くと Kotlin のビルドが失敗する。要求の届け方は各プラットフォームが自分で決める。"
+  },
+  "scrollAnchor": {
+    "en": "Anchor point for scroll target (default: bottom).",
+    "ja": "スクロール時のアンカー位置（既定値: bottom）。"
+  },
+  "scrollAnimated": {
+    "en": "Whether scrollTo uses animation (default: true).",
+    "ja": "`scrollTo` でアニメーションを使うか（既定値: true）。"
+  },
+  "scrollsToTop": {
+    "en": "Scroll to top on status bar tap.",
+    "ja": "ステータスバータップで最上部にスクロールする。"
+  },
+  "contentOffset": {
+    "en": "Initial offset [x, y].",
+    "ja": "初期スクロール位置 `[x, y]`。"
+  },
+  "contentSize": {
+    "en": "Content size [width, height].",
+    "ja": "コンテンツサイズ `[width, height]`。"
+  },
+  "contentInsets": {
+    "en": "Content insets.",
+    "ja": "コンテンツの内側余白。"
+  },
+  "contentInsetAdjustmentBehavior": {
+    "en": "Content inset adjustment.",
+    "ja": "コンテンツインセットの自動調整挙動。"
+  },
+  "insets": {
+    "en": "Content insets.",
+    "ja": "コンテンツインセット。"
+  },
+  "insetHorizontal": {
+    "en": "Horizontal inset.",
+    "ja": "水平方向のインセット。"
+  },
+  "insetVertical": {
+    "en": "Vertical inset.",
+    "ja": "垂直方向のインセット。"
+  },
+  "containerInset": {
+    "en": "Container inset.",
+    "ja": "コンテナインセット。"
+  },
+  "flexWrap": {
+    "en": "Flex wrap behavior.",
+    "ja": "Flex の折り返し挙動。"
+  },
+  "flexible": {
+    "en": "Enable flexible height.",
+    "ja": "フレキシブルな高さを有効化。"
+  },
+  "reverseLayout": {
+    "en": "Reverse the layout direction of the Collection grid. When true, section order in the generated code is also reversed so that JSON definition order (index 0 first) matches the visual top-to-bottom order on iOS (which does not support reverseLayout). Compose's reverseLayout then flips the entire list so index 0 appears at the bottom.",
+    "ja": "Collection グリッドのレイアウト方向を反転。`true` で JSON の定義順（index 0 が先）が iOS の視覚順（reverseLayout 非対応）と揃う。Compose の reverseLayout はリスト全体を反転し index 0 が最下段に来る。"
+  },
+  "defaultScrollAnchor": {
+    "en": "Initial scroll position anchor (iOS 17+). Sets where the scroll view starts.",
+    "ja": "初期スクロール位置アンカー（iOS 17+）。"
+  },
+  "currentPage": {
+    "en": "Current page index for paging collections (binding supported).",
+    "ja": "ページングコレクションの現在ページインデックス（binding 可）。"
+  },
+  "gradient": {
+    "en": "Gradient colors.",
+    "ja": "グラデーションの色配列。"
+  },
+  "gradientDirection": {
+    "en": "Gradient direction.",
+    "ja": "グラデーションの方向。"
+  },
+  "locations": {
+    "en": "Gradient color stop locations.",
+    "ja": "グラデーション色の停止位置（0.0〜1.0 の配列）。"
+  },
+  "color": {
+    "en": "Indicator color — hex string or color name from colors.json (binding supported).",
+    "ja": "インジケータ色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "tint": {
+    "en": "Tint color — hex string or color name from colors.json (binding supported).",
+    "ja": "tint 色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "tintColor": {
+    "en": "Tint color — hex string or color name from colors.json (alias).",
+    "ja": "tint 色（`tint` のエイリアス）。hex または `colors.json` のトークン名。"
+  },
+  "onTintColor": {
+    "en": "Track color when on — hex string or color name from colors.json.",
+    "ja": "ON 状態のトラック色。hex または `colors.json` のトークン名。"
+  },
+  "offTintColor": {
+    "en": "Off tint color — hex string or color name from colors.json (binding supported).",
+    "ja": "OFF 状態の tint 色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "thumbTintColor": {
+    "en": "Thumb tint color — hex string or color name from colors.json (binding supported).",
+    "ja": "サム（つまみ）の tint 色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "trackTintColor": {
+    "en": "Track portion color — hex string or color name from colors.json (binding supported).",
+    "ja": "トラック部分の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "progressTintColor": {
+    "en": "Progress portion color — hex string or color name from colors.json (binding supported).",
+    "ja": "進捗部分の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "selectedColor": {
+    "en": "Selected state color — hex string or color name from colors.json (binding supported).",
+    "ja": "選択状態の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "unselectedColor": {
+    "en": "Unselected tab color — hex string or color name from colors.json (binding supported). Applies to a TabView used as a tab bar. Honoured on Android and web; iOS 26 and later ignore it on both iOS faces, with no replacement.",
+    "ja": "未選択タブの色。hex または `colors.json` のトークン名（binding 可）。タブバーとして使う TabView の話。Android と web では有効。iOS は 26 以降、どちらの面でも無視され、代替も無い。"
+  },
+  "normalColor": {
+    "en": "Normal state color — hex string or color name from colors.json (binding supported).",
+    "ja": "通常状態の色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "selectedFontColor": {
+    "en": "Selected text color — hex string or color name from colors.json.",
+    "ja": "選択時のテキスト色。hex または `colors.json` のトークン名。"
+  },
+  "tabBarBackground": {
+    "en": "Tab bar background color — hex string or color name from colors.json (binding supported).",
+    "ja": "タブバーの背景色。hex または `colors.json` のトークン名（binding 可）。"
+  },
+  "progress": {
+    "en": "Progress value (0-1, binding supported).",
+    "ja": "進捗値（0.0〜1.0、binding 可）。"
+  },
+  "progressImage": {
+    "en": "Custom progress image.",
+    "ja": "カスタムの進捗画像。"
+  },
+  "trackImage": {
+    "en": "Custom track image.",
+    "ja": "カスタムのトラック画像。"
+  },
+  "progressViewStyle": {
+    "en": "Progress view style: default, bar.",
+    "ja": "進捗ビューのスタイル（`default` / `bar`）。"
+  },
+  "step": {
+    "en": "Step increment value.",
+    "ja": "値の増分ステップ。"
+  },
+  "minimum": {
+    "en": "Minimum value (alias for minValue) (binding supported).",
+    "ja": "最小値（`minValue` のエイリアス）。binding 可。"
+  },
+  "maximum": {
+    "en": "Maximum value (alias for maxValue) (binding supported).",
+    "ja": "最大値（`maxValue` のエイリアス）。binding 可。"
+  },
+  "minValue": {
+    "en": "Minimum value (binding supported).",
+    "ja": "最小値（binding 可）。"
+  },
+  "maxValue": {
+    "en": "Maximum value (binding supported).",
+    "ja": "最大値（binding 可）。"
+  },
+  "minimumValueImage": {
+    "en": "Image at minimum end.",
+    "ja": "最小値側に表示する画像。"
+  },
+  "maximumValueImage": {
+    "en": "Image at maximum end.",
+    "ja": "最大値側に表示する画像。"
+  },
+  "datePickerMode": {
+    "en": "Which picker a date-mode SelectBox shows: `date` / `time` / `dateAndTime` / `countDown` (`datetime` is a declared synonym of `dateAndTime`). Date mode itself is declared with `selectItemType: Date`.",
+    "ja": "Date モードの SelectBox が出すピッカー: `date` / `time` / `dateAndTime` / `countDown`（`datetime` は `dateAndTime` の宣言済み同義語）。Date モード自体は `selectItemType: Date` で宣言する。"
+  },
+  "datePickerStyle": {
+    "en": "Date picker style.",
+    "ja": "日付ピッカーの見た目。"
+  },
+  "dateStringFormat": {
+    "en": "Date string format.",
+    "ja": "日付フォーマット（iOS の `DateFormatter` 構文）。"
+  },
+  "minimumDate": {
+    "en": "Minimum date (yyyy-MM-dd format, binding supported).",
+    "ja": "選択可能な最小日付（`yyyy-MM-dd` 形式、binding 可）。"
+  },
+  "maximumDate": {
+    "en": "Maximum date (yyyy-MM-dd format, binding supported).",
+    "ja": "選択可能な最大日付（`yyyy-MM-dd` 形式、binding 可）。"
+  },
+  "selectedDate": {
+    "en": "Initial selected date (yyyy-MM-dd format, two-way binding). When the bound value is nil or empty string, the picker is rendered with no selection — it is NOT silently replaced with today's date. ViewModel must seed an explicit Date value if a default is desired.",
+    "ja": "初期選択日付（`yyyy-MM-dd` 形式、双方向 binding）。binding が nil または空文字のときはピッカーは未選択で描画される（暗黙的に「今日」へフォールバックしない）。デフォルト値が必要なら ViewModel 側で明示的に `Date` を初期化する。"
+  },
+  "selectedIndex": {
+    "en": "Initial selected index for normal picker (two-way binding).",
+    "ja": "通常ピッカーの初期選択インデックス（双方向 binding）。"
+  },
+  "selectedItem": {
+    "en": "Selected item value (two-way binding).",
+    "ja": "選択アイテムの値（双方向 binding）。"
+  },
+  "selectedValue": {
+    "en": "Selected value (binding for two-way).",
+    "ja": "選択値（双方向 binding）。"
+  },
+  "minuteInterval": {
+    "en": "Minute interval for time picker.",
+    "ja": "時刻ピッカーの分間隔。"
+  },
+  "inView": {
+    "en": "Display picker inside view.",
+    "ja": "ピッカーを View 内にインライン表示する。"
+  },
+  "includePromptWhenDataBinding": {
+    "en": "Include prompt in binding.",
+    "ja": "データバインディング時にプロンプトを含める。"
+  },
+  "referenceView": {
+    "en": "Reference view for picker.",
+    "ja": "ピッカーの参照 View。"
+  },
+  "selectItemType": {
+    "en": "Select item type.",
+    "ja": "選択アイテムのタイプ。"
+  },
+  "multiple": {
+    "en": "Allow multiple selection.",
+    "ja": "複数選択を許可。"
+  },
+  "size": {
+    "en": "Number of visible options.",
+    "ja": "同時に表示する選択肢数。"
+  },
+  "showLabels": {
+    "en": "Whether to show tab labels (default: true).",
+    "ja": "タブラベルを表示するか（既定値: true）。"
+  },
+  "setTargetAsDataSource": {
+    "en": "Set target as data source.",
+    "ja": "ターゲットをデータソースとして設定する。"
+  },
+  "setTargetAsDelegate": {
+    "en": "Set target as delegate.",
+    "ja": "ターゲットを delegate として設定する。"
+  },
+  "apportionsSegmentWidthsByContent": {
+    "en": "Size segments by content.",
+    "ja": "セグメント幅を中身のコンテンツ幅に合わせる。"
+  },
+  "momentary": {
+    "en": "Momentary selection mode.",
+    "ja": "momentary 選択モード。"
+  },
+  "group": {
+    "en": "Radio group name.",
+    "ja": "Radio のグループ名。"
+  },
+  "bind": {
+    "en": "Two-way binding @{variable}.",
+    "ja": "双方向 binding（`@{変数名}`）。"
+  },
+  "nextFocus": {
+    "en": "ID of the next field to focus on submit (for focus chain).",
+    "ja": "次にフォーカスするフィールドの ID（フォーカスチェーン用）。"
+  },
+  "fieldPadding": {
+    "en": "Field padding.",
+    "ja": "フィールドの内側余白。"
+  },
+  "draggable": {
+    "en": "Make this view draggable.",
+    "ja": "この View をドラッグ可能にする。"
+  },
+  "onDragStart": {
+    "en": "Handler called when drag starts — @{handlerName}.",
+    "ja": "ドラッグ開始時に呼ばれるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onDragEnter": {
+    "en": "Handler called when a dragged item enters this view — @{handlerName}.",
+    "ja": "ドラッグ要素がこの View に入ったときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onDragLeave": {
+    "en": "Handler called when a dragged item leaves this view — @{handlerName}.",
+    "ja": "ドラッグ要素がこの View から離れたときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onDragOver": {
+    "en": "Handler called while a dragged item hovers over this view — @{handlerName}.",
+    "ja": "ドラッグ要素がこの View の上にある間呼ばれ続けるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onDrop": {
+    "en": "Handler called when an item is dropped onto this view — @{handlerName}.",
+    "ja": "ドロップされたときに呼ばれるハンドラ（`@{ハンドラ名}`）。"
+  },
+  "onChangeSelection": {
+    "en": "Selection change event handler.",
+    "ja": "選択範囲変更時のハンドラ。"
+  },
+  "onDeleteBackward": {
+    "en": "Delete backward (backspace) event handler.",
+    "ja": "バックスペース押下時のハンドラ。"
+  },
+  "onShouldBeginEditing": {
+    "en": "Should begin editing event handler (return true to allow).",
+    "ja": "編集開始可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldChangeCharacters": {
+    "en": "Should change characters event handler (return true to allow).",
+    "ja": "文字変更可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldChangeText": {
+    "en": "Should change text event handler (return true to allow).",
+    "ja": "テキスト変更可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldClear": {
+    "en": "Should clear event handler (return true to allow).",
+    "ja": "クリア可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldEndEditing": {
+    "en": "Should end editing event handler (return true to allow).",
+    "ja": "編集終了可否を返すハンドラ（true で許可）。"
+  },
+  "onShouldReturn": {
+    "en": "Should return event handler (return true to allow).",
+    "ja": "Return キー押下時の可否を返すハンドラ（true で許可）。"
+  },
+  "borderStyle": {
+    "en": "Border style.",
+    "ja": "ボーダースタイル。"
+  },
+  "hasContainer": {
+    "en": "Has container view.",
+    "ja": "コンテナ View を持つかどうか。"
+  },
+  "config": {
+    "en": "Button configuration (iOS 15+).",
+    "ja": "Button 設定（iOS 15+）。"
+  },
+  "applyLiquidGlass": {
+    "en": "Apply liquid glass effect. Superseded by the common `glass` attribute, but both spellings are still live: no conversion from this one to `glass` exists yet.",
+    "ja": "liquid glass エフェクトを適用する。共通属性 `glass` に置き換えられたが、変換はまだ無く、両方の綴りが有効。"
+  },
+  "glassEffectStyle": {
+    "en": "Glass effect style. Superseded by `glass.style`, with the same caveat: both spellings are still live.",
+    "ja": "glass エフェクトのスタイル。`glass.style` に置き換えられたが、同じ理由で両方の綴りが有効。"
+  },
+  "glass": {
+    "en": "Liquid Glass. `true` for the default treatment, or an object taking `style`, `tint`, `interactive` and `shape`. Swift only, in both SwiftUI and UIKit.",
+    "ja": "Liquid Glass。`true` で既定の見た目、またはオブジェクトで `style` / `tint` / `interactive` / `shape` を指定。Swift のみ、SwiftUI と UIKit の両方。"
+  },
+  "effectStyle": {
+    "en": "Blur effect style.",
+    "ja": "ブラーエフェクトのスタイル。"
+  },
+  "html": {
+    "en": "HTML content.",
+    "ja": "HTML コンテンツ。"
+  },
+  "sandbox": {
+    "en": "Iframe sandbox attribute.",
+    "ja": "iframe の `sandbox` 属性。"
+  },
+  "allow": {
+    "en": "Iframe allow attribute for feature policy.",
+    "ja": "iframe の `allow` 属性（Feature Policy）。"
+  },
+  "cachePolicy": {
+    "en": "Cache policy.",
+    "ja": "キャッシュポリシー。"
+  },
+  "timeout": {
+    "en": "Download timeout in seconds.",
+    "ja": "ダウンロードのタイムアウト（秒）。"
+  },
+  "allowsBackForwardNavigationGestures": {
+    "en": "Enable swipe navigation.",
+    "ja": "スワイプでの戻る／進むナビを有効化。"
+  },
+  "allowsLinkPreview": {
+    "en": "Enable link preview.",
+    "ja": "リンクプレビューを有効化。"
+  },
+  "allowsEditingTextAttributes": {
+    "en": "Allow editing text attributes.",
+    "ja": "テキスト属性の編集を許可する。"
+  },
+  "canBack": {
+    "en": "Show back button.",
+    "ja": "戻るボタンを表示する。"
+  },
+  "colorScheme": {
+    "en": "Color scheme for native date picker icon visibility (set 'dark' for dark backgrounds).",
+    "ja": "ネイティブ日付ピッカーのアイコン可視性のためのカラースキーム（暗背景では `dark` を指定）。"
+  },
+  "dataDetectorTypes": {
+    "en": "Data detector types.",
+    "ja": "データ自動検出タイプ。"
+  },
+  "hidesWhenStopped": {
+    "en": "Hide when stopped.",
+    "ja": "停止時に非表示にする。"
+  },
+  "indicatorStyle": {
+    "en": "Scroll indicator style.",
+    "ja": "スクロールインジケータのスタイル。"
+  },
+  "minZoom": {
+    "en": "Minimum zoom scale (binding supported).",
+    "ja": "最小ズーム倍率（binding 可）。"
+  },
+  "maxZoom": {
+    "en": "Maximum zoom scale (binding supported).",
+    "ja": "最大ズーム倍率（binding 可）。"
+  },
+  "itemWeight": {
+    "en": "Item sizing weight.",
+    "ja": "アイテムのサイズ比率。"
+  },
+  "doneText": {
+    "en": "Done button text.",
+    "ja": "完了ボタンの文字列。"
+  },
+  "keyboardDismissMode": {
+    "en": "Keyboard dismiss mode.",
+    "ja": "キーボードを閉じるモード。"
+  },
+  "keyboardAvoidance": {
+    "en": "Enable keyboard avoidance.",
+    "ja": "キーボード回避を有効化する。"
+  },
+  "safeAreaInsetPositions": {
+    "en": "Safe area edges.",
+    "ja": "セーフエリアインセット対象エッジ。"
+  },
+  "layout": {
+    "en": "Layout type: `vertical` | `horizontal` | `flow` (wrapping, packed to the leading edge). `Flow` / `LeftAligned` / `leftAligned` are accepted spellings of `flow`. Scroll rule for flow: with `lazy` in effect (the default `'lazy'`, or `'eager'`) a flow Collection scrolls vertically inside its own bounds; with `lazy: 'none'` it only wraps and the parent must scroll.",
+    "ja": "レイアウトタイプ: `vertical` | `horizontal` | `flow`（先頭寄せで折り返す）。`Flow` / `LeftAligned` / `leftAligned` は `flow` の別綴りとして受け付ける。flow のスクロール規則: `lazy` が効いていれば（既定の `'lazy'` か `'eager'`）flow の Collection は自分の bounds の中で縦にスクロールし、`lazy: 'none'` なら折り返すだけで親がスクロールする。"
+  },
+  "caretAttributes": {
+    "en": "Caret styling attributes. On text inputs the caret is the text cursor; on SelectBox it is the closed-state arrow.",
+    "ja": "キャレットのスタイル属性。テキスト入力ではテキストカーソル、SelectBox では閉じた状態の矢印を指す。"
+  },
+  "dividerAttributes": {
+    "en": "Divider styling attributes.",
+    "ja": "区切り線のスタイル属性。"
+  },
+  "partialAttributes": {
+    "en": "Style (and optionally make tappable) a substring selected by `range`.",
+    "ja": "`range` で選んだ部分文字列にスタイルを当て、必要なら `onclick` でタップ可能にする。"
+  },
+  "labelAttributes": {
+    "en": "Label styling for Toggle.",
+    "ja": "Toggle のラベルスタイル属性。"
+  },
+  "leftView": {
+    "en": "Left view configuration.",
+    "ja": "左側 View の設定。"
+  },
+  "leftViewMode": {
+    "en": "Left view display mode.",
+    "ja": "左側 View の表示モード。"
+  },
+  "rightView": {
+    "en": "Right view configuration.",
+    "ja": "右側 View の設定。"
+  },
+  "rightViewMode": {
+    "en": "Right view display mode.",
+    "ja": "右側 View の表示モード。"
+  },
+  "textPaddingLeft": {
+    "en": "Text padding left.",
+    "ja": "テキストの左 padding。"
+  },
+  "textPaddingRight": {
+    "en": "Text padding right.",
+    "ja": "テキストの右 padding。"
+  },
+  "accessoryBackground": {
+    "en": "Input accessory background — hex string or color name from colors.json.",
+    "ja": "入力アクセサリ背景色。hex または `colors.json` のトークン名。"
+  },
+  "accessoryTextColor": {
+    "en": "Input accessory text color — hex string or color name from colors.json.",
+    "ja": "入力アクセサリのテキスト色。hex または `colors.json` のトークン名。"
+  },
+  "accessoryCornerRadius": {
+    "en": "Accessory corner radius.",
+    "ja": "アクセサリの角丸半径。"
+  },
+  "valueChange": {
+    "en": "Value change event.",
+    "ja": "値変更イベント。"
+  },
+  "minWidthWeight": {
+    "en": "Minimum width weight (binding supported).",
+    "ja": "幅 weight の下限（binding 可）。"
+  },
+  "maxWidthWeight": {
+    "en": "Maximum width weight (binding supported).",
+    "ja": "幅 weight の上限（binding 可）。"
+  },
+  "minHeightWeight": {
+    "en": "Minimum height weight (binding supported).",
+    "ja": "高さ weight の下限（binding 可）。"
+  },
+  "maxHeightWeight": {
+    "en": "Maximum height weight (binding supported).",
+    "ja": "高さ weight の上限（binding 可）。"
+  },
+  "topPadding": {
+    "en": "Top padding (alias for paddingTop, binding supported).",
+    "ja": "上 padding（paddingTop のエイリアス、binding 可）。"
+  },
+  "bottomPadding": {
+    "en": "Bottom padding (alias for paddingBottom, binding supported).",
+    "ja": "下 padding（paddingBottom のエイリアス、binding 可）。"
+  },
+  "leftPadding": {
+    "en": "Left padding (alias for paddingLeft, binding supported).",
+    "ja": "左 padding（paddingLeft のエイリアス、binding 可）。"
+  },
+  "rightPadding": {
+    "en": "Right padding (alias for paddingRight, binding supported).",
+    "ja": "右 padding（paddingRight のエイリアス、binding 可）。"
+  },
+  "minTopPadding": {
+    "en": "Minimum top padding.",
+    "ja": "上 padding の下限。"
+  },
+  "minBottomPadding": {
+    "en": "Minimum bottom padding.",
+    "ja": "下 padding の下限。"
+  },
+  "minLeftPadding": {
+    "en": "Minimum left padding.",
+    "ja": "左 padding の下限。"
+  },
+  "minRightPadding": {
+    "en": "Minimum right padding.",
+    "ja": "右 padding の下限。"
+  },
+  "maxTopPadding": {
+    "en": "Maximum top padding.",
+    "ja": "上 padding の上限。"
+  },
+  "maxBottomPadding": {
+    "en": "Maximum bottom padding.",
+    "ja": "下 padding の上限。"
+  },
+  "maxLeftPadding": {
+    "en": "Maximum left padding.",
+    "ja": "左 padding の上限。"
+  },
+  "maxRightPadding": {
+    "en": "Maximum right padding.",
+    "ja": "右 padding の上限。"
+  },
+  "minTopMargin": {
+    "en": "Minimum top margin (binding supported).",
+    "ja": "上 margin の下限（binding 可）。"
+  },
+  "minBottomMargin": {
+    "en": "Minimum bottom margin (binding supported).",
+    "ja": "下 margin の下限（binding 可）。"
+  },
+  "minLeftMargin": {
+    "en": "Minimum left margin (binding supported).",
+    "ja": "左 margin の下限（binding 可）。"
+  },
+  "minRightMargin": {
+    "en": "Minimum right margin (binding supported).",
+    "ja": "右 margin の下限（binding 可）。"
+  },
+  "maxTopMargin": {
+    "en": "Maximum top margin (binding supported).",
+    "ja": "上 margin の上限（binding 可）。"
+  },
+  "maxBottomMargin": {
+    "en": "Maximum bottom margin (binding supported).",
+    "ja": "下 margin の上限（binding 可）。"
+  },
+  "maxLeftMargin": {
+    "en": "Maximum left margin (binding supported).",
+    "ja": "左 margin の上限（binding 可）。"
+  },
+  "maxRightMargin": {
+    "en": "Maximum right margin (binding supported).",
+    "ja": "右 margin の上限（binding 可）。"
+  },
+  "minStartMargin": {
+    "en": "Min margin constraint (SwiftUI dynamic layout).",
+    "ja": "start 側 margin の下限（SwiftUI dynamic レイアウト）。"
+  },
+  "maxStartMargin": {
+    "en": "Max margin constraint (SwiftUI dynamic layout).",
+    "ja": "start 側 margin の上限（SwiftUI dynamic レイアウト）。"
+  },
+  "minEndMargin": {
+    "en": "Min margin constraint (SwiftUI dynamic layout).",
+    "ja": "end 側 margin の下限（SwiftUI dynamic レイアウト）。"
+  },
+  "maxEndMargin": {
+    "en": "Max margin constraint (SwiftUI dynamic layout).",
+    "ja": "end 側 margin の上限（SwiftUI dynamic レイアウト）。"
+  },
+  "toView": {
+    "en": "Relative layout target view ID.",
+    "ja": "相対レイアウトの基準にするビュー ID。"
+  },
+  "keyTopView": {
+    "en": "Key top view ID (relative-layout anchor).",
+    "ja": "上側の基準ビュー ID（相対レイアウトのアンカー）。"
+  },
+  "keyBottomView": {
+    "en": "Key bottom view ID (relative-layout anchor).",
+    "ja": "下側の基準ビュー ID（相対レイアウトのアンカー）。"
+  },
+  "keyLeftView": {
+    "en": "Key left view ID (relative-layout anchor).",
+    "ja": "左側の基準ビュー ID（相対レイアウトのアンカー）。"
+  },
+  "keyRightView": {
+    "en": "Key right view ID (relative-layout anchor).",
+    "ja": "右側の基準ビュー ID（相対レイアウトのアンカー）。"
+  },
+  "wrapContent": {
+    "en": "Wrap content — size the view to its content.",
+    "ja": "サイズをコンテンツに合わせる（wrap content）。"
+  },
+  "innerPadding": {
+    "en": "Inner padding (binding supported).",
+    "ja": "内側 padding（binding 可）。"
+  },
+  "idealWidth": {
+    "en": "SwiftUI .frame(idealWidth:) hint for the layout system.",
+    "ja": "SwiftUI の .frame(idealWidth:) ヒント。"
+  },
+  "idealHeight": {
+    "en": "SwiftUI .frame(idealHeight:) hint.",
+    "ja": "SwiftUI の .frame(idealHeight:) ヒント。"
+  },
+  "widthRaw": {
+    "en": "Debug: original width string before parsing. Dynamic-only; not emitted to static code.",
+    "ja": "デバッグ用: パース前の width 文字列。dynamic モード専用で、静的コードには出力されない。"
+  },
+  "heightRaw": {
+    "en": "Debug: original height string before parsing. Dynamic-only; not emitted to static code.",
+    "ja": "デバッグ用: パース前の height 文字列。dynamic モード専用で、静的コードには出力されない。"
+  },
+  "$jui": {
+    "en": "Normalization marker injected by `jui build` when build.normalizeLayouts is enabled. Metadata only, not rendered.",
+    "ja": "build.normalizeLayouts 有効時に `jui build` が刻印する正規化マーカー。メタデータであり描画はされない。"
+  },
+  "accessibilityLabel": {
+    "en": "What a screen reader says for this control in place of what it shows: a strings.json key or text, localized like `text`, or a binding. Web writes `aria-label`, iOS `.accessibilityLabel(Text(…))` last on the chain and Android `contentDescription` in the modifier's semantics (measured on a Button). Use it where the visible text does not say enough, as with a row's \"Open\" that should be read \"Open the second image\". Left out, the control is read by what it shows. Also spelled `contentDescription`. An Image's name is `alt`, which takes both spellings.",
+    "ja": "スクリーンリーダーが、このコントロールの見た目の代わりに読み上げる名前です。strings.json のキーか文字（`text` と同じようにローカライズされます）、または binding を書きます。Web は `aria-label`、iOS はチェーンの最後に `.accessibilityLabel(Text(…))`、Android は modifier の semantics の `contentDescription` を書きます（Button で実測）。見えている文だけでは足りない所に使います。たとえば行の「開く」を「2 枚目の画像を開く」と読ませたいときです。書かなければ、見えている文で読まれます。`contentDescription` とも書けます。Image の名前は `alt` で、こちらも両方の書き方を受け付けます。"
+  },
+  "accessibilityLiveRegion": {
+    "en": "Reads this text out whenever it changes, without moving focus (a saved or failed line, a progress count): `polite` waits for the screen reader to finish, `assertive` interrupts it, `off` (or leaving it out) reads nothing. Web writes `role=\"status\" aria-live=\"polite\"` or `role=\"alert\" aria-live=\"assertive\"`, Android `liveRegion = LiveRegionMode.Polite` or `Assertive`. iOS has no live region, so a Label whose text is bound posts an announcement of its new text when it changes, at high priority for `assertive`; a static text never changes and announces nothing (all measured).",
+    "ja": "この文が変わるたびに、フォーカスを動かさずに読み上げます（保存できた・失敗した、の 1 行や、進み具合の数など）。`polite` はスクリーンリーダーが読み終わるのを待ち、`assertive` は割り込み、`off`（または書かない）は何も読みません。Web は `role=\"status\" aria-live=\"polite\"` か `role=\"alert\" aria-live=\"assertive\"`、Android は `liveRegion = LiveRegionMode.Polite` か `Assertive` を書きます。iOS には live region が無いので、文が bind された Label は、文が変わったときに新しい文の読み上げを通知します。`assertive` では高い優先度です。固定の文は変わらないので、何も読み上げません（すべて実測）。"
+  },
+  "loadingRenderer": {
+    "en": "The name of a loading renderer the app registered: on iOS with NetworkImageLoadingRenderers.register, on Android with KjuiLoadingRenderers.register. The renderer is a native drawer laid over the image's frame while the image is read from disk or the network, put on only once the read has taken longer than loadingDelay, and it alone is told the bytes received (the ViewModel is not, so the screen is not redrawn by the progress). While a renderer is named, placeholder, hint, loadingImage and the built-in spinner are not drawn for the loading state; errorImage and defaultImage keep their states. An image the memory cache already holds is drawn at once, with no renderer. Absent, \"\" (a binding may hand \"\" to turn it off) or a name nothing registered draws the loading state as it does without a renderer. iOS and Android only: the web generator passes nothing, and the web draws placeholder. The renderer is told the response and the bytes only for the image's own response, a 2xx or a 304 answering a conditional request. A redirect is followed and the answer it ends at decides; a 4xx or 5xx goes from requesting to failed with no progress. An error page's body is not counted as progress, and a 404 whose body is an image fails too. A load that is retried — a 5xx, a 408, a 429 or a dropped connection — tells the renderer retrying before each of the two waits (2 s, then 4 s) and requesting again after it, the bytes received starting again from 0; anything else that is not the image goes to failed with no retry. On Android this holds only with KjuiImageLoaderFactory installed.",
+    "ja": "アプリが登録した、読み込み中の描き手の名前。iOS は NetworkImageLoadingRenderers.register、Android は KjuiLoadingRenderers.register で登録する。描き手は、画像をディスクやネットワークから読んでいる間だけ画像の枠の上に重ねるネイティブの描画で、読み込みが loadingDelay より長くかかったときだけ置かれる。届いたバイト数を知らされるのは描き手だけで、ViewModel には届かないので、進み具合で画面が描き直されることはない。描き手の名前を書いている間は、読み込み中に placeholder・hint・loadingImage・組み込みのくるくるを描かない。errorImage と defaultImage はそれぞれの状態で描く。メモリのキャッシュにある画像は、描き手なしですぐ描く。書かない、\"\"（binding で \"\" を渡せば消せる）、登録の無い名前のときは、読み込み中を描き手が無いときと同じに描く。iOS と Android だけ。web の generator は何も渡さず、web は placeholder を描く。描き手に応答とバイト数を知らせるのは、画像そのものの応答（2xx と、条件付きで頼んだ 304）のときだけ。転送はたどり、行き着いた応答で決める。4xx・5xx は、進み具合なしで requesting から failed になる。エラーページの本文は進み具合に数えず、本文が画像の 404 も失敗になる。やり直す読み込み（5xx・408・429・接続が切れた）では、2 回の待ち（2 秒、次に 4 秒）の前ごとに描き手へ retrying を、待ちの後に改めて requesting を知らせ、届いたバイト数は 0 から数え直す。それ以外で画像でないものは、やり直さずに failed になる。Android では KjuiImageLoaderFactory を入れているときだけこうなる。"
+  },
+  "loadingDelay": {
+    "en": "Milliseconds a read must take before the loadingRenderer is put on, 0 to 2000. Default 200, and read only when loadingRenderer is written. A read that ends sooner shows the image with no renderer at all. iOS and Android only.",
+    "ja": "loadingRenderer を置くまでに読み込みがかかる時間（ms、0〜2000）。既定は 200 で、loadingRenderer を書いたときだけ読む。それより早く終わった読み込みは、描き手を一度も出さずに画像を見せる。iOS と Android だけ。"
+  },
+  "transitionDuration": {
+    "en": "Milliseconds of the fade into the loaded image or the error image, 0 to 1000. Default 240 when a loadingRenderer was found at run time, otherwise 0, which shows the image at once; a written value fades with or without a renderer. An image the memory cache already holds (on the web, one the browser already holds) is never faded. On the web it is a CSS opacity transition on the img, ease-out, and the generator brings a value over 1000 down to 1000 with a warning.",
+    "ja": "読み込んだ画像やエラー画像へのフェードの長さ（ms、0〜1000）。実行時に loadingRenderer が見つかったときの既定は 240、ほかは 0 で、すぐ見せる。書いた値は描き手の有無にかかわらずフェードする。メモリのキャッシュにある画像（web ではブラウザが持っている画像）はフェードしない。web では img の CSS の opacity の transition（ease-out）で、generator は 1000 を超える値を警告付きで 1000 にする。"
+  },
+  "onLoadStateChange": {
+    "en": "A binding to a function, such as @{onImageState}, called on the main thread with \"loading\", \"loaded\" or \"failed\" when the image's load state changes, and only on a change. An image the memory cache already holds calls \"loaded\" alone. The handler may take nothing, the state, or the view id and the state. Progress is not sent here. On the web \"loading\" comes when src is set, then \"loaded\" or \"failed\" from the img's load and error events. While there is no src (null, \"\" or only whitespace) nothing is called, and a src that comes back starts again from \"loading\". While a load is retried (a 5xx, a 408, a 429 or a dropped connection, after 2 s and after 4 s, on iOS and Android) the state stays \"loading\", and \"failed\" comes once the last try fails.",
+    "ja": "@{onImageState} のような関数の binding。画像の読み込みの状態が変わったときだけ、main で \"loading\"・\"loaded\"・\"failed\" を渡して呼ぶ。メモリのキャッシュにある画像は \"loaded\" だけを呼ぶ。受け手は引数なし、状態だけ、view の id と状態、のどれでもよい。進み具合はここに来ない。web では src を入れたときに \"loading\"、その後 img の load・error のイベントで \"loaded\" か \"failed\"。src が無い間（null・\"\"・空白だけ）は何も呼ばず、src が戻ると改めて \"loading\" から呼ぶ。読み込みをやり直している間（iOS と Android で、5xx・408・429・接続が切れたときに 2 秒後と 4 秒後）も状態は \"loading\" のままで、最後の試みが失敗したときに \"failed\" を呼ぶ。"
+  }
+}

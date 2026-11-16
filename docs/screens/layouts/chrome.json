@@ -1,0 +1,48 @@
+{
+  "type": "View",
+  "id": "chrome_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "wrapContent",
+  "child": [
+    {
+      "data": [
+        { "name": "navItems",            "class": "Array",  "defaultValue": "[]" },
+        { "name": "activeUrl",           "class": "String", "defaultValue": "" },
+        { "name": "collapsedIds",        "class": "Array",  "defaultValue": "[]" },
+        { "name": "mobileOpen",          "class": "Bool",   "defaultValue": false },
+        { "name": "currentLanguage",     "class": "String", "defaultValue": "en" },
+        { "name": "currentColorMode",    "class": "String", "defaultValue": "light" },
+        { "name": "onToggleSection",     "class": "() -> Void" },
+        { "name": "onToggleMobileMenu",  "class": "() -> Void" },
+        { "name": "onToggleLanguage",    "class": "() -> Void" },
+        { "name": "onToggleColorMode",   "class": "() -> Void" },
+        { "name": "onLinkTap",           "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "TopBar",
+      "id": "chrome_topbar",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "brandLabel": "chrome_brand_name",
+      "currentLanguage": "@{currentLanguage}",
+      "currentColorMode": "@{currentColorMode}",
+      "onToggleLanguage": "@{onToggleLanguage}",
+      "onToggleColorMode": "@{onToggleColorMode}",
+      "onToggleMobileMenu": "@{onToggleMobileMenu}"
+    },
+    {
+      "type": "Sidebar",
+      "id": "chrome_sidebar",
+      "width": "matchParent",
+      "height": "wrapContent",
+      "items": "@{navItems}",
+      "activeUrl": "@{activeUrl}",
+      "collapsedIds": "@{collapsedIds}",
+      "mobileOpen": "@{mobileOpen}",
+      "onToggleSection": "@{onToggleSection}",
+      "onLinkTap": "@{onLinkTap}"
+    }
+  ]
+}

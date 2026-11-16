@@ -1,0 +1,118 @@
+{
+  "category": "style",
+  "description": {
+    "en": "Style attributes control visual appearance: background, borders, shadows, corners, and style presets.",
+    "ja": "style 属性はコンポーネントの見た目を制御する: 背景、ボーダー、シャドウ、角丸、スタイルプリセット。"
+  },
+  "attributes": {
+    "background": {
+      "summary": {
+        "en": "Background color. Accepts hex `#RGB`/`#RRGGBB`/`#AARRGGBB` (alpha first, on every platform), named colors, or `@color/token`. For gradients use the `gradient` attribute or GradientView.",
+        "ja": "背景色。hex `#RGB`/`#RRGGBB`/`#AARRGGBB`（アルファが先、全プラットフォーム共通）、色名、または `@color/token`。グラデーションは `gradient` 属性または GradientView を使う。"
+      }
+    },
+    "defaultBackground": {
+      "summary": {
+        "en": "Background color in the default (non-interactive) state. Base layer for the pressed / disabled overlays.",
+        "ja": "デフォルト（非操作）状態の背景色。押下・disabled オーバーレイの下地。"
+      }
+    },
+    "disabledBackground": {
+      "summary": {
+        "en": "Background color when `enabled: false`.",
+        "ja": "`enabled: false` のときの背景色。"
+      }
+    },
+    "highlightBackground": {
+      "summary": {
+        "en": "Background color shown when the component is highlighted (e.g., pressed).",
+        "ja": "ハイライト状態（押下など）の背景色。"
+      }
+    },
+    "tapBackground": {
+      "summary": {
+        "en": "Button-specific. Background color shown during tap-down. Reverts to `background` on release.",
+        "ja": "Button 専用。押下中に表示される背景色。解放で `background` に戻る。"
+      }
+    },
+    "cornerRadius": {
+      "summary": {
+        "en": "Rounded corners in pt/dp/px. Accepts a number (uniform) or array `[tl, tr, br, bl]` for per-corner control. Unwritten, a Button, TextField or TextView is square (0) and a SelectBox 8, the same on iOS, Android and the web; no setting changes it.",
+        "ja": "角丸半径（pt/dp/px）。数値（全辺同一）または配列 `[左上, 右上, 右下, 左下]` で角ごとに指定可。 書かないと、Button・TextField・TextView は四角（0）、SelectBox は 8 で、iOS・Android・web で同じ。設定では変えられない。"
+      }
+    },
+    "borderColor": {
+      "summary": {
+        "en": "Border color. Requires `borderWidth` for the border to render.",
+        "ja": "ボーダー色。描画には `borderWidth` の指定が必要。"
+      }
+    },
+    "borderWidth": {
+      "summary": {
+        "en": "Border thickness in pt/dp/px.",
+        "ja": "ボーダーの太さ（pt/dp/px）。"
+      },
+      "note": {
+        "en": "The border is drawn over the content and does not push it inward: children keep the positions they have without it, and a wrapContent Label is no taller for it. TextField, TextView and SelectBox are the exception — their border is the control's frame and the text stays inside it.",
+        "ja": "ボーダーは内容の上に描かれ、内容を内側へ押さない — 子はボーダーが無いときと同じ位置のままで、wrapContent の Label もボーダーの分だけ高くはならない。例外は TextField・TextView・SelectBox で、ボーダーはコントロールの枠であり、テキストはその内側に収まる。"
+      }
+    },
+    "borderStyle": {
+      "summary": {
+        "en": "`solid` / `dashed` / `dotted`. Web supports all; iOS/Android default is `solid`.",
+        "ja": "`solid` / `dashed` / `dotted`。Web は全対応、iOS/Android は既定 `solid`。"
+      }
+    },
+    "shadow": {
+      "summary": {
+        "en": "Drop shadow object: `{ color, offsetX, offsetY, radius, opacity }`. Applied to the entire View bounds. Known difference: Android draws the shadow across the component's whole shape and then draws the component over it, so where the component is transparent or translucent the shadow shows through — a Label, View or Image with a shadow and no background has a grey box behind its content on Android. iOS casts the shadow from what the component actually draws (its text, its image, a translucent fill at that fill's opacity), and the web draws it only outside the box (an outer box-shadow). To get the same picture on every platform, give a component that declares a shadow an opaque `background`. Measured with a 60% black shadow on a 120×60 component over white, the darkening inside the box with no background was 153 of 255 on Android and about 0 on iOS, for 19 component types (Label, IconLabel, Image, NetworkImage, CircleImage, Switch, Toggle, CheckBox, Radio, Slider, Progress, Indicator, Segment, View, ScrollView, SafeAreaView, Collection, CircleView, Blur); with a 50% background it was 76 on Android and 37 on iOS; with an opaque background, none on either. A Button, SelectBox, TextField, TextView or WebView has an opaque fill of its own on Android and shows nothing through without a background.",
+        "ja": "ドロップシャドウのオブジェクト: `{ color, offsetX, offsetY, radius, opacity }`。View の全体境界に適用される。 既知の差: Android は影を部品の形いっぱいに描き、その上に部品を描く。そのため部品が透明・半透明の所では影が透け、影を付けて背景の無い Label・View・Image は、Android では中身の後ろに灰色の箱が出る。iOS は部品が実際に描いた物（字、絵、半透明の塗りならその不透明さの分）から影を作り、web は箱の外にだけ影を落とす（外側の box-shadow）。3 面で同じ絵にするには、影を付ける部品に不透明の `background` を付ける。白の上の 120×60 の部品に 60% の黒の影を付けて測ると、背景が無いとき、箱の中が暗くなった量は 255 のうち Android で 153、iOS でほぼ 0 だった。当たるのは 19 種類（Label・IconLabel・Image・NetworkImage・CircleImage・Switch・Toggle・CheckBox・Radio・Slider・Progress・Indicator・Segment・View・ScrollView・SafeAreaView・Collection・CircleView・Blur）。50% の背景では Android 76、iOS 37、不透明の背景ではどちらも 0 だった。Button・SelectBox・TextField・TextView・WebView は、Android では自分の不透明な塗りがあるので、背景が無くても透けない。"
+      },
+      "note": {
+        "en": "Every field takes a binding. A field left out takes the declared default on every platform: radius 5, offsets 0, opacity 1, and no colour is black at 33%. On web a shadow whose colour is a colors.json key, which every written hex becomes at build time, goes through `ColorManager.resolveColor`. Generated code read on a scratch project; what the browser drew is jsonui-cli's measurement. iOS Dynamic reads a bound shadow and draws it on a Button, and Android Dynamic does not draw a bound shadow colour as black; both are jsonui-cli's measurement.",
+        "ja": "どのフィールドも binding を取れる。書かなかったフィールドは 3 面とも宣言の既定値になる: radius 5、offset 0、opacity 1、色なしは黒の 33%。web では、色が colors.json のキー（書いた hex は build ですべてキーになる）の shadow は `ColorManager.resolveColor` を通る。生成コードは使い捨てのプロジェクトで読み、ブラウザの描画は jsonui-cli の測定。iOS の Dynamic は shadow の binding を読み Button にも描き、Android の Dynamic は binding の shadow の色を黒にしない。どちらも jsonui-cli の測定。"
+      },
+      "platformDiff": {
+        "swift_uikit": "layer.shadowColor / shadowOffset / shadowRadius / shadowOpacity に分解してマップ。",
+        "swift_swiftui": ".shadow(color:, radius:, x:, y:) modifier。",
+        "kotlin_compose": "Modifier.dropShadow(shape, Shadow(radius, color, offset))。",
+        "kotlin_xml": "elevation + outline provider が必要。",
+        "react": "CSS `box-shadow: Xpx Ypx radiuspx color` に変換。"
+      }
+    },
+    "clipToBounds": {
+      "summary": {
+        "en": "Boolean. When `true`, children that overflow the View are clipped.",
+        "ja": "Boolean。`true` で境界を超える子要素を切り取る。"
+      }
+    },
+    "tintColor": {
+      "summary": {
+        "en": "The accent of the node's operable parts — a control's accent, a link's colour, the text cursor — never the text colour, and images and icons do not take it. Each type says what its accent is (TextField: the cursor; Switch / Slider / Progress: the tint; Segment / TabView: the selected item). A container's tintColor reaches the controls inside it, as SwiftUI's `.tint` does — on Compose too — and a control's own tintColor wins. On web a View's tintColor renders as CSS `accent-color` (measured).",
+        "ja": "ノードの操作できる部分のアクセント色 — コントロールのアクセント、リンクの色、テキストカーソル — で、文字色には決してならず、画像とアイコンも受けない。何がアクセントかは型ごとに決まる（TextField: カーソル、Switch / Slider / Progress: tint、Segment / TabView: 選択中の項目）。入れ物の tintColor は、SwiftUI の `.tint` と同じく中のコントロールに届く — Compose でも — そしてコントロール自身の tintColor が優先される。web では View の tintColor は CSS の `accent-color` になる（実測）。"
+      }
+    },
+    "style": {
+      "summary": {
+        "en": "Preset style name. Defined in `docs/screens/styles/*.json`. Accepts a single name or array of names; later entries override earlier.",
+        "ja": "プリセットスタイル名。`docs/screens/styles/*.json` で定義。単一名または名前配列を受け付け、後出の値が前を上書き。"
+      },
+      "examples": [
+        { "language": "json", "code": "{ \"type\": \"Button\", \"style\": \"primary_button\" }" },
+        { "language": "json", "code": "{ \"type\": \"Button\", \"style\": [\"button_base\", \"button_primary\"] }" }
+      ]
+    },
+    "effectStyle": {
+      "summary": {
+        "en": "Visual effect (blur) style on any node: `Regular` (the default and the fallback) / `Prominent` / `UltraThin` / `Thin` / `Thick` / `Chrome` / `Light` / `Dark` / `ExtraLight`, with `systemMaterial`, `systemUltraThinMaterial` and the other `system*Material` names as aliases of the material ones. Written as declared — `thick` or `light` is an undeclared spelling that draws the default. A Blur takes only Light / Dark / ExtraLight (see Blur).",
+        "ja": "どのノードにも書ける視覚効果（ぼかし）のスタイル: `Regular`（既定値でありフォールバック）/ `Prominent` / `UltraThin` / `Thin` / `Thick` / `Chrome` / `Light` / `Dark` / `ExtraLight`。`systemMaterial`・`systemUltraThinMaterial` などの `system*Material` はマテリアル名の別名。宣言どおりの綴りで書く — `thick` や `light` は宣言に無い綴りとして既定で描かれる。Blur が受けるのは Light / Dark / ExtraLight だけ（Blur 参照）。"
+      }
+    },
+    "glass": {
+      "summary": {
+        "en": "Liquid Glass. Write `true` for the default treatment, or an object: `style` (`regular` / `clear` / `identity`), `tint`, `interactive`, and `shape` (`capsule` / `circle` / `rect`, or `rounded(N)` for a radius). Swift only, and the two Swift modes render it differently: SwiftUI calls `.glassEffect()`, UIKit uses `UIGlassEffect`. Two values SwiftUI honours and UIKit cannot. `style: identity` has no UIKit member, so the UIKit path applies no effect at all rather than a different one; and `shape` is a SwiftUI argument, so under UIKit the glass takes the shape of the view it sits on and the value you wrote is not read.",
+        "ja": "Liquid Glass。既定の見た目なら `true`、細かく指定するならオブジェクトで `style`（`regular` / `clear` / `identity`）、`tint`、`interactive`、`shape`（`capsule` / `circle` / `rect`、半径を指定するなら `rounded(N)`）。Swift のみで、2 つの Swift モードは別々に描画する: SwiftUI は `.glassEffect()`、UIKit は `UIGlassEffect`。SwiftUI が解釈して UIKit が解釈できない値が 2 つある。`style: identity` に対応する UIKit のメンバーが無いため、UIKit では別の効果になるのではなく効果が一切かからない。`shape` は SwiftUI の引数なので、UIKit では下敷きのビューの形になり、書いた値は読まれない。"
+      }
+    }
+  }
+}

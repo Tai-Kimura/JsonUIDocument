@@ -1,0 +1,8 @@
+aws_profile       = "tanosys"
+aws_region        = "ap-northeast-1"
+root_domain       = "tanosys.com"
+site_fqdn         = "jsonui.tanosys.com"
+site_bucket_name  = "jsonui-tanosys-com-site"
+price_class       = "PriceClass_200"
+github_repo       = "Tai-Kimura/JsonUIDocument"
+github_deploy_ref = "refs/heads/main"

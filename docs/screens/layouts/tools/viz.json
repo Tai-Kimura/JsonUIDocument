@@ -1,0 +1,152 @@
+{
+  "type": "View",
+  "id": "tools_viz_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "surface_base",
+  "child": [
+    {
+      "data": [
+        {
+          "name": "articleLinks",
+          "class": "CollectionDataSource"
+        },
+        {
+          "name": "onNavigateTools",
+          "class": "() -> Void"
+        }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "tools_viz_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "tools_viz_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            24,
+            32
+          ],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "width": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "ink_subtle",
+              "tapBackground": "surface_sunken",
+              "onClick": "@{onNavigateTools}",
+              "text": "breadcrumb"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "ink",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "ink_muted",
+              "text": "lead"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "section_moved",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            32,
+            32
+          ],
+          "background": "surface",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 26,
+              "fontWeight": "bold",
+              "fontColor": "ink",
+              "text": "section_moved_heading"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 16,
+              "fontColor": "ink_muted",
+              "text": "section_moved_body"
+            },
+            {
+              "type": "Collection",
+              "id": "tools_viz_articles_collection",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 20,
+              "columnCount": 2,
+              "lineSpacing": 16,
+              "itemSpacing": 16,
+              "lazy": "none",
+              "scrollEnabled": false,
+              "items": "@{articleLinks}",
+              "cellIdProperty": "id",
+              "sections": [
+                {
+                  "cell": "cells/next_step_card"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "tools_viz_footer",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [
+            24,
+            32,
+            32,
+            32
+          ],
+          "background": "chrome_fill",
+          "child": [
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "fontSize": 12,
+              "fontColor": "ink_faint",
+              "text": "footer_copyright"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

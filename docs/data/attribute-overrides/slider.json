@@ -1,0 +1,81 @@
+{
+  "component": "Slider",
+  "description": {
+    "en": "Continuous numeric input over a defined range. Can be constrained to discrete values via `step`.",
+    "ja": "指定範囲の連続数値入力。`step` で離散値にもできる。"
+  },
+  "usage": {
+    "en": "Use Slider for values where rough precision is acceptable (volume, brightness, opacity). For exact integers use a numeric TextField. For a range of two values, place two Sliders and keep their values consistent in the ViewModel.",
+    "ja": "大まかな精度で十分な値（音量・輝度・不透明度）に使う。厳密な整数入力なら数値 TextField を使う。範囲指定には 2 つの Slider を並べ、ViewModel で値を整合させる。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Volume slider", "ja": "音量スライダー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{volume}\",\n  \"minimum\": 0,\n  \"maximum\": 100,\n  \"step\": 1,\n  \"onValueChange\": \"@{onVolumeChanged}\"\n}"
+    },
+    {
+      "title": { "en": "With min/max images", "ja": "両端にアイコン" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Slider\",\n  \"value\": \"@{brightness}\",\n  \"minimum\": 0,\n  \"maximum\": 1,\n  \"step\": 0.01,\n  \"minimumValueImage\": \"sun_small\",\n  \"maximumValueImage\": \"sun_large\"\n}"
+    }
+  ],
+  "attributes": {
+    "value": {
+      "summary": { "en": "Current value (two-way binding).", "ja": "現在値（two-way binding）。" },
+      "note": {
+        "en": "Two-way numeric binding.",
+        "ja": "数値の two-way binding。"
+      }
+    },
+    "minimum": {
+      "note": {
+        "en": "Inclusive lower bound. Default 0.",
+        "ja": "端点を含む下限。デフォルト 0。"
+      }
+    },
+    "maximum": {
+      "note": {
+        "en": "Inclusive upper bound. Default 1.",
+        "ja": "端点を含む上限。デフォルト 1。"
+      }
+    },
+    "step": {
+      "note": {
+        "en": "Discrete step size. `0` means continuous. Defaults to `(maximum - minimum) / 100`.",
+        "ja": "離散ステップサイズ。`0` で連続値。デフォルトは `(maximum - minimum) / 100`。"
+      }
+    },
+    "tintColor": {
+      "note": {
+        "en": "Color of the filled track (left of the thumb).",
+        "ja": "thumb より左側の track 色。"
+      }
+    },
+    "trackTintColor": {
+      "note": {
+        "en": "Colour of the unfilled track. Since 2026-08 iOS paints the track itself rather than the whole view background (a codegen bug until then). Its deprecation was retracted upstream — SwiftUI reaches the track through `.background()`, so the attribute stays declared.",
+        "ja": "未充填側トラックの色。2026-08 以降、iOS はビュー全体の背景ではなくトラックそのものを塗ります（それまでは codegen のバグでした）。deprecation は上流で撤回されました — SwiftUI は `.background()` でトラックに到達できるため、この属性は宣言され続けます。"
+      }
+    },
+    "minimumValueImage": {
+      "note": {
+        "en": "Small image shown at the minimum end (usually a small-amount glyph like 🔈).",
+        "ja": "最小端に表示する小画像（通常は「少量」を示すグリフ）。"
+      }
+    },
+    "maximumValueImage": {
+      "note": {
+        "en": "Small image at the maximum end.",
+        "ja": "最大端の小画像。"
+      }
+    },
+    "onValueChange": {
+      "note": {
+        "en": "Fires on drag release (or continuously during drag depending on platform). Declare the handler `((Double) -> Void)?`, or `((Double?) -> Void)?`, or `((String, Double) -> Void)?` to take the Slider's id first; the same holds for the alias `onValueChanged`. One declaration serves both platforms: iOS hands the handler a Double, and Android's Slider gives a Float that the generated Compose passes as `.toDouble()`, inside a cell or not (KotlinJsonUI does the same in Dynamic). A `(Float)` handler takes the Float as it is, and an `(Int)` one gets no conversion on either platform. The generated call was read here; that it compiles, the iOS side and Dynamic are jsonui-cli's measurement.",
+        "ja": "ドラッグ解放時に発火（プラットフォームによってはドラッグ中も発火）。ハンドラーは `((Double) -> Void)?` と宣言します。`((Double?) -> Void)?` でも、Slider の id を先に受け取る `((String, Double) -> Void)?` でも構いません。別名の `onValueChanged` も同じです。1 つの宣言が両プラットフォームに効きます: iOS はハンドラーに Double を渡し、Android の Slider は Float を出しますが、生成される Compose はそれを `.toDouble()` で渡します（セルの中でも外でも。Dynamic では KotlinJsonUI が同じことをします）。`(Float)` のハンドラーは Float をそのまま受け取り、`(Int)` はどちらのプラットフォームでも変換されません。生成される呼び出しはここで読みました。コンパイルが通ること、iOS 側、Dynamic は jsonui-cli の測定です。"
+      }
+    }
+  },
+  "relatedComponents": ["Progress", "TextField"]
+}

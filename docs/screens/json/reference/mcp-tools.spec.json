@@ -1,0 +1,184 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "McpTools",
+    "displayName": "MCP tool API",
+    "description": "Reference > MCP tool API. All 57 tools of jsonui-mcp-server, grouped A–H, each with its params and a one-line role. Hand-authored: TOOL_IDS in McpToolsViewModel plus the tools_mcp_* / reference_mcp_tools_* strings. Four sections + TOC + next-reads.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "reference/mcp-tools",
+    "createdAt": "2026-04-23",
+    "updatedAt": "2026-09-30"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "tools",
+        "type": "CollectionDataSource(McpToolDetail)",
+        "initial": "[]",
+        "description": "39 MCP tools across 6 groups (A:8 / B:6 / C:7 / D:9 / E:3 / F:6). Each row carries name, group letter, role, and a preformatted parameters block."
+      },
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Two closing cards."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW --> VM",
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the module-scope NEXT_READ_ENTRIES catalog (two rows: next_mcp_overview -> /tools/mcp, next_agents -> /tools/agents) and stamp currentLanguage from StringManager.language. Each row's titleKey / descriptionKey is resolved through StringManager with the reference_mcp_tools_ namespace prefix."
+        },
+        {
+          "name": "onNavigate",
+          "params": [
+            {
+              "name": "url",
+              "type": "String"
+            }
+          ],
+          "description": "Client-side navigation via router.push(url). Destinations are the spec-mapped URLs enumerated in transitions: /, /tools/mcp, /tools/agents."
+        }
+      ],
+      "vars": [
+        {
+          "name": "tools",
+          "type": "CollectionDataSource(McpToolDetail)",
+          "observable": true,
+          "description": "39 MCP tools across 6 groups (A:8 Lookup / B:6 Validation / C:7 Generation / D:9 Build + Runtime / E:3 API Model Discovery / F:6 Test Tooling) rendered as one row each via cells/reference_mcp_tool_detail. Each row carries the tool name, group letter chip, one-line role, a Parameters heading, and a preformatted parameters code block (or '(no parameters)')."
+        },
+        {
+          "name": "nextReadLinks",
+          "type": "Array(NextReadLink)",
+          "observable": true,
+          "description": "Two closing 'read next' cards pointing at /tools/mcp and /tools/agents. Seeded by onAppear from the NEXT_READ_ENTRIES static catalog and re-seeded by onToggleLanguage."
+        }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "titleKey",
+            "type": "String"
+          },
+          {
+            "name": "descriptionKey",
+            "type": "String"
+          },
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ]
+      },
+      {
+        "name": "McpToolDetail",
+        "properties": [
+          { "name": "id",                "type": "String" },
+          { "name": "nameKey",           "type": "String" },
+          { "name": "groupKey",          "type": "String" },
+          { "name": "roleKey",           "type": "String" },
+          { "name": "paramsHeadingKey",  "type": "String" },
+          { "name": "paramsCode",        "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    {
+      "action": "Tap a TOC entry",
+      "processing": "TOC-internal scroll."
+    },
+    {
+      "action": "Tap a NextReadLink card",
+      "processing": "onNavigate(url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is spec-mapped",
+      "destination": "Target screen or tab",
+      "description": "v1 destinations: /, /tools/mcp, /tools/agents."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/reference/mcp-tools.json",
+      "description": "Layout."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/reference/McpToolsViewModel.ts",
+      "description": "VM."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/reference/mcp-tools/page.tsx",
+      "description": "Page."
+    }
+  ],
+  "notes": [
+    "Live Reference entry. Flip REFERENCE_ENTRIES row for 'mcp-tools' to 'live' in HomeViewModel when shipping.",
+    "v1 is hand-authored overview. Auto-generation from the upstream artifact is a future pass.",
+    "2026-05-27 — Swagger-driven Data Model additions. Surgical edits only; do not restructure existing group ordering.",
+    "Base catalog is 30 tools across 4 groups: A:8 (Lookup) / B:6 (Validation) / C:7 (Generation) / D:9 (Build + Runtime). Source of truth = `TOOL_IDS` in `jsonui-doc-web/src/viewmodels/reference/McpToolsViewModel.ts` lines 27-39. Do NOT use the earlier (incorrect) 29 / A:7 count that briefly appeared in `tools/mcp.spec.json`.",
+    "Append Group E (API Model Discovery) with 3 entries after the existing Group D tail. New totals: 33 tools / 5 groups (A:8 / B:6 / C:7 / D:9 / E:3).",
+    "Group E entry 1 — `list_api_specs`. group=E. role (en): 'Discover swagger files + parsed metadata (schema_count, endpoint_count, halts)'. role (ja): 'swagger ファイルと metadata を発見（schema 件数 / endpoint 件数 / halt の有無）'.",
+    "Group E entry 2 — `list_api_models`. group=E. role (en): 'Inventory generated DTO + Domain scaffold + orphan files per platform'. role (ja): 'プラットフォーム別 DTO / Domain scaffold / orphan の在庫を返す'.",
+    "Group E entry 3 — `preview_api_model_sync`. group=E. role (en): 'Dry-run filter impact — returns kept_schemas / filtered_out / skip_domain_matches / halts as JSON without writing files'. role (ja): 'filter 変更の影響を dry-run — kept_schemas / filtered_out / skip_domain_matches / halts を JSON で返す。ファイル書き込みなし'.",
+    "String-key declarations for the 3 new rows (en + ja content owned by jsonui-localize): each tool needs name / group letter chip text / role / params heading / params CodeBlock body. Suggested key shape (mirrors existing rows): `reference_mcp_tools_tool_list_api_specs_{name,group,role,params_heading,params_code}`, `reference_mcp_tools_tool_list_api_models_{...}`, `reference_mcp_tools_tool_preview_api_model_sync_{...}`. Group label key (en 'API Model Discovery' / ja 'API Model Discovery'): `reference_mcp_tools_group_e_label`. The actual `_params` JSON schema bodies are jsonui-implement's responsibility — only the string-key declarations live here.",
+    "Update any prose strings on this page that name the group / tool counts: `reference_mcp_tools_intro_*`, `reference_mcp_tools_section_overview_*`, any 'X tools across Y groups' sentence. 30 -> 33, 4 -> 5. Surgical replacements; do not rewrite the surrounding copy.",
+    "2026-07-09 — Test Tooling additions. Append Group F (Test Tooling) with 6 entries after the Group E tail. New totals: 39 tools / 6 groups (A:8 / B:6 / C:7 / D:9 / E:3 / F:6). Source of truth = `TOOL_IDS` in `jsonui-doc-web/src/viewmodels/reference/McpToolsViewModel.ts` (kept in sync with the tools/mcp McpViewModel).",
+    "Group F entries (group=F), added after preview_api_model_sync: test_validate (role: schema-validate screen/flow tests + descriptions; installs validated tests to platform dirs when test.install is configured), test_generate_screen (scaffold screen test template), test_generate_flow (scaffold flow test template), test_generate_description (scaffold a description JSON for one case), test_report (results JSON → JUnit/HTML), test_mock_generate (scaffold OpenAPI mocks; check:true = drift-only). `mock serve` is intentionally NOT exposed over MCP.",
+    "String-key declarations for the 6 new rows: name / group / role shared with tools/mcp via `tools_mcp_tool_test_{...}_{name,group,role}`; per-tool params via `reference_mcp_tools_tool_test_{...}_params`. Group label key `reference_mcp_tools_group_f_label` (en/ja 'Test Tooling'). Prose counts on this page: 33 -> 39, 5 -> 6, A–E -> A–F. Also fixed the stale section_groups_body which still read A:7 / 4 groups.",
+    "2026-07-28 — two stale claims corrected. read_time said 'auto-generated', but this catalogue is hand-authored (TOOL_IDS in the ViewModel plus the tools_mcp_* / reference_mcp_tools_* strings); it now reads 'reference', matching the lead, which already said hand-authored. section_groups_body still showed B (6) after get_screen_identity joined group B — measured from TOOL_IDS against the tools_mcp tool_<id>_group keys, the real split is A:8 / B:7 / C:7 / D:9 / E:3 / F:8 = 42, which the lead, tools_mcp.section_catalog_body and learn_installation.card_mcp_body already stated. This one line was the only place left behind. reference_attributes / reference_components keep 'auto-generated' — those pages really are emitted by scripts/build-attribute-reference.ts.",
+    "2026-09-25 — test_contracts_coverage added, its params and its exit / envelope contract read from src/tools/test/test_contracts_coverage.ts at 2.13.0. jui_generate_converter's params now list all eight the tool declares: name, attributes and skip_existing had been missing since the entry was written, and force arrived in 2.12.10. Count sentences across the site moved from 45 to 46.",
+    "2026-10-23 — the catalogue gains groups G (jui viz: viz_status, viz_doctor, viz_start, viz_stop, viz_open) and H (Server room: infra_validate, infra_load_validate, infra_prices_validate, infra_seed, infra_check, infra_cost): 57 tools, A:10 / B:7 / C:7 / D:9 / E:3 / F:10 / G:5 / H:6. Counted against jsonui-mcp-server's README (Available Tools (57)) and src/index.ts (57 registrations), and against the published npm package (57 server.tool names in dist). Roles from the README's G and H tables, params from each tool's zod schema; viz_doctor, viz_stop and viz_open take none. The per-group counts in the two groups sentences had lagged (A 8, B 6, F 8 against 10 / 7 / 10) and the Japanese F was 9 on two pages; all now match the TOOL_IDS."
+  ]
+}

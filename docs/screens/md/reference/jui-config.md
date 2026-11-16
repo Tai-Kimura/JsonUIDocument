@@ -1,0 +1,155 @@
+# JuiConfig - jui.config.json — Reference
+
+## Overview
+
+Single-page reference for the jui.config.json keys a project most often sets (not every key the toolchain reads — e.g. lint.strings, verify.requireSpecPerScreen, spec.transitionAliases, test.artifacts and mock.* are not listed yet): core directories, platforms.*, build.normalizeLayouts, api.*, test.*, checks[] + databases{}, and lint.*. Collects what was previously scattered across the pages that use each key. Content is hand-maintained against jui_tools ConfigManager and each key's consumer.
+
+| | |
+|---|---|
+| Layout File | `reference/jui-config` |
+| Created | 2026-08-01 |
+| Updated | 2026-09-30 |
+
+## Screen Structure
+
+### UI Components
+
+| Component | ID | Platform | Description | Initial State | Notes |
+|---|---|---|---|---|---|
+| View | `reference_jui_config_root` | - | - | - | - |
+| &nbsp;&nbsp;↳ Scroll | `reference_jui_config_scroll` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_jui_config_header` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_jui_config_content_with_rail` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_jui_config_body_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_file` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_directories` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_platforms` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_build` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_verify` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_api` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_test` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_checks` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `section_lint` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ CodeBlock | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_jui_config_next` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Collection | `reference_jui_config_next_collection` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_jui_config_footer` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ Label | `-` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_jui_config_rail_column` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ View | `reference_jui_config_toc_wrap` | - | - | - | - |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↳ TableOfContents | `-` | - | - | - | - |
+
+### Layout Structure
+
+```
+reference_jui_config_root
+└── reference_jui_config_scroll
+```
+
+## Data Flow
+
+```mermaid
+flowchart TD
+    VIEW[JuiConfigView] --> VM[JuiConfigViewModel]
+    VM -- nextReadLinks --> VIEW
+```
+
+### ViewModel
+
+#### Methods
+
+| Signature | Platforms | Description |
+|---|---|---|
+| `onAppear()` | all | Seed nextReadLinks from the static pair (cli-commands, db-schema-check). |
+
+#### Vars
+
+| Declaration | Flags | Platforms | Description |
+|---|---|---|---|
+| `var nextReadLinks: CollectionDataSource` | observable | all | Next-read cards. |
+
+## State Management
+
+### UI Data Variables
+
+| Variable Name | Type | Default | Description | Notes |
+|---|---|---|---|---|
+| `nextReadLinks` | CollectionDataSource | `-` | Bottom next-read cards (CLI command reference, DB schema check). | - |
+
+### View-local Event Handlers
+
+_Handlers kept inside the View layer. ViewModel public API lives under `dataFlow.viewModel`._
+
+| Handler | Description | Notes |
+|---|---|---|
+| `onNavigateReference` | Breadcrumb tap — router.push('/reference'). | - |
+
+## User Actions
+
+| Action | Processing | Destination | Notes |
+|---|---|---|---|
+| Tap the breadcrumb | router.push('/reference'). | - | - |
+| Tap a next-read card | router.push(card.url). | - | - |
+
+## Validation
+
+## Transitions
+
+| Condition | Destination | Notes |
+|---|---|---|
+| always | ReferenceIndex | - |
+
+## Related Files
+
+| Type | File Path | Notes |
+|---|---|---|
+| Layout | `docs/screens/layouts/reference/jui-config.json` | - |
+| ViewModel | `jsonui-doc-web/src/viewmodels/reference/JuiConfigViewModel.ts` | - |
+| View | `jsonui-doc-web/src/app/reference/jui-config/page.tsx` | - |
+
+## Notes
+
+- Key facts sourced from jui_tools ConfigManager (DEFAULT_CONFIG, API_PLATFORM_DEFAULTS), lint_generated_cmd, test_tools install resolution, and jsonui-doc project_config — verify against those when the config surface changes.
+- Strings prefix: `reference_jui_config_*`.
+- document_tools_path caveat added 2026-09-09 to the core-directories section. The page had stated only when the key is NEEDED (jsonui-doc not importable from the standard install) and said nothing about what setting it DOES: with a path that exists, document_tools resolves to that working copy rather than the installed distribution, so jui --version stops describing what runs; with a path that does not exist the setting has no effect at all. jsonui-cli prints a NOTE on stderr naming which case occurred. The second paragraph records that jui build reports only the broken case and stays silent when the path exists, because it never prepends it -- a command that did not do the work does not report having done it.
+- 2026-09-25 — test.appOwnedIds (ids the app draws outside every layout; a trailing `*` is a prefix; a declaration no step names is listed) added to the test section and the example; the lint section now names lint.stringsUsage and lint.stringsUsageTestPaths. Both keys are read from the shipped README and source. The element-id check they serve was measured on this site's own tests (see the testing guide's note).
+- 2026-09-30 — The lead said 'every key'; the page does not list lint.strings / lint.stringsAllowlist, test.artifacts, verify.requireSpecPerScreen, spec.transitionAliases, mock.* or server.port, which jsonui-cli reads. The lead is narrowed rather than the keys added in this pass.
+- 2026-11-10 — section_platforms_images_body added under the platforms CodeBlock: what jui build writes per platform from docs/screens/images, iOS writing a raster-only SVG's PNG/JPEG (scale 2x/3x) instead of a PDF under four conditions, Android's WARNINGs, and the vector/raster switch removing the other form's file. Measured by calling ImageConverter.convert_ios / convert_android on 9 scratch SVGs plus a vector-raster-vector switch; no app compiled; the site builds web only.
+- 2026-11-10 — section_platforms_images_body rewritten. Android draws an SVG's picture (whole-canvas PNG/JPEG/WebP to drawable-nodpi as is; mixed, two pictures, moved to drawable-xxhdpi at 3x), the URL-href WARNING on all three platforms, and stale removal limited to files jui wrote (iOS: named by a jui-authored Contents.json; Android: .jsonui-cli/image-outputs.json, nothing on the first build). Measured by calling ImageConverter the way jui build does (ImageOutputs load/save) on scratch SVGs with planted files: an Xcode-authored set, an unnamed png in a jui set, a user png in drawable-nodpi before the first build, a three-build switch. The no-converter fallback is jsonui-cli's statement, not run.
+- 2026-11-10: section_platforms_images_body adds that jui build names a same-named drawable and removes nothing: ERROR line in the folder jui wrote to (build continues, exit 1, 0 with --allow-partial), WARNING in another folder with the density a device shows it at, WARNING for a lone density folder, silence for a project's two-density set and other names. Measured by calling the shipped converter plus same_name_drawables as build does; exit read via the stage ledger; aapt2 stopping and density choice are jsonui-cli's measurement.
+- 2026-11-12: section_api_body names api.platforms.ios.modules and links /concepts/data-models-from-openapi, where it is measured.
+
+<!-- jsonui-doc-producer: jsonui-doc:spec -->

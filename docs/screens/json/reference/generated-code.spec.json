@@ -1,0 +1,69 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "GeneratedCode",
+    "displayName": "Generated code",
+    "description": "Reference > Generated code. What `jui build` writes, the size bounds every generated view function is held to, and the full set of knobs. Covers the artifact table (who writes what, what is hand-editable, what carries the @generated sentinel), the depth-5 hard / 250-line soft bounds and how they are measured, why iOS erases every section boundary to AnyView (opaque `some View` is transparent to type-metadata instantiation; the runtime decodes it on a 1 MB device stack), why Android has no counterpart (the dex 65,535 code-unit cap is a hard compile error, so oversized Compose functions are not warned about), `jui lint-generated` with its two signals and exit codes (0/1/2/3), the `.jui-size-waivers` ratchet, the three places knobs live (jui.config.json build.normalizeLayouts + lint.exclude_*, CLI flags --max-depth/--max-lines/--fail-on, KJUI_SECTION_WAIVER_WARNINGS) plus what is deliberately not configurable, and a table of the build diagnostics with their severity. Eight H2 sections + TOC + next-reads. ~7-min read.",
+    "platforms": ["web"],
+    "layoutFile": "reference/generated-code",
+    "createdAt": "2026-07-28",
+    "updatedAt": "2026-07-28"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing cards: CLI reference, SwiftJsonUI, KotlinJsonUI."
+      }
+    ],
+    "eventHandlers": [
+      { "name": "onAppear", "description": "Seed nextReadLinks." },
+      {
+        "name": "onNavigate",
+        "params": [{ "name": "url", "type": "String" }],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "customTypes": [
+    {
+      "name": "NextReadLink",
+      "fields": [
+        { "name": "id", "type": "String" },
+        { "name": "titleKey", "type": "String" },
+        { "name": "descriptionKey", "type": "String" },
+        { "name": "url", "type": "String" }
+      ]
+    }
+  ],
+  "notes": [
+    "2026-07-28 — New page. Created after the generated-function depth-bounding batch (sjui SectionBounder + kjui SectionExtractor) and the Android size-warning policy change, which between them moved the per-platform prose past what a 'Production caveats' bullet can carry.",
+    "Section 1 — section_artifacts: who writes each artifact, which are hand-editable, which carry the @generated sentinel. Generated view files are the exception (hand-edit markers inside instead), which is why the linter walks them separately.",
+    "Section 2 — section_bounds: depth 5 HARD measured on braces with literals/comments stripped (indentation over-reads); 250 lines SOFT; a function with no safe cut becomes a declared waiver, never a silent pass. Cutting is scope-aware.",
+    "Section 3 — section_erasure: opaque `some View` does not truncate type-metadata recursion, so `some View` helpers do not prevent the overflow; only value-level erasure does. Placement is structural so an edit near a threshold cannot flip AnyView on a sibling and change its transition identity.",
+    "Section 4 — section_android: bounds are iOS-calibrated, Compose has no counterpart, dex 65,535 code units is a hard compile error (measured worst case 12.6 %), so no build warning; KJUI_SECTION_WAIVER_WARNINGS=1 restores them for extractor debugging.",
+    "Section 5 — section_lint: not part of jui build; two signals, exit codes 0 clean / 1 could not run / 2 size-ratchet regression / 3 artifact health; --fail-on narrows the gating signal.",
+    "Section 6 — section_ratchet: --update-size-baseline writes .jui-size-waivers; entries may leave freely, a new entry is the regression signal; identity is path + function name so depth/line wobble does not trip it; opt-in.",
+    "Section 7 — section_knobs: jui.config.json (build.normalizeLayouts, lint.exclude_dir_names, lint.exclude_files, and since 2026-07-28 lint.max_depth / lint.max_lines) / CLI flags (--max-depth, --max-lines, --fail-on) / env (KJUI_SECTION_WAIVER_WARNINGS, JSONUI_CLI_DIR family), and the explicit statement that the generators' own bounds are constants, not settings. Resolution order is flag > jui.config.json lint > the built-in 5 and 250; the size flags default to None rather than the number, so an explicitly typed built-in still beats a stricter config.",
+    "Section 8 — section_warnings: diagnostics table with severity — canonical binding rules are errors, business logic / unknown attribute / off-palette colour / unused data property are warnings, oversized function is a warning on iOS only, missing marker is a lint finding.",
+    "Canonical sources: sjui_tools/lib/swiftui/section_bounder.rb (bounds + AnyView rationale), jui_tools/jui_cli/commands/lint_generated_cmd.py (exit codes, ratchet, lint config keys), kjui_tools/lib/compose/compose_builder.rb (the env-var switch), rjui_tools/lib/core/{binding,attribute}_validator.rb and react/tailwind_mapper.rb (warning families).",
+    "2026-07-28 — lint.max_depth / lint.max_lines landed upstream (report: lint-size-bounds-config) from this site's own filing; before it the bounds were argparse defaults with no config path at all. Verified against lint_generated_cmd.py _resolve_size_bounds: int only (bool excluded), a non-int value falls back to the built-in silently, and a value looser than the built-in is refused with a warning naming .jui-size-waivers. The clamp guards the config path only — a looser number passed as a flag is still honoured, so section 7 attributes the refusal to the config key, not to the flag.",
+    "2026-09-04 - `jui build` does not gate on warnings. Measured here in a throwaway project, one layout, five runs — an unknown attribute, a missing required attribute, an unknown component type and a `--lint-strings` localize finding are each printed and the build exits 0, while `jui lint-strings` on the same tree exits 2. The build fails only on inputs that stop the run (a layout that is not valid JSON exits 1; the code's other early returns are a missing jui.config.json and a responsive-variant contract violation). The warnings section is rewritten: it used to say the build is expected to run clean and that binding-grammar violations are errors that fail it.",
+    "2026-09-04 - the sentence removed here today ('canonical binding-grammar violations are errors that fail the build') was true of a different command. `sjui build` keeps canonical binding-rule errors separate from advisory warnings and fails on them whatever the flags, with other validation errors gated behind --strict; its card has said so all along, and the source is consistent with it (binding_validator_core.rb, and build.rb's own comment). The page names the sjui difference so the removed claim is findable where it is actually true, and says plainly that the measurements are the web path, the only one this site runs.",
+    "2026-09-04 - the sjui half of yesterday's note is now measured, not read. iOS scratch project, SwiftUI mode, one Label: `@{a ?? b ?? c}` (the canonical rule binding-double-default, severity error) exits 1 with `Build failed: 1 binding error(s) (canonical severity: error)`, while `@{a ?? b}` in the same position exits 0 — and exits 0 under --strict too, carrying four binding warnings. An unknown attribute exits 0 plain and 1 under --strict (`Build failed: 1 validation error(s)`). The same unknown attribute on the web path exits 0 and has no --strict to reach for. So the two builds differ in kind, not degree, and the page's sentence about it rests on runs rather than on the neighbouring card.",
+    "2026-09-04 - every failure case this page names is now run, not read off the command's early returns. No jui.config.json exits 1 ('ERROR: jui.config.json not found'). A layout that is not valid JSON exits 1 on a JSONDecodeError. A responsive-variant contract violation exits 1 naming the file and the rule — measured by dropping an orphan `name@regular.json` beside a base that does not exist, with the same tree minus that file exiting 0 as the control. The unresolvable @canonical mark was measured on 2026-09-03 and is already in this ledger. The page said these three in a sentence that came from reading the source; they are measurements now.",
+    "2026-09-04 - a binding whose contents are not an expression is warned about and emitted as literal text: `@{ bad name }` raises one warning and the generated file parses. The warning-counting expression in the toolchain's own comment has `| grep -vic 'warnings found'`, which is the off-by-one reported from here, and upstream documented the exclusion's own blind spot in the same block: a finding whose message contains that phrase is dropped with the summary. The `jui build` card loses its parenthetical about the flag's help calling the scan a gate, because the help does not; the card is re-stamped and help churn for the release is 1 of 61 leaves, that one.",
+    "2026-10-04 — section_warnings_body's list of non-zero exits gains the platform-not-in-config ERROR, measured here (see the CLI reference ledger for the arms)."
+  ]
+}

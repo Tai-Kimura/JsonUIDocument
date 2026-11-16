@@ -1,0 +1,74 @@
+{
+  "component": "TabView",
+  "description": {
+    "en": "Tab bar with multiple pages. Each tab's content is a separate child view; only the active tab's content is in the foreground.",
+    "ja": "複数ページを持つタブバー。各タブは独立した子 View を持ち、アクティブなタブのみ前面表示される。"
+  },
+  "usage": {
+    "en": "Use TabView for top-level screen switching where users expect a persistent bar (iOS bottom, Android Material top). Do not nest TabViews — use a sidebar or segmented control for secondary navigation.",
+    "ja": "ユーザーが常設タブバーを期待する最上位画面切替に使う（iOS はボトム、Android Material はトップ）。TabView のネストは避け、二次ナビはサイドバーや Segment を使う。"
+  },
+  "examples": [
+    {
+      "title": { "en": "3-tab bottom bar", "ja": "3 タブのボトムバー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{activeTab}\",\n  \"tabs\": [\n    { \"label\": \"@string/home\", \"icon\": \"house\", \"include\": \"screens/home\" },\n    { \"label\": \"@string/search\", \"icon\": \"magnifyingglass\", \"include\": \"screens/search\" },\n    { \"label\": \"@string/profile\", \"icon\": \"person\", \"include\": \"screens/profile\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Labels hidden (icon-only)", "ja": "ラベル非表示（アイコンのみ）" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{tabIndex}\",\n  \"showLabels\": false,\n  \"tabs\": [\n    { \"icon\": \"house\", \"include\": \"screens/home\" },\n    { \"icon\": \"gearshape\", \"include\": \"screens/settings\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Custom tint with on-change handler", "ja": "カスタム tint + 変更ハンドラ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{tabIndex}\",\n  \"tintColor\": \"#2563EB\",\n  \"unselectedColor\": \"#9CA3AF\",\n  \"tabBarBackground\": \"#FFFFFF\",\n  \"onTabChange\": \"@{onTabChanged}\",\n  \"tabs\": [ ]\n}"
+    }
+  ],
+  "attributes": {
+    "selectedIndex": {
+      "summary": { "en": "Currently selected tab index (two-way binding).", "ja": "現在選択されているタブのインデックス（two-way binding）。" },
+      "note": {
+        "en": "Two-way Int binding. Writes back on tab tap.",
+        "ja": "Int の two-way binding。タブタップで書き戻される。"
+      }
+    },
+    "tabs": {
+      "note": {
+        "en": "Array of tab definitions: `{ label, icon, include }`. `label` supports `@string/key`. `icon` resolves per platform (SF Symbol / Material / lucide). `include` is a layout file path loaded lazily.",
+        "ja": "タブ定義の配列: `{ label, icon, include }`。`label` は `@string/key` 対応。`icon` はプラットフォーム別に解決（SF Symbol / Material / lucide）。`include` は遅延読み込みされる layout ファイルパス。"
+      }
+    },
+    "showLabels": {
+      "note": {
+        "en": "Boolean. When `false`, only icons render.",
+        "ja": "Boolean。`false` でアイコンのみ描画。"
+      }
+    },
+    "tintColor": {
+      "note": {
+        "en": "Selected tab tint (icon + label). Accepts hex or color token.",
+        "ja": "選択中タブの tint（アイコン + ラベル）。hex または color token。"
+      }
+    },
+    "unselectedColor": {
+      "note": {
+        "en": "Unselected tab color. Defaults to 60% of `tintColor`. It colours a tab ITEM, so it only concerns a TabView used as a tab bar — a TabView carrying `.tabViewStyle(.page)` is a pager with no tab items, and nothing here reaches it. Android and web honour it; iOS 26 and later do not, on either iOS face, and nothing replaces it. SwiftUI exposes no per-item tint for a tab bar, so both iOS faces set the UIKit appearance proxy, and iOS 26 ignores that proxy for item tints — it still returns the colour you assigned when you read it back, it just does not draw with it. The loss is this one key: `tintColor` and `tabBarBackground` are still honoured on iOS 26, and it is not a regression in the library, since iOS 26 builds older than the current release behave the same way.",
+        "ja": "非選択タブ色。デフォルトは `tintColor` の 60%。色が付くのはタブ「項目」なので、タブバーとして使う TabView だけの話 — `.tabViewStyle(.page)` を付けた TabView はタブ項目を持たない pager で、以下はどれも当たらない。Android と web では有効。iOS は 26 以降、どちらの面でも効かず、代替も無い。SwiftUI にはタブ 1 個ごとの tint を指定する API が無いため、iOS の両面とも UIKit の appearance proxy を設定するが、iOS 26 はその proxy を item の tint については無視する — 設定した色は読み戻せば返ってくるが、描画には使われない。失われたのはこのキーだけで、`tintColor` と `tabBarBackground` は iOS 26 でも有効。ライブラリの退行でもない — 現行リリースより古い iOS 26 のビルドでも同じ挙動になる。"
+      }
+    },
+    "tabBarBackground": {
+      "note": {
+        "en": "Background color of the tab bar itself. For translucent bars (iOS default), leave undefined.",
+        "ja": "タブバー本体の背景色。iOS の半透明バー（デフォルト）にしたい場合は未指定。"
+      }
+    },
+    "onValueChange": {
+      "note": {
+        "en": "Called after `selectedIndex` updates. Use for analytics or conditional data prefetch. It is called only when the selected tab changes — a tap on another tab, or a write of a different value to `selectedIndex` — with the new index; not when the TabView first appears, nor when the selected tab is tapped again. That holds in generated code on iOS, Android and web and in Dynamic mode. The aliases `onTabChange` and `onPageChanged` are the same attribute.",
+        "ja": "`selectedIndex` 更新後に呼ばれる。アナリティクスや条件付きプリフェッチに使う。呼ばれるのは選択中のタブが変わったとき（別のタブのタップ、または `selectedIndex` への別の値の書き換え）だけで、新しい index を引数に取る。TabView が最初に表示されたときや、選択中のタブをもう一度タップしたときには呼ばれない。これは iOS・Android・web の生成コードと Dynamic モードでの挙動です。別名の `onTabChange` と `onPageChanged` は同じ 1 つの属性。"
+      }
+    }
+  },
+  "relatedComponents": ["View", "ScrollView", "Collection"]
+}

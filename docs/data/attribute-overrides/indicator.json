@@ -1,0 +1,54 @@
+{
+  "component": "Indicator",
+  "description": {
+    "en": "Activity spinner for indefinite, short-duration waits (loading, network fetching). Always animated; has no progress value.",
+    "ja": "不定・短時間の待機用スピナー（ローディング、ネットワーク取得）。常にアニメーション、進捗値なし。"
+  },
+  "usage": {
+    "en": "Use Indicator to signal 'something is happening' when you don't know the duration. For progress percent use Progress. Combine with `visibility` binding to show only while loading.",
+    "ja": "所要時間不明で「何かが進行中」だと示したいときに使う。進捗 % が分かるなら Progress。`visibility` binding と組み合わせてロード中のみ表示する。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Inline spinner", "ja": "インラインスピナー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Indicator\",\n  \"indicatorStyle\": \"medium\"\n}"
+    },
+    {
+      "title": { "en": "Conditional display", "ja": "条件付き表示" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Indicator\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"color\": \"#2563EB\",\n  \"hidesWhenStopped\": true\n}",
+      "note": {
+        "en": "`loadingVisibility` is derived in the ViewModel: `get loadingVisibility() { return this.loading ? \"visible\" : \"gone\"; }` — expressions inside `@{…}` are not part of the grammar.",
+        "ja": "`loadingVisibility` は ViewModel で導出する: `get loadingVisibility() { return this.loading ? \"visible\" : \"gone\"; }` — `@{…}` 内の式は文法に無い。"
+      }
+    },
+    {
+      "title": { "en": "Full-screen overlay", "ja": "全画面オーバーレイ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{loadingVisibility}\",\n  \"background\": \"#00000066\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"gravity\": \"center\",\n  \"child\": [\n    { \"type\": \"Indicator\", \"color\": \"#FFFFFF\", \"indicatorStyle\": \"large\" }\n  ]\n}"
+    }
+  ],
+  "attributes": {
+    "color": {
+      "note": {
+        "en": "Spinner stroke color. Defaults to the current theme's accent / tint color.",
+        "ja": "スピナーの線色。省略時は現テーマの accent / tint 色。"
+      }
+    },
+    "indicatorStyle": {
+      "summary": { "en": "Indicator style.", "ja": "インジケーターのスタイル。" },
+      "note": {
+        "en": "`small` / `medium` / `large` are the spinner's size — each one the platform's own, `small` and `large` as well as `medium`, so the platforms need not draw the same small or large spinner — and `linear` draws a bar instead of a spinner. A declared width / height wins over the style's size. The older spellings `style` (naming one of these values) and `size` (a length) are folded by the layout normalizer with a warning — `style` into this attribute, `size` into width and height. iOS (SwiftUI) and Android Compose. Upstream records one open defect: on Android, an Indicator that declares wrapContent does not take `small` / `large`. From the declaration; this site draws no Indicator.",
+        "ja": "`small` / `medium` / `large` はスピナーの大きさで、`medium` だけでなく `small` と `large` もそれぞれのプラットフォーム自身の値 — なのでプラットフォーム間で同じ大きさの small / large を描くとは限らない。`linear` はスピナーの代わりにバーを描く。width / height を宣言すれば、スタイルの大きさより優先される。古い綴りの `style`（これらの値を名指すもの）と `size`（長さ）は、layout の normalizer が警告付きで畳む — `style` はこの属性へ、`size` は width と height へ。iOS（SwiftUI）と Android Compose。上流が記録した未修正の不具合が 1 つある: Android で wrapContent を宣言した Indicator は `small` / `large` が効かない。宣言の記述で、このサイトは Indicator を描かない。"
+      }
+    },
+    "hidesWhenStopped": {
+      "note": {
+        "en": "Boolean. When `true`, the Indicator hides itself when not animating. Default `true`.",
+        "ja": "Boolean。`true` でアニメーション停止中は自身を非表示にする。デフォルト `true`。"
+      }
+    }
+  },
+  "relatedComponents": ["Progress"]
+}

@@ -1,0 +1,3816 @@
+{
+  "component": "ScrollView",
+  "kebab": "scroll-view",
+  "aliasOf": null,
+  "title": "ScrollView",
+  "description": {
+    "en": "Vertically (default) or horizontally scrollable container. Children that exceed the visible bounds become scrollable.",
+    "ja": "垂直（デフォルト）または水平にスクロール可能なコンテナ。可視領域を超えた子要素がスクロール対象になる。"
+  },
+  "usage": {
+    "en": "Use ScrollView for static-sized content that may overflow (forms, long articles, long card stacks). For large dynamic lists use Collection — it virtualizes. An iOS ScrollView that is wrapContent along its scroll axis (a vertical one with height wrapContent, a horizontal one with width wrapContent) is as long as its content there, or shorter and scrolling when its parent offers less, as Android and the web draw it. The generator measures the content into a state named after the ScrollView's id (<id>ContentLength) and frames the ScrollView at it; SwiftJsonUI's Dynamic mode draws the same. Read from sjui's ScrollViewConverter with a vertical ScrollView of height wrapContent.",
+    "ja": "オーバーフローする可能性のある静的コンテンツ（フォーム、長文、長いカードスタック）に使う。大量の動的リストは仮想化される Collection を使う。 iOS の ScrollView がスクロールの向きに wrapContent のとき（縦なら height が wrapContent、横なら width が wrapContent）、その向きの長さは中身の長さになり、親がそれより短くしか取れないときは短くなって中でスクロールします。Android と web と同じ描き方です。generator は中身の長さを ScrollView の id から名付けた state（<id>ContentLength）に測り、ScrollView をその長さで枠取ります。SwiftJsonUI の Dynamic も同じに描きます。sjui の ScrollViewConverter に height が wrapContent の縦の ScrollView を渡して読んだもの。"
+  },
+  "aliasNotice": null,
+  "kicker": "Component · Reference",
+  "kickerParentLabel": "Components",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "platform_ios",
+              "label": "iOS",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_android",
+              "label": "Android",
+              "fontColor": "var(--color-ink)"
+            },
+            {
+              "id": "platform_web",
+              "label": "Web",
+              "fontColor": "var(--color-ink)"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "visible",
+  "aliasCalloutVisibility": "gone",
+  "aliasLinkUrl": "",
+  "canonicalCode": "{\n  \"type\": \"ScrollView\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}",
+  "canonicalLanguage": "json",
+  "statRequired": "0",
+  "statOptional": "24",
+  "statEvents": "0",
+  "statRequiredText": {
+    "en": "0 required",
+    "ja": "必須 0"
+  },
+  "statOptionalText": {
+    "en": "24 optional",
+    "ja": "任意 24"
+  },
+  "statEventsText": {
+    "en": "0 events",
+    "ja": "イベント 0"
+  },
+  "usageVisibility": "visible",
+  "attributeCategories": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "cat_common",
+              "label": {
+                "en": "Common",
+                "ja": "共通"
+              },
+              "anchorUrl": "#section-common"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributesCommon": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_orientation",
+              "name": "orientation",
+              "anchorId": "attr-orientation",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll orientation.",
+                "ja": "レイアウト方向。`vertical` / `horizontal`。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`vertical` (default) / `horizontal`. For both-axis scrolling, nest two ScrollViews. The axis comes only from this attribute and `horizontalScroll`, never from the children. A ScrollView that writes neither scrolls vertically, even when its only child is a horizontal View, which is then laid out inside a vertical scroll. To scroll sideways, write `orientation: \"horizontal\"` on the ScrollView itself.",
+                "ja": "`vertical`（デフォルト）/ `horizontal`。両軸スクロールは 2 つの ScrollView をネスト。スクロールの向きは、この属性と `horizontalScroll` だけで決まり、子からは決めない。どちらも書かない ScrollView は縦にスクロールし、唯一の子が横並びの View でも、その子は縦スクロールの中に置かれる。横にスクロールさせるには、ScrollView 自身に `orientation: \"horizontal\"` を書く。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_paging",
+              "name": "paging",
+              "anchorId": "attr-paging",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable paging.",
+                "ja": "ページングを有効化する。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`true` snaps to child boundaries (each child = one page). Usually paired with children sized to the parent.",
+                "ja": "`true` で子要素境界にスナップ（子要素 1 つ = 1 ページ）。通常は子要素を親サイズに揃える。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_scrollEnabled",
+              "name": "scrollEnabled",
+              "anchorId": "attr-scrollEnabled",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable scrolling (binding supported).",
+                "ja": "スクロール可否（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. When `false`, ScrollView acts as a plain View. Useful when scroll behavior is conditional.",
+                "ja": "Boolean。`false` で通常の View として振る舞う。スクロール挙動を条件付きで変えたいときに使う。"
+              },
+              "type": "boolean | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_bounces",
+              "name": "bounces",
+              "anchorId": "attr-bounces",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable bounce effect.",
+                "ja": "端でのバウンスエフェクトを有効化する。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "iOS-specific bounce behavior at scroll edges. Default `true`. Set `false` to remove the rubber-band effect. Why the surface is narrower — Android: Compose's equivalent is overscroll, and disabling it means CompositionLocalProvider(LocalOverscrollConfiguration provides null) — an experimental Foundation API the generated code does not carry an @OptIn for. Re-declare when the API stabilizes.",
+                "ja": "iOS 固有のスクロール端バウンス挙動。デフォルト `true`。ラバーバンド効果を消すには `false`。 対応面が狭い理由 — Android: Compose's equivalent is overscroll, and disabling it means CompositionLocalProvider(LocalOverscrollConfiguration provides null) — an experimental Foundation API the generated code does not carry an @OptIn for. Re-declare when the API stabilizes."
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_keyboardAvoidance",
+              "name": "keyboardAvoidance",
+              "anchorId": "attr-keyboardAvoidance",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "default: true",
+              "defaultChipVisibility": "visible",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable keyboard avoidance.",
+                "ja": "キーボード回避を有効化する。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Boolean, default `true`: absent means on. When on, the ScrollView keeps the focused text field above the soft keyboard. iOS uses the keyboard-avoiding scroll view and disables its configuration when `false`. Android applies KotlinJsonUI's Modifier.keyboardAvoidance only when not `false`: imePadding(), the `keyboardAvoidancePadding` clearance, and scrolling the focused field up once the IME is showing. Both the generated code and the dynamic ScrollView call it. Read from the codegen and the upstream report, not measured here.",
+                "ja": "Boolean、既定 `true`: 書かなければ有効。有効ならフォーカス中のテキストフィールドがソフトキーボードの上に来るよう ScrollView が保つ。iOS はキーボード回避付きの scroll view を使い、`false` で構成を無効化。Android は `false` でない場合だけ KotlinJsonUI の Modifier.keyboardAvoidance を適用する: imePadding()、`keyboardAvoidancePadding` の余白、そして IME が出たあとフォーカス中のフィールドを上へスクロールする追従。生成コードと dynamic の ScrollView の両方がこれを呼ぶ。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_keyboardDismissMode",
+              "name": "keyboardDismissMode",
+              "anchorId": "attr-keyboardDismissMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "none",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "onDrag",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "interactive",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Keyboard dismiss mode.",
+                "ja": "キーボードを閉じるモード。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "`none` / `onDrag` / `interactive`. Controls when the keyboard dismisses during scroll. `interactive` lets a drag pull the keyboard down with the finger.",
+                "ja": "`none` / `onDrag` / `interactive`。スクロール中のキーボード閉じ挙動を制御。`interactive` は指のドラッグに合わせてキーボードを引き下ろせる。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_showsVerticalScrollIndicator",
+              "name": "showsVerticalScrollIndicator",
+              "anchorId": "attr-showsVerticalScrollIndicator",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Show vertical indicator.",
+                "ja": "垂直スクロールインジケータの表示。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. On iOS SwiftUI, hiding requires iOS 16+ (earlier versions ignore the setting). Why the surface is narrower — Android: Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists.",
+                "ja": "Boolean。iOS SwiftUI で非表示にするには iOS 16+ が必要（それ以前は無視される）。 対応面が狭い理由 — Android: Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists."
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_showsHorizontalScrollIndicator",
+              "name": "showsHorizontalScrollIndicator",
+              "anchorId": "attr-showsHorizontalScrollIndicator",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Show horizontal indicator.",
+                "ja": "水平スクロールインジケータの表示。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Why the surface is narrower — Android: Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists.",
+                "ja": "対応面が狭い理由 — Android: Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists."
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_contentInsetAdjustmentBehavior",
+              "name": "contentInsetAdjustmentBehavior",
+              "anchorId": "attr-contentInsetAdjustmentBehavior",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "never",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "always",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "automatic",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "scrollableAxes",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Content inset adjustment.",
+                "ja": "コンテンツインセットの自動調整挙動。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`automatic` / `never` / `scrollableAxes` / `always`: whether the content clears the safe area (the system bars). On iOS the system adjusts by default and `never` stops it. On Android (kjui and KotlinJsonUI Dynamic) `always` / `automatic` pad the content by the safe area, `scrollableAxes` only on the scroll axis, and `never` or no declaration by nothing. That padding is only the part of the safe area the scroll view's own frame overlaps, as on iOS, so inside a SafeAreaView or below a header it is 0. kjui's output calls KotlinJsonUI's rememberSafeAreaOverlap. The web draws no safe area for it; `never` writes `scroll-p-0`. Read from kjui's ScrollViewComponent (`rememberSafeAreaOverlap()`) and from rjui's converter; the drawing on a device is jsonui-cli's word.",
+                "ja": "`automatic` / `never` / `scrollableAxes` / `always`: 内容がセーフエリア（システムバー）を避けるかどうか。iOS は既定でシステムが調整し、`never` で止まる。Android（kjui と KotlinJsonUI Dynamic）は、`always` / `automatic` でセーフエリアの分、`scrollableAxes` でスクロール方向の分だけ内容に余白を足し、`never` か宣言なしなら足さない。その余白はスクロールビュー自身の枠がセーフエリアと重なる分だけ（iOS と同じ）。SafeAreaView の内側やヘッダーの下では 0。kjui の生成物は KotlinJsonUI の rememberSafeAreaOverlap を呼ぶ。web はセーフエリアを描かず、`never` で `scroll-p-0` を書く。kjui の ScrollViewComponent（`rememberSafeAreaOverlap()`）を、rjui の converter とあわせて読んだもの。端末での描かれ方は jsonui-cli の言葉。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_indicatorStyle",
+              "name": "indicatorStyle",
+              "anchorId": "attr-indicatorStyle",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll indicator style.",
+                "ja": "スクロールインジケータのスタイル。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "iOS-only. `default` / `black` / `white`. Scroll indicator color.",
+                "ja": "iOS 専用。`default` / `black` / `white`。スクロールバーの色。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_minZoom",
+              "name": "minZoom",
+              "anchorId": "attr-minZoom",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Minimum zoom scale (binding supported).",
+                "ja": "最小ズーム倍率（binding 可）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Why the surface is narrower — Android: Same gesture-arbitration problem as maxZoom: Compose has no zoom primitive for a scrolling container. / Web: The browser arbitrates pinch zoom itself (touch-action); there is no control surface for a minimum scale.",
+                "ja": "対応面が狭い理由 — Android: Same gesture-arbitration problem as maxZoom: Compose has no zoom primitive for a scrolling container. / Web: The browser arbitrates pinch zoom itself (touch-action); there is no control surface for a minimum scale."
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_maxZoom",
+              "name": "maxZoom",
+              "anchorId": "attr-maxZoom",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Maximum zoom scale (binding supported).",
+                "ja": "最大ズーム倍率（binding 可）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Why the surface is narrower — Android: Pinch-zoom on a SCROLLING container needs real gesture arbitration in Compose — detectTransformGestures/transformable consume the drag and would take scrolling away — and a maximum without minZoom would be half a feature. iOS gets zoom from UIScrollView; web delegates to the browser via touch-action.",
+                "ja": "対応面が狭い理由 — Android: Pinch-zoom on a SCROLLING container needs real gesture arbitration in Compose — detectTransformGestures/transformable consume the drag and would take scrolling away — and a maximum without minZoom would be half a feature. iOS gets zoom from UIScrollView; web delegates to the browser via touch-action."
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_child",
+              "name": "child",
+              "anchorId": "attr-child",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child component(s): an array of nodes, or a single node as shorthand for a one-element array (declared as `acceptsSingle` in the attribute SSoT).",
+                "ja": "子コンポーネント: ノードの配列、または 1 要素の配列の省略形としての単一ノード（属性 SSoT に `acceptsSingle` として宣言）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_children",
+              "name": "children",
+              "anchorId": "attr-children",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child components (alias for `child`): an array of nodes, or a single node as shorthand for a one-element array.",
+                "ja": "子コンポーネント（`child` のエイリアス）: ノードの配列、または 1 要素の配列の省略形としての単一ノード。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_contentInset",
+              "name": "contentInset",
+              "anchorId": "attr-contentInset",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Padding inside the scroll area: one, two or four values (rjui scroll_view_converter).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | array",
+              "required": ""
+            },
+            {
+              "id": "attr_contentOffset",
+              "name": "contentOffset",
+              "anchorId": "attr-contentOffset",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Initial offset [x, y].",
+                "ja": "初期スクロール位置 `[x, y]`。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_contentSize",
+              "name": "contentSize",
+              "anchorId": "attr-contentSize",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Content size [width, height].",
+                "ja": "コンテンツサイズ `[width, height]`。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_decelerationRate",
+              "name": "decelerationRate",
+              "anchorId": "attr-decelerationRate",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Deceleration rate.",
+                "ja": "スクロール減速レート。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_defaultScrollAnchor",
+              "name": "defaultScrollAnchor",
+              "anchorId": "attr-defaultScrollAnchor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Initial scroll position anchor (iOS 17+). Sets where the scroll view starts.",
+                "ja": "初期スクロール位置アンカー（iOS 17+）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_horizontalScroll",
+              "name": "horizontalScroll",
+              "anchorId": "attr-horizontalScroll",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable horizontal scroll.",
+                "ja": "水平スクロールを有効化する。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. `true` is the same as `orientation: \"horizontal\"`; `false` or absent leaves the axis to `orientation`, which is vertical when it is not written either. Written together with `orientation`, the two must agree: `orientation: \"horizontal\"` with `horizontalScroll: false`, or `\"vertical\"` with `true`, is refused by `jui build` with `ERROR [scrollview]`, under a responsive key too.",
+                "ja": "Boolean。`true` は `orientation: \"horizontal\"` と同じ。`false` または書かなければ向きは `orientation` に任され、それも書かなければ縦。`orientation` と一緒に書くときは一致していなければならない: `orientation: \"horizontal\"` に `horizontalScroll: false`、または `\"vertical\"` に `true` を組み合わせると、`jui build` が `ERROR [scrollview]` で拒否する。responsive のキーの中でも同じ。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_keyboardAvoidancePadding",
+              "name": "keyboardAvoidancePadding",
+              "anchorId": "attr-keyboardAvoidancePadding",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "default: 20",
+              "defaultChipVisibility": "visible",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Clearance, in points/dp, that a focused text field keeps from the ScrollView's visible bottom edge while the soft keyboard is up.",
+                "ja": "ソフトキーボード表示中、フォーカス中のテキストフィールドが ScrollView の見えている下端から保つ余白（pt / dp）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Number. Absent means 20, not 0. The visible bottom edge is whatever bounds the scroll area at that moment: the top of a fixed footer laid out below the ScrollView, or the keyboard itself when the ScrollView meets it directly. iOS applies it as a bottom safe-area inset (KeyboardAvoidanceConfiguration.additionalPadding). The inset is there while the keyboard is visible, and also from the moment a text input inside the ScrollView begins editing, so it is in place before SwiftUI scrolls the focused field. With a hardware keyboard, where no software keyboard shows, the inset is there while an input inside is being edited. Android's Modifier.keyboardAvoidance ends the scrollable's viewport that far above the IME while it is visible and scrolls the focused field to that edge once the IME is up. The follow itself is done by KotlinJsonUI, not left to Compose's built-in tracking. Ignored when `keyboardAvoidance` is `false`. Not applicable on Web, which has no soft-keyboard avoidance. Read from the codegen and the upstream report, not measured here.",
+                "ja": "Number。書かなければ 20 であって 0 ではない。「見えている下端」はその瞬間にスクロール領域を区切っているもの: ScrollView の下に置いた固定フッターの上端、または ScrollView がキーボードに直接接しているならキーボードそのもの。iOS では bottom safe-area inset として適用（KeyboardAvoidanceConfiguration.additionalPadding）。この inset はキーボードが見えている間に加え、ScrollView の中の入力欄が編集を始めた時点から入る。そのため SwiftUI がフォーカス中のフィールドをスクロールする前に inset が揃っている。ソフトキーボードが出ないハードウェアキーボードの場合も、中の入力欄を編集している間は inset が入る。Android では Modifier.keyboardAvoidance が IME 表示中にスクロール領域の viewport をその分だけ IME の上で終わらせ、IME が出たあとフォーカス中のフィールドをその縁までスクロールする。追従そのものは KotlinJsonUI が行い、Compose 組み込みの追跡には任せていない。`keyboardAvoidance` が `false` なら無視される。Web は非対応（ソフトキーボード回避が無い）。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_scrollBehavior",
+              "name": "scrollBehavior",
+              "anchorId": "attr-scrollBehavior",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "auto",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "smooth",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll behavior animation.",
+                "ja": "スクロールアニメーションの挙動。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_scrollMode",
+              "name": "scrollMode",
+              "anchorId": "attr-scrollMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "inner",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "window",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Where the scroll happens. 'inner' (default, iOS/Android-style): the ScrollView div itself gets overflow-y-auto and scrolls internally — requires a bounded-height ancestor on web to actually activate. 'window' (web-only escape hatch): skip the overflow class so the page/window scrolls naturally; fixes position:sticky descendants that would otherwise be anchored to a never-scrolling inner container. iOS/Android ignore this attribute (UIScrollView always scrolls internally).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_scrollsToTop",
+              "name": "scrollsToTop",
+              "anchorId": "attr-scrollsToTop",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll to top on status bar tap.",
+                "ja": "ステータスバータップで最上部にスクロールする。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "groupCommonVisibility": "visible",
+  "attributesStyle": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStyleVisibility": "gone",
+  "attributesLayout": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupLayoutVisibility": "gone",
+  "attributesSpacing": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupSpacingVisibility": "gone",
+  "attributesAlignment": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupAlignmentVisibility": "gone",
+  "attributesState": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupStateVisibility": "gone",
+  "attributesBinding": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupBindingVisibility": "gone",
+  "attributesEvent": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupEventVisibility": "gone",
+  "attributesResponsive": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupResponsiveVisibility": "gone",
+  "attributesMisc": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "groupMiscVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_glance",
+      "label": {
+        "en": "At a glance",
+        "ja": "概要"
+      },
+      "anchor": "section-glance",
+      "level": 1
+    },
+    {
+      "id": "toc_common",
+      "label": {
+        "en": "Common",
+        "ja": "共通"
+      },
+      "anchor": "section-common",
+      "level": 1
+    },
+    {
+      "id": "toc_examples",
+      "label": {
+        "en": "Examples",
+        "ja": "例"
+      },
+      "anchor": "section-examples",
+      "level": 1
+    },
+    {
+      "id": "toc_related",
+      "label": {
+        "en": "Related",
+        "ja": "関連"
+      },
+      "anchor": "section-related",
+      "level": 1
+    }
+  ],
+  "examples": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "example_1",
+              "anchorId": "example-1",
+              "title": {
+                "en": "Vertical scroll",
+                "ja": "垂直スクロール"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"ScrollView\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"ScrollView\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"ScrollView\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_2",
+              "anchorId": "example-2",
+              "title": {
+                "en": "Horizontal carousel without indicators",
+                "ja": "水平カルーセル・スクロールバー非表示"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"showsHorizontalScrollIndicator\": false,\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"horizontal\", \"child\": [ ] }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"showsHorizontalScrollIndicator\": false,\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"horizontal\", \"child\": [ ] }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"showsHorizontalScrollIndicator\": false,\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"horizontal\", \"child\": [ ] }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_3",
+              "anchorId": "example-3",
+              "title": {
+                "en": "Paging per screen",
+                "ja": "画面単位のスナップ"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"paging\": true,\n  \"child\": [\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"paging\": true,\n  \"child\": [\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"paging\": true,\n  \"child\": [\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" }\n  ]\n}",
+              "required": ""
+            },
+            {
+              "id": "example_4",
+              "anchorId": "example-4",
+              "title": {
+                "en": "Form with keyboard avoidance",
+                "ja": "キーボード回避を有効にしたフォーム"
+              },
+              "description": {
+                "en": "",
+                "ja": ""
+              },
+              "descriptionVisibility": "gone",
+              "filePath": "",
+              "filePathVisibility": "gone",
+              "tabs": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "tabsVisibility": "gone",
+              "languagePill": "json",
+              "languagePillVisibility": "visible",
+              "activeLanguage": "json",
+              "activeCode": "{\n  \"type\": \"ScrollView\",\n  \"keyboardAvoidance\": true,\n  \"keyboardDismissMode\": \"interactive\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "noteVisibility": "gone",
+              "_variants": [
+                {
+                  "language": "json",
+                  "code": "{\n  \"type\": \"ScrollView\",\n  \"keyboardAvoidance\": true,\n  \"keyboardDismissMode\": \"interactive\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}"
+                }
+              ],
+              "language": "json",
+              "code": "{\n  \"type\": \"ScrollView\",\n  \"keyboardAvoidance\": true,\n  \"keyboardDismissMode\": \"interactive\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_orientation",
+              "name": "orientation",
+              "anchorId": "attr-orientation",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "horizontal",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "vertical",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll orientation.",
+                "ja": "レイアウト方向。`vertical` / `horizontal`。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`vertical` (default) / `horizontal`. For both-axis scrolling, nest two ScrollViews. The axis comes only from this attribute and `horizontalScroll`, never from the children. A ScrollView that writes neither scrolls vertically, even when its only child is a horizontal View, which is then laid out inside a vertical scroll. To scroll sideways, write `orientation: \"horizontal\"` on the ScrollView itself.",
+                "ja": "`vertical`（デフォルト）/ `horizontal`。両軸スクロールは 2 つの ScrollView をネスト。スクロールの向きは、この属性と `horizontalScroll` だけで決まり、子からは決めない。どちらも書かない ScrollView は縦にスクロールし、唯一の子が横並びの View でも、その子は縦スクロールの中に置かれる。横にスクロールさせるには、ScrollView 自身に `orientation: \"horizontal\"` を書く。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_paging",
+              "name": "paging",
+              "anchorId": "attr-paging",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable paging.",
+                "ja": "ページングを有効化する。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`true` snaps to child boundaries (each child = one page). Usually paired with children sized to the parent.",
+                "ja": "`true` で子要素境界にスナップ（子要素 1 つ = 1 ページ）。通常は子要素を親サイズに揃える。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_scrollEnabled",
+              "name": "scrollEnabled",
+              "anchorId": "attr-scrollEnabled",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable scrolling (binding supported).",
+                "ja": "スクロール可否（binding 可）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. When `false`, ScrollView acts as a plain View. Useful when scroll behavior is conditional.",
+                "ja": "Boolean。`false` で通常の View として振る舞う。スクロール挙動を条件付きで変えたいときに使う。"
+              },
+              "type": "boolean | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_bounces",
+              "name": "bounces",
+              "anchorId": "attr-bounces",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable bounce effect.",
+                "ja": "端でのバウンスエフェクトを有効化する。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "iOS-specific bounce behavior at scroll edges. Default `true`. Set `false` to remove the rubber-band effect. Why the surface is narrower — Android: Compose's equivalent is overscroll, and disabling it means CompositionLocalProvider(LocalOverscrollConfiguration provides null) — an experimental Foundation API the generated code does not carry an @OptIn for. Re-declare when the API stabilizes.",
+                "ja": "iOS 固有のスクロール端バウンス挙動。デフォルト `true`。ラバーバンド効果を消すには `false`。 対応面が狭い理由 — Android: Compose's equivalent is overscroll, and disabling it means CompositionLocalProvider(LocalOverscrollConfiguration provides null) — an experimental Foundation API the generated code does not carry an @OptIn for. Re-declare when the API stabilizes."
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_keyboardAvoidance",
+              "name": "keyboardAvoidance",
+              "anchorId": "attr-keyboardAvoidance",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "default: true",
+              "defaultChipVisibility": "visible",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable keyboard avoidance.",
+                "ja": "キーボード回避を有効化する。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Boolean, default `true`: absent means on. When on, the ScrollView keeps the focused text field above the soft keyboard. iOS uses the keyboard-avoiding scroll view and disables its configuration when `false`. Android applies KotlinJsonUI's Modifier.keyboardAvoidance only when not `false`: imePadding(), the `keyboardAvoidancePadding` clearance, and scrolling the focused field up once the IME is showing. Both the generated code and the dynamic ScrollView call it. Read from the codegen and the upstream report, not measured here.",
+                "ja": "Boolean、既定 `true`: 書かなければ有効。有効ならフォーカス中のテキストフィールドがソフトキーボードの上に来るよう ScrollView が保つ。iOS はキーボード回避付きの scroll view を使い、`false` で構成を無効化。Android は `false` でない場合だけ KotlinJsonUI の Modifier.keyboardAvoidance を適用する: imePadding()、`keyboardAvoidancePadding` の余白、そして IME が出たあとフォーカス中のフィールドを上へスクロールする追従。生成コードと dynamic の ScrollView の両方がこれを呼ぶ。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_keyboardDismissMode",
+              "name": "keyboardDismissMode",
+              "anchorId": "attr-keyboardDismissMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "none",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "onDrag",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "interactive",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Keyboard dismiss mode.",
+                "ja": "キーボードを閉じるモード。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "`none` / `onDrag` / `interactive`. Controls when the keyboard dismisses during scroll. `interactive` lets a drag pull the keyboard down with the finger.",
+                "ja": "`none` / `onDrag` / `interactive`。スクロール中のキーボード閉じ挙動を制御。`interactive` は指のドラッグに合わせてキーボードを引き下ろせる。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_showsVerticalScrollIndicator",
+              "name": "showsVerticalScrollIndicator",
+              "anchorId": "attr-showsVerticalScrollIndicator",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Show vertical indicator.",
+                "ja": "垂直スクロールインジケータの表示。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. On iOS SwiftUI, hiding requires iOS 16+ (earlier versions ignore the setting). Why the surface is narrower — Android: Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists.",
+                "ja": "Boolean。iOS SwiftUI で非表示にするには iOS 16+ が必要（それ以前は無視される）。 対応面が狭い理由 — Android: Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists."
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_showsHorizontalScrollIndicator",
+              "name": "showsHorizontalScrollIndicator",
+              "anchorId": "attr-showsHorizontalScrollIndicator",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Show horizontal indicator.",
+                "ja": "水平スクロールインジケータの表示。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Why the surface is narrower — Android: Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists.",
+                "ja": "対応面が狭い理由 — Android: Compose has no scrollbar primitive for scrollable/Lazy content (ScrollbarStyle is Desktop-only), so there is nothing to switch on or off — needs a drawn scrollbar composable in KotlinJsonUI first. iOS uses .scrollIndicators and web uses CSS, both native. Re-declare when the composable exists."
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_contentInsetAdjustmentBehavior",
+              "name": "contentInsetAdjustmentBehavior",
+              "anchorId": "attr-contentInsetAdjustmentBehavior",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "never",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "always",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "automatic",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_3",
+                          "label": "scrollableAxes",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Content inset adjustment.",
+                "ja": "コンテンツインセットの自動調整挙動。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`automatic` / `never` / `scrollableAxes` / `always`: whether the content clears the safe area (the system bars). On iOS the system adjusts by default and `never` stops it. On Android (kjui and KotlinJsonUI Dynamic) `always` / `automatic` pad the content by the safe area, `scrollableAxes` only on the scroll axis, and `never` or no declaration by nothing. That padding is only the part of the safe area the scroll view's own frame overlaps, as on iOS, so inside a SafeAreaView or below a header it is 0. kjui's output calls KotlinJsonUI's rememberSafeAreaOverlap. The web draws no safe area for it; `never` writes `scroll-p-0`. Read from kjui's ScrollViewComponent (`rememberSafeAreaOverlap()`) and from rjui's converter; the drawing on a device is jsonui-cli's word.",
+                "ja": "`automatic` / `never` / `scrollableAxes` / `always`: 内容がセーフエリア（システムバー）を避けるかどうか。iOS は既定でシステムが調整し、`never` で止まる。Android（kjui と KotlinJsonUI Dynamic）は、`always` / `automatic` でセーフエリアの分、`scrollableAxes` でスクロール方向の分だけ内容に余白を足し、`never` か宣言なしなら足さない。その余白はスクロールビュー自身の枠がセーフエリアと重なる分だけ（iOS と同じ）。SafeAreaView の内側やヘッダーの下では 0。kjui の生成物は KotlinJsonUI の rememberSafeAreaOverlap を呼ぶ。web はセーフエリアを描かず、`never` で `scroll-p-0` を書く。kjui の ScrollViewComponent（`rememberSafeAreaOverlap()`）を、rjui の converter とあわせて読んだもの。端末での描かれ方は jsonui-cli の言葉。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_indicatorStyle",
+              "name": "indicatorStyle",
+              "anchorId": "attr-indicatorStyle",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll indicator style.",
+                "ja": "スクロールインジケータのスタイル。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "iOS-only. `default` / `black` / `white`. Scroll indicator color.",
+                "ja": "iOS 専用。`default` / `black` / `white`。スクロールバーの色。"
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_minZoom",
+              "name": "minZoom",
+              "anchorId": "attr-minZoom",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Minimum zoom scale (binding supported).",
+                "ja": "最小ズーム倍率（binding 可）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Why the surface is narrower — Android: Same gesture-arbitration problem as maxZoom: Compose has no zoom primitive for a scrolling container. / Web: The browser arbitrates pinch zoom itself (touch-action); there is no control surface for a minimum scale.",
+                "ja": "対応面が狭い理由 — Android: Same gesture-arbitration problem as maxZoom: Compose has no zoom primitive for a scrolling container. / Web: The browser arbitrates pinch zoom itself (touch-action); there is no control surface for a minimum scale."
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_maxZoom",
+              "name": "maxZoom",
+              "anchorId": "attr-maxZoom",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Maximum zoom scale (binding supported).",
+                "ja": "最大ズーム倍率（binding 可）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Why the surface is narrower — Android: Pinch-zoom on a SCROLLING container needs real gesture arbitration in Compose — detectTransformGestures/transformable consume the drag and would take scrolling away — and a maximum without minZoom would be half a feature. iOS gets zoom from UIScrollView; web delegates to the browser via touch-action.",
+                "ja": "対応面が狭い理由 — Android: Pinch-zoom on a SCROLLING container needs real gesture arbitration in Compose — detectTransformGestures/transformable consume the drag and would take scrolling away — and a maximum without minZoom would be half a feature. iOS gets zoom from UIScrollView; web delegates to the browser via touch-action."
+              },
+              "type": "number | binding",
+              "required": ""
+            },
+            {
+              "id": "attr_child",
+              "name": "child",
+              "anchorId": "attr-child",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child component(s): an array of nodes, or a single node as shorthand for a one-element array (declared as `acceptsSingle` in the attribute SSoT).",
+                "ja": "子コンポーネント: ノードの配列、または 1 要素の配列の省略形としての単一ノード（属性 SSoT に `acceptsSingle` として宣言）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_children",
+              "name": "children",
+              "anchorId": "attr-children",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Child components (alias for `child`): an array of nodes, or a single node as shorthand for a one-element array.",
+                "ja": "子コンポーネント（`child` のエイリアス）: ノードの配列、または 1 要素の配列の省略形としての単一ノード。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_contentInset",
+              "name": "contentInset",
+              "anchorId": "attr-contentInset",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Padding inside the scroll area: one, two or four values (rjui scroll_view_converter).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "number | array",
+              "required": ""
+            },
+            {
+              "id": "attr_contentOffset",
+              "name": "contentOffset",
+              "anchorId": "attr-contentOffset",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Initial offset [x, y].",
+                "ja": "初期スクロール位置 `[x, y]`。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_contentSize",
+              "name": "contentSize",
+              "anchorId": "attr-contentSize",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Content size [width, height].",
+                "ja": "コンテンツサイズ `[width, height]`。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            },
+            {
+              "id": "attr_decelerationRate",
+              "name": "decelerationRate",
+              "anchorId": "attr-decelerationRate",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Deceleration rate.",
+                "ja": "スクロール減速レート。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_defaultScrollAnchor",
+              "name": "defaultScrollAnchor",
+              "anchorId": "attr-defaultScrollAnchor",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "top",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "center",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_2",
+                          "label": "bottom",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Initial scroll position anchor (iOS 17+). Sets where the scroll view starts.",
+                "ja": "初期スクロール位置アンカー（iOS 17+）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_horizontalScroll",
+              "name": "horizontalScroll",
+              "anchorId": "attr-horizontalScroll",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Enable horizontal scroll.",
+                "ja": "水平スクロールを有効化する。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Boolean. `true` is the same as `orientation: \"horizontal\"`; `false` or absent leaves the axis to `orientation`, which is vertical when it is not written either. Written together with `orientation`, the two must agree: `orientation: \"horizontal\"` with `horizontalScroll: false`, or `\"vertical\"` with `true`, is refused by `jui build` with `ERROR [scrollview]`, under a responsive key too.",
+                "ja": "Boolean。`true` は `orientation: \"horizontal\"` と同じ。`false` または書かなければ向きは `orientation` に任され、それも書かなければ縦。`orientation` と一緒に書くときは一致していなければならない: `orientation: \"horizontal\"` に `horizontalScroll: false`、または `\"vertical\"` に `true` を組み合わせると、`jui build` が `ERROR [scrollview]` で拒否する。responsive のキーの中でも同じ。"
+              },
+              "type": "boolean",
+              "required": ""
+            },
+            {
+              "id": "attr_keyboardAvoidancePadding",
+              "name": "keyboardAvoidancePadding",
+              "anchorId": "attr-keyboardAvoidancePadding",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "default: 20",
+              "defaultChipVisibility": "visible",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "number",
+                          "background": "var(--color-warning_chip_bg)",
+                          "fontColor": "var(--color-warning_chip_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Clearance, in points/dp, that a focused text field keeps from the ScrollView's visible bottom edge while the soft keyboard is up.",
+                "ja": "ソフトキーボード表示中、フォーカス中のテキストフィールドが ScrollView の見えている下端から保つ余白（pt / dp）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "Number. Absent means 20, not 0. The visible bottom edge is whatever bounds the scroll area at that moment: the top of a fixed footer laid out below the ScrollView, or the keyboard itself when the ScrollView meets it directly. iOS applies it as a bottom safe-area inset (KeyboardAvoidanceConfiguration.additionalPadding). The inset is there while the keyboard is visible, and also from the moment a text input inside the ScrollView begins editing, so it is in place before SwiftUI scrolls the focused field. With a hardware keyboard, where no software keyboard shows, the inset is there while an input inside is being edited. Android's Modifier.keyboardAvoidance ends the scrollable's viewport that far above the IME while it is visible and scrolls the focused field to that edge once the IME is up. The follow itself is done by KotlinJsonUI, not left to Compose's built-in tracking. Ignored when `keyboardAvoidance` is `false`. Not applicable on Web, which has no soft-keyboard avoidance. Read from the codegen and the upstream report, not measured here.",
+                "ja": "Number。書かなければ 20 であって 0 ではない。「見えている下端」はその瞬間にスクロール領域を区切っているもの: ScrollView の下に置いた固定フッターの上端、または ScrollView がキーボードに直接接しているならキーボードそのもの。iOS では bottom safe-area inset として適用（KeyboardAvoidanceConfiguration.additionalPadding）。この inset はキーボードが見えている間に加え、ScrollView の中の入力欄が編集を始めた時点から入る。そのため SwiftUI がフォーカス中のフィールドをスクロールする前に inset が揃っている。ソフトキーボードが出ないハードウェアキーボードの場合も、中の入力欄を編集している間は inset が入る。Android では Modifier.keyboardAvoidance が IME 表示中にスクロール領域の viewport をその分だけ IME の上で終わらせ、IME が出たあとフォーカス中のフィールドをその縁までスクロールする。追従そのものは KotlinJsonUI が行い、Compose 組み込みの追跡には任せていない。`keyboardAvoidance` が `false` なら無視される。Web は非対応（ソフトキーボード回避が無い）。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
+              },
+              "type": "number",
+              "required": ""
+            },
+            {
+              "id": "attr_scrollBehavior",
+              "name": "scrollBehavior",
+              "anchorId": "attr-scrollBehavior",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "auto",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "smooth",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll behavior animation.",
+                "ja": "スクロールアニメーションの挙動。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_scrollMode",
+              "name": "scrollMode",
+              "anchorId": "attr-scrollMode",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "visible",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "ec_0",
+                          "label": "inner",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        },
+                        {
+                          "id": "ec_1",
+                          "label": "window",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": "Where the scroll happens. 'inner' (default, iOS/Android-style): the ScrollView div itself gets overflow-y-auto and scrolls internally — requires a bounded-height ancestor on web to actually activate. 'window' (web-only escape hatch): skip the overflow class so the page/window scrolls naturally; fixes position:sticky descendants that would otherwise be anchored to a never-scrolling inner container. iOS/Android ignore this attribute (UIScrollView always scrolls internally).",
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "—",
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_scrollsToTop",
+              "name": "scrollsToTop",
+              "anchorId": "attr-scrollsToTop",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "boolean",
+                          "background": "var(--color-accent_secondary_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Scroll to top on status bar tap.",
+                "ja": "ステータスバータップで最上部にスクロールする。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "boolean",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "relatedComponents": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "related_collection",
+              "name": "Collection",
+              "hint": "",
+              "url": "/reference/components/collection"
+            },
+            {
+              "id": "related_view",
+              "name": "View",
+              "hint": "",
+              "url": "/reference/components/view"
+            },
+            {
+              "id": "related_safe_area_view",
+              "name": "SafeAreaView",
+              "hint": "",
+              "url": "/reference/components/safe-area-view"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_attributes",
+              "titleKey": {
+                "en": "Attribute reference",
+                "ja": "属性リファレンス"
+              },
+              "descriptionKey": {
+                "en": "Every common attribute in one place — width / padding / binding / events grouped by category.",
+                "ja": "共通属性を 1 箇所にまとめたリファレンス。width / padding / binding / event などカテゴリ別に整理。"
+              },
+              "url": "/reference/attributes"
+            },
+            {
+              "id": "next_custom_components",
+              "titleKey": {
+                "en": "Building a custom component",
+                "ja": "カスタムコンポーネントを作る"
+              },
+              "descriptionKey": {
+                "en": "Extend JsonUI with your own components (spec → converter → React/Swift/Kotlin).",
+                "ja": "spec → converter → React/Swift/Kotlin で JsonUI を独自拡張する手順。"
+              },
+              "url": "/guides/custom-components"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

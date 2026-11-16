@@ -1,0 +1,76 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "InitialState",
+    "displayName": "Initial state and the state bridge",
+    "description": "Guides > Initial state. Dedicated page for a test's initialState and the state bridge (jsonui-test-runner spec §10). Ten sections: what it does, how to write it (file level, case level under caseIsolation reopen, the shallow merge), keys and the class table with the fixed rejection reasons, when the app applies the values and the gate it shares with the screen marker, the receipt the driver waits for and where the bridge lives per platform, reading state back without a provider, flows (viewModels, the removed initialState.screen, ignored references), the launch sequence and the web runner's afterLaunch, what validate checks (measured output), and what it does not cover. ~11-min read.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "guides/initial-state",
+    "createdAt": "2026-10-17",
+    "updatedAt": "2026-10-17"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing cards: writing screen tests, screen identity, the test tooling reference."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "customTypes": [
+    {
+      "name": "NextReadLink",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String"
+        },
+        {
+          "name": "titleKey",
+          "type": "String"
+        },
+        {
+          "name": "descriptionKey",
+          "type": "String"
+        },
+        {
+          "name": "url",
+          "type": "String"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "2026-10-17 - Page created. Facts are read from jsonui-test-runner specs §5, §6 and §10 and the published drivers; the validate block is output measured against a scratch fixture; the claim that the web bridge is absent from a production bundle was measured on this site's own export (no occurrence of __JSONUI_STATE__).",
+    "2026-11-11: section_keys_types does not say Visibility cannot be set. jsonui-test validate on a scratch layout declaring Visibility, Visibility? and [Visibility]: passes gone and null-for-Visibility?, reports type mismatch for hidden, Gone and false, null for non-optional for null, unsupported type for [Visibility]. This site's jsonuiTestBridge.ts gains the visibility case (3 lines). The iOS / Android library side is jsonui-cli's word; no app was run."
+  ]
+}

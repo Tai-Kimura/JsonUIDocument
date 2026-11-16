@@ -1,0 +1,600 @@
+name: Deploy docs to S3 + CloudFront
+
+# Pipeline: jsonui-cli toolchain (sync_tool + jui build) → Next.js static export
+# → S3 (private) → CloudFront (jsonui.tanosys.com).
+# Auth is via GitHub OIDC assuming an AWS IAM role — no long-lived AWS keys.
+# Infra is defined in infra/terraform/.
+#
+# Why the toolchain steps: src/generated/* (incl. ColorManager, StringManager,
+# component TSX) and rjui_tools/ are NOT committed — they are produced by
+# `jui build` from docs/screens/. A bare `npm run build` fails with
+# "Module not found: @/generated/ColorManager". See infra/DESIGN.md §6.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "jsonui-doc-web/**"
+      - "docs/**"
+      - "tests/**"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: true
+
+permissions:
+  id-token: write # required for OIDC
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-1
+  SITE_BUCKET: jsonui-tanosys-com-site
+  DISTRIBUTION_ID: ESH27Z3X4XNHO
+  # jsonui-cli is pinned to a known-good commit SHA for reproducible deploys.
+  # Bump procedure: pick the new jsonui-cli main SHA, replace this value, and
+  # review the regenerated reference pages in that deploy — the SHA bump is
+  # the review point for reference updates.
+  JSONUI_CLI_REF: 4f31e09f7b6b6120c51a38a3869d571c19028ca8 # v2.5.47
+  # Two releases were skipped on the way here. v1.8.6's `jui build` crashed on
+  # `from ..core.version import toolchain_version` (the module is at
+  # jui_cli/version.py, not under core/), and v1.8.8 was withdrawn upstream for
+  # manifest churn. Both measured here against their neighbours as controls
+  # before being skipped.
+
+jobs:
+  # ENFORCING — `deploy` depends on this job; a red gate stops the deploy
+  # before anything is published, and the site stays on its previous version.
+  #
+  # Six of these gates used to run only in the maintainer's hands:
+  # lint-strings, verify --fail-on-diff, validate:strings, tsc --noEmit,
+  # jsonui-doc validate spec, jsonui-test validate. As a local procedure they
+  # were not a mechanism — skip the run and nothing catches it. This job ran
+  # in reporting-only mode first and measured two facts before being switched
+  # to enforcing: a local zero was not a CI zero (tsc needed the prebuild
+  # artifacts a fresh checkout lacks), and after that fix, two consecutive
+  # runs reported 0 of 6.
+  #
+  # A seventh joined them on 2026-09-02: check:cli-coverage reads each
+  # binary's --help at the PINNED toolchain (JSONUI_CLI_PATH below — a local
+  # install can be any version, which is why this is a gate and not part of
+  # `prebuild`) and does two things with it. It compares the subcommand SET
+  # with the reference both ways — added the day a card for a subcommand that
+  # never existed was found, four months after it was published — and it
+  # checks the read-stamps: whether a human has read each card against this
+  # version's help. The second half never judges whether a card is right, only
+  # whether it was read; unstamped cards are counted, never red.
+  #
+  # All twenty gates run even when one fails, so a red run names everything that
+  # is red, and every gate prints its own exit code — a gate that could not
+  # run must not read as a gate that passed.
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 20 reached end of life and gets no fix for the October 2026 or
+      # November 2026 security releases (the November one has sixteen CVEs,
+      # seven of them HIGH; fixed in v24.22.3 on this line). check-latest
+      # makes setup-node take the newest 24.x instead of the runner image's
+      # cached one, and the next step refuses a 24.x older than the fix.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          check-latest: true
+          cache: npm
+          cache-dependency-path: jsonui-doc-web/package-lock.json
+
+      # It guards the 24 pin above, so a later line passes by design.
+      - name: Node is at or above the November 2026 security release (v24.22.3)
+        run: node -e 'const [a,b,c]=process.versions.node.split(".").map(Number); const ok=a>24||(a===24&&(b>22||(b===22&&c>=3))); console.log("node "+process.version+(ok?" >= v24.22.3":" < v24.22.3, the November 2026 security release")); process.exit(ok?0:1)'
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.11"
+
+      - uses: actions/setup-python@v5
+        with:
+          # 3.12 on purpose: the cli-coverage gate hashes `--help` output, and
+          # argparse changed how it lists short+long options in 3.13. The
+          # interpreter is pinned in scripts/lib/cli-help.ts and recorded in
+          # every stamp; CI and the maintainer must read under the same one.
+          python-version: "3.12"
+
+      - name: Fetch jsonui-cli toolchain
+        run: |
+          git init "$RUNNER_TEMP/jsonui-cli"
+          git -C "$RUNNER_TEMP/jsonui-cli" remote add origin \
+            https://github.com/Tai-Kimura/jsonui-cli.git
+          git -C "$RUNNER_TEMP/jsonui-cli" fetch --depth 1 origin "${JSONUI_CLI_REF}"
+          git -C "$RUNNER_TEMP/jsonui-cli" checkout --detach FETCH_HEAD
+          echo "JSONUI_CLI_PATH=$RUNNER_TEMP/jsonui-cli" >> "$GITHUB_ENV"
+
+      - name: Prepare toolchain and generated sources
+        run: |
+          python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" sync_tool
+          build_log=$(mktemp)
+          # pipefail, or `tee` reports 0 for a build that failed — the same
+          # shape as the defect this guard is here to catch.
+          set -o pipefail
+          python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean 2>&1 | tee "$build_log"
+          # `jui build` can log a caught exception as `[ERROR] Error processing
+          # <file>` and still exit 0 with a success line — measured upstream on
+          # 1.8.13. 1.8.15 changed the final line to name the incomplete stage;
+          # it did NOT change the exit code. This comment used to say the class
+          # was not reproduced here. It is now, measured on 1.8.42 with a
+          # control: a Collection given a binding for `sections` (declared
+          # `type: array`, no binding) raises a Ruby NoMethodError, the screen is
+          # not generated, four [ERROR] lines print, and the command exits 0,
+          # while a valid layout in the same position generates and prints none.
+          # Filed upstream — their own doc generator defaults to failing on a
+          # dropped page and makes exit-0 opt-in via --allow-partial, which is
+          # what `jui build` lacks. So this grep is not standing in for someone
+          # else's measurement any more: it is the only thing between a partial
+          # tree and the bucket. Version-independent on purpose: a healthy build
+          # of this site prints zero [ERROR] lines, measured, so any is a partial
+          # tree and a partial tree must not be deployed.
+          if grep -q "\[ERROR\]" "$build_log"; then
+            echo "jui build logged [ERROR] while exiting 0 — refusing to deploy a partial tree:"
+            grep "\[ERROR\]" "$build_log" | head -20
+            exit 1
+          fi
+          # Two steps, and a failure stops the job. This used to be one joint
+          # `pip install -e test_tools -e document_tools` followed by
+          # `|| echo NOTE`. pip refuses that pair: document_tools declares its
+          # sibling as a git URL at the tag, and the editable checkout conflicts
+          # with it. The install failed on every run from at least 2026-09-17
+          # to v1.9.21, and the gates stayed 21/21. The comment here claimed
+          # the opposite, that a failed install would turn the Python gates
+          # red. It could not: they run the launchers in the checkout, which
+          # need no install, and this site has no `.texts.yaml`, so the
+          # missing PyYAML and markdown-it-py were never imported.
+          # --no-deps keeps the sibling the checkout copy, so it is the same
+          # commit as the pin. The two prose dependencies are installed by name.
+          python3 -m pip install -q -e "$JSONUI_CLI_PATH/test_tools"
+          python3 -m pip install -q --no-deps -e "$JSONUI_CLI_PATH/document_tools"
+          python3 -m pip install -q "PyYAML>=6.0" "markdown-it-py>=3.0"
+          python3 -m pip check
+
+      - name: Install JS dependencies
+        working-directory: jsonui-doc-web
+        run: npm ci
+
+      # `tsc --noEmit` resolves `@/data/*.json`, which `prebuild` writes into
+      # the gitignored `src/data/`. Locally those files survive from an
+      # earlier build, so tsc passes; the first CI run of this job reported
+      # `error TS2307: Cannot find module '@/data/cli-commands.json'` for
+      # exactly that reason. That is the difference the job was added to find,
+      # and it is an ordering fact about the checkout, not a finding about the
+      # code — so the fix is to generate the inputs, not to drop the gate.
+      - name: Generate prebuild artifacts (inputs to tsc)
+        working-directory: jsonui-doc-web
+        run: npm run prebuild
+
+      - name: Run the twenty-one gates (enforcing — a red one stops the deploy)
+        run: |
+          set +e
+          fail=0
+          run_gate() {
+            name="$1"; shift
+            echo "::group::$name"
+            "$@"; rc=$?
+            echo "GATE $name: exit=$rc"
+            [ "$rc" -ne 0 ] && fail=$((fail + 1))
+            echo "::endgroup::"
+          }
+          JUI="python3 $JSONUI_CLI_PATH/jui_tools/bin/jui"
+          run_gate lint-strings           $JUI lint-strings
+          # Every screen here has a hand-authored layout, so the generated-layout
+          # comparison skips all of them ("verified 0 of 2"). Until jsonui-cli
+          # 2.3.12 that was the whole gate: an exit 0 over an empty comparison.
+          # From 2.3.12 verify also holds an externally authored layout to its
+          # spec (every binding and data entry declared in what goes into the
+          # data section), and jui.config.json's "verify": {"external": "gate"}
+          # makes --fail-on-diff count those findings. Both scope lines are
+          # printed so that "exit=0" is read against what was checked.
+          run_gate verify-fail-on-diff    $JUI verify --fail-on-diff
+          verify_out=$($JUI verify 2>/dev/null)
+          verify_scope=$(printf '%s\n' "$verify_out" | sed -n 's/.*\*\*\(verified [0-9]* of [0-9]* screen(s)\)\*\*.*/\1/p' | head -1)
+          verify_external=$(printf '%s\n' "$verify_out" | sed -n 's/.*\*\*checked against the spec.s declarations: \([0-9]* of [0-9]*\) externally authored layout(s)\*\* — \([0-9]*\) finding.*/\1 external, \2 finding(s)/p' | head -1)
+          echo "GATE verify-fail-on-diff: scope=${verify_scope:-could not read the denominator}; ${verify_external:-could not read the external line}"
+          run_gate validate-strings       npm --prefix jsonui-doc-web run validate:strings
+          run_gate tsc-noEmit             npx --prefix jsonui-doc-web tsc --noEmit \
+                                            --project jsonui-doc-web/tsconfig.json
+          # The distributed jsonui-doc launcher calls main() without sys.exit,
+          # so it prints `Result: FAILED` and still exits 0 — measured on this
+          # pin: 103 valid specs and a deliberately broken one both exit 0,
+          # while the same call wrapped in sys.exit(main()) gives 0 and 1.
+          # (jui and jsonui-test wrap it; only this one does not. Fixed
+          # upstream in 1.8.14.) So this gate reads the verdict rather than the
+          # exit code, which also survives the next launcher regression — and
+          # it fails when no verdict line is printed at all, because a crash
+          # must not read as a pass.
+          run_gate jsonui-doc-validate sh -c '
+            out=$(python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" validate spec docs/screens/json 2>&1)
+            printf "%s\n" "$out"
+            case "$out" in
+              *"Result: FAILED"*) echo "jsonui-doc validate reported FAILED"; exit 1 ;;
+              *"Result: PASSED"*) exit 0 ;;
+              *) echo "no Result: line in the output — refusing to read that as a pass"; exit 1 ;;
+            esac'
+          # docs/screens/html and docs/screens/md are tracked but derived from
+          # the specs, and nothing here regenerated or compared them: on
+          # 2026-09-03 one page was eight ledger entries behind its spec. Both
+          # trees are regenerated into a scratch directory and compared byte
+          # for byte — the spec pages carry no timestamp, so a difference is a
+          # stale commit, never the clock. Needs jsonui-cli 1.8.18: before it,
+          # batch mode ignored --format and wrote HTML into .md-shaped trees.
+          # Since jsonui-cli 1.8.55 a component link is emitted ONLY when the
+          # output tree sits inside the source tree; writing to a bare temp
+          # directory renders each entry as text instead, because no link from
+          # there would resolve. Measured 2026-09-08: with the old shape below,
+          # the only tracked tree that could match was one that had lost its
+          # links, so the gate forced a choice between the right artifact and a
+          # green run. The face is copied and generated IN PLACE instead. That
+          # is still a real answer rather than a machine-dependent one: two
+          # independent copies generate byte-identical trees (measured, with a
+          # decoy proving the comparison can fail). The copied html/md trees are
+          # removed first so that a file the specs stopped producing shows up as
+          # "Only in" rather than surviving as a leftover.
+          run_gate spec-docs-match sh -c '
+            tmp=$(mktemp -d)
+            rsync -a --exclude .git --exclude node_modules --exclude .next --exclude out ./ "$tmp/face/"
+            rm -rf "$tmp/face/docs/screens/html" "$tmp/face/docs/screens/md"
+            ( cd "$tmp/face" && python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate spec docs/screens/json -o docs/screens/html --format html ) > "$tmp/gen-html.log" 2>&1 || { cat "$tmp/gen-html.log"; exit 1; }
+            ( cd "$tmp/face" && python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate spec docs/screens/json -o docs/screens/md --format markdown ) > "$tmp/gen-md.log" 2>&1 || { cat "$tmp/gen-md.log"; exit 1; }
+            n=$(find "$tmp/face/docs/screens/html" "$tmp/face/docs/screens/md" -type f | wc -l | tr -d " ")
+            [ "$n" -gt 0 ] || { echo "the generator wrote nothing — refusing to read an empty comparison as a match"; exit 1; }
+            fail=0
+            diff -r "$tmp/face/docs/screens/html" docs/screens/html > "$tmp/html.diff" || fail=1
+            diff -r "$tmp/face/docs/screens/md"   docs/screens/md   > "$tmp/md.diff"   || fail=1
+            if [ "$fail" -ne 0 ]; then
+              echo "the tracked spec docs are not what the specs generate — regenerate and commit them:"
+              grep -E "^(diff|Only in)" "$tmp/html.diff" "$tmp/md.diff" | head -20
+              exit 1
+            fi
+            echo "docs/screens/html and docs/screens/md match their specs ($n generated files compared)"'
+          # The same check for the component trees, which the arm above does not
+          # reach. It regenerates only docs/screens/**, so docs/components/{html,md}
+          # were tracked derived output that nothing compared against its
+          # generator: the producer mark landed on the screens trees at 1.8.58 and
+          # its value changed at 1.8.59, and the component trees took neither,
+          # silently, for two releases (found 2026-09-09 by an unrelated A/B whose
+          # baseline arm came back non-zero here and zero for screens). A gate only
+          # ever speaks for its own set, so the fix is another arm, not a wider
+          # claim by the existing one. Kept separate rather than folded in above:
+          # that arm is measured and proven, and this one fails with its own name.
+          run_gate component-docs-match sh -c '
+            tmp=$(mktemp -d)
+            rsync -a --exclude .git --exclude node_modules --exclude .next --exclude out ./ "$tmp/face/"
+            rm -rf "$tmp/face/docs/components/html" "$tmp/face/docs/components/md"
+            ( cd "$tmp/face" && python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate component docs/components/json -o docs/components/html --format html ) > "$tmp/gen-ch.log" 2>&1 || { cat "$tmp/gen-ch.log"; exit 1; }
+            ( cd "$tmp/face" && python3 "$JSONUI_CLI_PATH/document_tools/jsonui-doc" generate component docs/components/json -o docs/components/md --format markdown ) > "$tmp/gen-cm.log" 2>&1 || { cat "$tmp/gen-cm.log"; exit 1; }
+            n=$(find "$tmp/face/docs/components/html" "$tmp/face/docs/components/md" -type f | wc -l | tr -d " ")
+            [ "$n" -gt 0 ] || { echo "the generator wrote nothing — refusing to read an empty comparison as a match"; exit 1; }
+            fail=0
+            diff -r "$tmp/face/docs/components/html" docs/components/html > "$tmp/ch.diff" || fail=1
+            diff -r "$tmp/face/docs/components/md"   docs/components/md   > "$tmp/cm.diff" || fail=1
+            if [ "$fail" -ne 0 ]; then
+              echo "the tracked component docs are not what the component specs generate — regenerate and commit them:"
+              grep -E "^(diff|Only in|[<>])" "$tmp/ch.diff" "$tmp/cm.diff" | head -20
+              exit 1
+            fi
+            echo "docs/components/html and docs/components/md match their specs ($n generated files compared)"'
+          # Directory argument, not a `find` expansion: a partial argument list
+          # is the shape that used to uninstall the tests it did not name, and
+          # --no-install removes the install step from this reporting run
+          # entirely.
+          run_gate jsonui-test-validate   python3 "$JSONUI_CLI_PATH/test_tools/jsonui-test" \
+                                            validate --no-install tests/screens
+          # Reads JSONUI_CLI_PATH itself; refuses to pass when it cannot run
+          # the binaries or when the stampability classification is missing, so
+          # "could not compare" never reads as "agreed".
+          # A Label whose text names a string key becomes a lookup in the generated
+          # component — unless the generator does not recognise the key, in which
+          # case it emits the key NAME as literal text and the page publishes
+          # `section_collection_basic_bullet_scrollEnabled` where a sentence
+          # belongs. Two pages carried a raw key that way, found by a live check:
+          # `jui build` printed zero warnings and every gate here was green. This
+          # scans what the pinned toolchain actually emitted, and refuses an empty
+          # scan rather than reporting success for a tree it never read.
+          run_gate raw-string-keys        npm --prefix jsonui-doc-web run check:raw-string-keys
+          # The parent/sub-spec page carries a hand-written list of what a
+          # sub-spec supplies. Since jsonui-cli 1.8.29 that list has a canonical
+          # source (`shared/core/parent_spec_rules.py`), which an upstream test
+          # walks through a real merge. This checks COVERAGE, not derivation:
+          # the sentence stays editorial — two of the names are read from the
+          # parent too and belong elsewhere on the page — while a section added
+          # upstream cannot go unmentioned here. It refuses a toolchain with no
+          # rules module rather than passing on an empty read.
+          run_gate parent-sub-sections    npm --prefix jsonui-doc-web run check:parent-sub-sections
+          # A string `partialAttributes[].range` that is absent from the text it
+          # decorates is SKIPPED at runtime — no error, no warning, the link or
+          # emphasis simply is not there. This site is bilingual and the match is
+          # per locale, so the shape that matters is asymmetric: a phrase reworded
+          # in one language leaves the link working in the other. Nothing else here
+          # sees it — the build is silent by design and the live probe checks that
+          # the STRING is on the page, which it still is, with the link missing
+          # from inside it.
+          run_gate partial-ranges         npm --prefix jsonui-doc-web run check:partial-ranges
+          run_gate cli-coverage           npm --prefix jsonui-doc-web run check:cli-coverage
+          # The card ABOVE is stamped against `--help`; the example blocks inside it
+          # are not stamped against anything. A card's `examples[].code` is a
+          # transcript, and the read-stamp hashes the card — so it detects an
+          # editor touching the example and cannot detect the tool moving under
+          # it. That is the half that failed: `generate html` published
+          # `Generated 174 HTML files` for several releases after the tool began
+          # printing a parenthetical breakdown, with every gate green and the
+          # stamp still matching. It was found only because a release notice
+          # happened to mention that line's spelling, which does not generalise.
+          # This arm re-renders the one part that can be re-rendered — the
+          # summary lines — from a live run, and compares shapes, never values.
+          # It covers 5 of the ~73 quoted-output lines in the reference; the
+          # script says so itself rather than letting a green tick imply more.
+          run_gate cli-example-shapes     npm --prefix jsonui-doc-web run check:cli-example-shapes
+          # And the flags. `cli-coverage` prints "Flags are not compared either —
+          # the page records a selection of them on purpose", which was true and
+          # left 206 documented flags never once put to a binary. This arm asks
+          # one direction only: a flag the page DOCUMENTS must be one the binary
+          # DECLARES. The reverse stays unenforced deliberately — a flag that
+          # exists and is not on the page is an editorial choice, and requiring
+          # it would redden the deploy every time upstream adds one.
+          # A card may document a PARENT whose flags live on its children
+          # (`jsonui-doc rules` is exactly that), so a card is compared against
+          # its node AND everything under it; reading only the parent reports
+          # three false defects. Flags come from argparse's declaration lines,
+          # never from prose, so a flag named in a description cannot satisfy it.
+          run_gate cli-flags              npm --prefix jsonui-doc-web run check:cli-flags
+          # And the commands a reader can COPY. Two guides told readers to run
+          # `jui doc validate spec --file …` for as long as they existed: `jui`
+          # has no `doc` subcommand, and the real command takes the file as a
+          # positional, so it failed twice over. Cards were checked, flags were
+          # checked, and a command typed inside a GUIDE's code block was checked
+          # by nothing.
+          # The surface is code blocks, never prose — the site names commands in
+          # prose in order to DENY them ("there is no `jui test` command"), and a
+          # check over prose would redden the deploy on its most careful
+          # sentences. Resolution stops at the first leaf, so `jsonui-doc check
+          # db` passes with `db` as the positional filter it is.
+          run_gate cli-invocations        npm --prefix jsonui-doc-web run check:cli-invocations
+          # And what the ARTICLES claim the library does. Until this arm, the
+          # gates read flags, invocations and output shapes — never a sentence
+          # asserting that `external browser` in lower case does not match. The
+          # vocabulary exists in ONE place in the implementation and the article
+          # is a second copy of it, made by hand; second copies diverge. This
+          # runs the article's assertions against the PINNED classifier, so the
+          # copy is answerable to the original on every deploy.
+          # A red here means a published sentence is now false, and it names the
+          # sentence: every claim is anchored to the text it backs, and a
+          # rewritten paragraph fails loudly rather than leaving the check
+          # guarding words nobody publishes. Verified against a simulated next
+          # release (English `none` + IGNORECASE): it reddens and names both the
+          # en and ja paragraphs.
+          run_gate article-claims         npm --prefix jsonui-doc-web run check:article-claims
+          # And the TRANSCRIPTS. A code block opening `$ jsonui-test generate
+          # branch-tests …` is not an illustration — a reader compares their
+          # terminal to it. Three of them had quietly lost two lines the tool
+          # prints: the `routes:` qualifier saying the list comes from the
+          # dataFlow endpoint declarations and NOT from the contract's api
+          # references, and the closing line naming the toolchain that generated
+          # the files. No release moved underneath them; the drift was already
+          # there at the pin, which is what makes it this class of defect.
+          # cli-example-shapes structurally cannot see it: that arm reads the
+          # reference cards, one line family, jsonui-doc only. This one runs the
+          # command the page shows against a fixture mirroring the page's own
+          # example and compares EVERY line — paths relative and the version as
+          # `<version>`, both of which the page states; wrapping is not compared.
+          # Fired against four inputs that must fail: the pre-fix page, a wrong
+          # branch count, a flag the binary rejects, and an empty harvest.
+          run_gate branch-transcripts     npm --prefix jsonui-doc-web run check:branch-transcripts
+          # And the MARKDOWN the prose must not contain. Labels print markdown
+          # literally, so `**bold**` reaches the reader as asterisks and
+          # `[text](url)` as brackets; only a bare https URL is linkified. That
+          # was guarded by a remembered number — "the literal `**` count is 8" —
+          # re-grepped by hand before each commit, and the number was the wrong
+          # question twice over. All 8 sit INSIDE BACKTICKS (`Layouts/**/*.json`,
+          # `docs/**/.check-report.json`, and a sentence saying globs have no
+          # `**`), so the rule was never the count; it was code voice versus
+          # prose voice. And a count cannot see a SWAP: drop one glob mention,
+          # add one bold marker, and 8 is still 8 — the check passes the exact
+          # edit it exists to catch. Fired against that swap, a bold marker, a
+          # markdown link, and an empty scan.
+          run_gate prose-markdown         npm --prefix jsonui-doc-web run check:prose-markdown
+          # The committed rjui_tools must BE what the pinned toolchain syncs.
+          # `jui sync_tool` resolves its source as $JSONUI_CLI_PATH > ~/.jsonui-cli
+          # (measured 2026-09-03 with a control pair: env set to 1.8.5 while the
+          # home install was 1.8.7 vendored 1.8.5; unset vendored 1.8.7). CI always
+          # sets the env, so by the time this runs the working copy IS the pin's —
+          # which makes a diff against the commit the exact question: did the
+          # committed tree come from the pin? A maintainer who builds locally
+          # without the env vendors whatever the home install holds, and that is
+          # how a tree stamped 1.8.6 with content older still was committed under
+          # a 1.8.5 pin. Content, not just the VERSION stamp: a stamp can be right
+          # while the files behind it are stale. sync_tool is idempotent (measured:
+          # a second run changes nothing), so a clean tree here is a real answer.
+          # vendored-matches-pin (below) asks whether the COMMITTED tree equals
+          # what a sync produces: it syncs, then reads `git status`. That cannot
+          # see a file the pin stopped shipping — `jui sync_tool` copies and never
+          # deletes, so the leftover sits there, the sync does not touch it, and
+          # git reports nothing. Measured 2026-09-04 in a scratch copy: delete a
+          # tracked vendored file from the source, sync, and git status is empty.
+          # This gate compares the two TREES instead — in the pin but not vendored,
+          # vendored but not in the pin, and byte differences — so the two together
+          # cover committed-vs-synced and synced-vs-pin. Neither alone does.
+          run_gate vendored-tree          npm --prefix jsonui-doc-web run check:vendored-tree
+          run_gate vendored-matches-pin sh -c '
+            echo "committed rjui_tools stamp: $(git show HEAD:jsonui-doc-web/rjui_tools/VERSION 2>/dev/null | tr -d "[:space:]")"
+            echo "pinned toolchain:           $(cat "$JSONUI_CLI_PATH/VERSION" | tr -d "[:space:]")"
+            changed=$(git status --porcelain -- jsonui-doc-web/rjui_tools | wc -l | tr -d " ")
+            if [ "$changed" -ne 0 ]; then
+              echo "the committed vendored toolchain is not what this pin syncs ($changed path(s) differ):"
+              git status --porcelain -- jsonui-doc-web/rjui_tools | head -20
+              echo "re-run: JSONUI_CLI_PATH=<pinned checkout> jui sync_tool, and commit the result"
+              exit 1
+            fi
+            echo "the committed vendored tree matches the pin, file for file"'
+          # Twenty-one. Every gate above compares one artifact against its
+          # source. This one asks the reverse question about the run that
+          # already happened: steps 5 and 7 regenerate the whole derived tree
+          # — sync_tool, `jui build --web-only --clean`, `npm run prebuild` —
+          # so by the time the gates start, every tracked file a generator
+          # owns has been rewritten. If a committed copy was stale, git says
+          # so here and nowhere else. The gap that prompted it: 132 tracked
+          # files under jsonui-doc-web/public/data and src/app/reference are
+          # produced by build:attrs, and nothing regenerated and compared
+          # them — the two *-docs-match gates cover docs/ only, and a stale
+          # copy there deployed correctly anyway because CI regenerates
+          # before building, so the staleness was invisible rather than
+          # harmful. Found by deriving the set of tracked generated files
+          # instead of trusting the four this repository already watched.
+          #
+          # The population is every tracked file, derived rather than named,
+          # so a generator that starts writing somewhere new is covered the
+          # day it does. Untracked counts too: a generator that emits a new
+          # page must have that page committed. rjui_tools is included and
+          # also has its own gate, which reports the same staleness with a
+          # better message.
+          #
+          # Measured 2026-09-16 on a clean checkout: a full prebuild + build
+          # leaves 0 of the tracked files modified, so a non-empty status is
+          # a real answer rather than ambient noise. Fired once against a
+          # staged stale copy of a generated file, which it reports.
+          #
+          # /!\ What this does NOT check: that the generators are right —
+          # only that the commit carries what they produce. A file no
+          # generator writes can be wrong here and stay green.
+          run_gate regenerated-outputs-committed sh -c '
+            tracked=$(git ls-files | wc -l | tr -d " ")
+            [ "$tracked" -gt 0 ] || { echo "0 tracked files — refusing to read an empty comparison as agreement"; exit 1; }
+            changed=$(git status --porcelain | wc -l | tr -d " ")
+            if [ "$changed" -ne 0 ]; then
+              echo "regenerating left $changed path(s) differing from the commit:"
+              git status --porcelain | head -20
+              echo "Run npm run prebuild and jui build --web-only, then commit what they write."
+              exit 1
+            fi
+            echo "all $tracked tracked file(s) survived a full regeneration unchanged"'
+          echo "----"
+          echo "gates with a non-zero exit: $fail of 21"
+          if [ "$fail" -ne 0 ]; then
+            echo "FAILING this job: the deploy job depends on it and will not run."
+            exit 1
+          fi
+
+  deploy:
+    # Enforced by `needs`: platform semantics skip this job unless every gate
+    # above exited 0. Note the blocking arm itself has not been fired on main
+    # — proving it would mean pushing a red commit to the deploy branch — so
+    # this rests on GitHub Actions' documented `needs` behaviour, not on a
+    # measurement from this repository.
+    needs: gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 20 reached end of life and gets no fix for the October 2026 or
+      # November 2026 security releases (the November one has sixteen CVEs,
+      # seven of them HIGH; fixed in v24.22.3 on this line). check-latest
+      # makes setup-node take the newest 24.x instead of the runner image's
+      # cached one, and the next step refuses a 24.x older than the fix.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          check-latest: true
+          cache: npm
+          cache-dependency-path: jsonui-doc-web/package-lock.json
+
+      # It guards the 24 pin above, so a later line passes by design.
+      - name: Node is at or above the November 2026 security release (v24.22.3)
+        run: node -e 'const [a,b,c]=process.versions.node.split(".").map(Number); const ok=a>24||(a===24&&(b>22||(b===22&&c>=3))); console.log("node "+process.version+(ok?" >= v24.22.3":" < v24.22.3, the November 2026 security release")); process.exit(ok?0:1)'
+
+      # rjui_tools pins Ruby 3.2.11 (jsonui-doc-web/rjui_tools/.ruby-version); setup-ruby on
+      # ubuntu-26.04 builds only the latest patch of each series, so this follows the vendored pin.
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.11"
+
+      - uses: actions/setup-python@v5
+        with:
+          # 3.12 on purpose: the cli-coverage gate hashes `--help` output, and
+          # argparse changed how it lists short+long options in 3.13. The
+          # interpreter is pinned in scripts/lib/cli-help.ts and recorded in
+          # every stamp; CI and the maintainer must read under the same one.
+          python-version: "3.12"
+
+      - name: Fetch jsonui-cli toolchain
+        # fetch-by-SHA instead of clone --branch: --branch only accepts
+        # branch/tag names, and JSONUI_CLI_REF is pinned to a commit SHA.
+        run: |
+          git init "$RUNNER_TEMP/jsonui-cli"
+          git -C "$RUNNER_TEMP/jsonui-cli" remote add origin \
+            https://github.com/Tai-Kimura/jsonui-cli.git
+          git -C "$RUNNER_TEMP/jsonui-cli" fetch --depth 1 origin "${JSONUI_CLI_REF}"
+          git -C "$RUNNER_TEMP/jsonui-cli" checkout --detach FETCH_HEAD
+          echo "JSONUI_CLI_PATH=$RUNNER_TEMP/jsonui-cli" >> "$GITHUB_ENV"
+
+      - name: Sync platform toolchain (populates jsonui-doc-web/rjui_tools)
+        run: python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" sync_tool
+
+      - name: Generate Layout + TSX (src/generated/*)
+        run: |
+          build_log=$(mktemp)
+          set -o pipefail
+          python3 "$JSONUI_CLI_PATH/jui_tools/bin/jui" build --web-only --clean 2>&1 | tee "$build_log"
+          # `jui build` can log a caught exception as `[ERROR] Error processing
+          # <file>` and still exit 0 with a success line — measured upstream on
+          # 1.8.13. 1.8.15 changed the final line to name the incomplete stage;
+          # it did NOT change the exit code. This comment used to say the class
+          # was not reproduced here. It is now, measured on 1.8.42 with a
+          # control: a Collection given a binding for `sections` (declared
+          # `type: array`, no binding) raises a Ruby NoMethodError, the screen is
+          # not generated, four [ERROR] lines print, and the command exits 0,
+          # while a valid layout in the same position generates and prints none.
+          # Filed upstream — their own doc generator defaults to failing on a
+          # dropped page and makes exit-0 opt-in via --allow-partial, which is
+          # what `jui build` lacks. So this grep is not standing in for someone
+          # else's measurement any more: it is the only thing between a partial
+          # tree and the bucket. Version-independent on purpose: a healthy build
+          # of this site prints zero [ERROR] lines, measured, so any is a partial
+          # tree and a partial tree must not be deployed.
+          if grep -q "\[ERROR\]" "$build_log"; then
+            echo "jui build logged [ERROR] while exiting 0 — refusing to deploy a partial tree:"
+            grep "\[ERROR\]" "$build_log" | head -20
+            exit 1
+          fi
+
+      - name: Install JS dependencies
+        working-directory: jsonui-doc-web
+        run: npm ci
+
+      - name: Build static export
+        working-directory: jsonui-doc-web
+        run: npm run build
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Sync immutable assets (long cache)
+        working-directory: jsonui-doc-web
+        run: |
+          aws s3 sync out/ "s3://${SITE_BUCKET}" \
+            --exclude "*.html" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      - name: Sync HTML (revalidate)
+        working-directory: jsonui-doc-web
+        run: |
+          aws s3 sync out/ "s3://${SITE_BUCKET}" \
+            --exclude "*" --include "*.html" \
+            --cache-control "public,max-age=0,must-revalidate" \
+            --content-type "text/html; charset=utf-8"
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${DISTRIBUTION_ID}" \
+            --paths "/*"

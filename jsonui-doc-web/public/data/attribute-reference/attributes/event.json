@@ -1,0 +1,805 @@
+{
+  "category": "event",
+  "title": "Event attributes",
+  "description": {
+    "en": "Event attributes bind user interactions to ViewModel methods. All are optional; their omission disables the corresponding interaction.",
+    "ja": "イベント属性はユーザー操作を ViewModel のメソッドにバインドする。全て任意、省略すれば該当操作は無効。"
+  },
+  "kicker": "Attribute category · Reference",
+  "kickerParentLabel": "Attributes",
+  "badges": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "copyTypeVisibility": "gone",
+  "aliasCalloutVisibility": "gone",
+  "aliasOf": null,
+  "aliasLinkUrl": "",
+  "aliasNotice": null,
+  "overviewRows": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "overview_events",
+              "name": "events",
+              "type": "object",
+              "summary": {
+                "en": "Batch-declare multiple event handlers in one object. Alternative to individual `onClick` / `onLon…",
+                "ja": "複数のイベントハンドラを 1 オブジェクトでまとめて宣言。個別の `onClick` / `onLongPress` より読みやすいとき使う。"
+              },
+              "anchorUrl": "#attr-events"
+            },
+            {
+              "id": "overview_onAppear",
+              "name": "onAppear",
+              "type": "string",
+              "summary": {
+                "en": "Fired when the component becomes visible (mount / re-mount), on SwiftUI and Compose only: web and…",
+                "ja": "コンポーネントが可視になったとき（マウント／再マウント時）に発火。SwiftUI と Compose だけで、web と UIKit はハンドラを呼ぶコードを出さない。web のビルドは、この属…"
+              },
+              "anchorUrl": "#attr-onAppear"
+            },
+            {
+              "id": "overview_onClick",
+              "name": "onClick",
+              "type": "binding",
+              "summary": {
+                "en": "Tap / click. Fires on single tap after gesture recognition (≈0–50 ms). Required on Button for int…",
+                "ja": "タップ／クリック。ジェスチャ認識後（約 0〜50ms）、シングルタップで発火。Button では必須。"
+              },
+              "anchorUrl": "#attr-onClick"
+            },
+            {
+              "id": "overview_onDisappear",
+              "name": "onDisappear",
+              "type": "string",
+              "summary": {
+                "en": "Fired when the component is unmounted, on SwiftUI and Compose only (as onAppear).",
+                "ja": "コンポーネントがアンマウントされたとき発火。SwiftUI と Compose だけ（onAppear と同じ）。"
+              },
+              "anchorUrl": "#attr-onDisappear"
+            },
+            {
+              "id": "overview_onLongPress",
+              "name": "onLongPress",
+              "type": "binding",
+              "summary": {
+                "en": "Long-press event. Default threshold: iOS 500 ms / Android 500 ms / Web 600 ms.",
+                "ja": "長押しイベント。既定閾値は iOS 500ms / Android 500ms / Web 600ms。"
+              },
+              "anchorUrl": "#attr-onLongPress"
+            },
+            {
+              "id": "overview_onPan",
+              "name": "onPan",
+              "type": "binding",
+              "summary": {
+                "en": "Pan gesture (drag) events. Receives a vector `{ dx, dy }` per frame.",
+                "ja": "パンジェスチャ（ドラッグ）イベント。フレームごとに `{ dx, dy }` を受け取る。"
+              },
+              "anchorUrl": "#attr-onPan"
+            },
+            {
+              "id": "overview_onPinch",
+              "name": "onPinch",
+              "type": "binding",
+              "summary": {
+                "en": "Pinch gesture (two-finger zoom). Receives a `scale` factor per frame.",
+                "ja": "ピンチジェスチャ（2 本指ズーム）。フレームごとに `scale` 係数を受け取る。"
+              },
+              "anchorUrl": "#attr-onPinch"
+            },
+            {
+              "id": "overview_onclick",
+              "name": "onclick",
+              "type": "string | array",
+              "summary": {
+                "en": "Selector-based click handler — a plain handler name, not a binding.",
+                "ja": "セレクタ形式のクリックハンドラ。ハンドラ名を直接書く（binding ではない）。"
+              },
+              "anchorUrl": "#attr-onclick"
+            },
+            {
+              "id": "overview_scripts",
+              "name": "scripts",
+              "type": "array",
+              "summary": {
+                "en": "Inline scripts that run on specific lifecycle events (e.g., `onMount`). Use sparingly — prefer Vi…",
+                "ja": "特定のライフサイクルイベント（例: `onMount`）で実行されるインラインスクリプト。控えめに使い、通常は ViewModel のイベントハンドラを優先する。"
+              },
+              "anchorUrl": "#attr-scripts"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "subgroups": {
+    "sections": [
+      {
+        "cells": {
+          "data": []
+        }
+      }
+    ]
+  },
+  "subgroupsVisibility": "gone",
+  "tocEntries": [
+    {
+      "id": "toc_overview",
+      "label": {
+        "en": "Overview",
+        "ja": "概要"
+      },
+      "anchor": "section-overview",
+      "level": 1
+    },
+    {
+      "id": "toc_detail",
+      "label": {
+        "en": "Attributes",
+        "ja": "属性"
+      },
+      "anchor": "section-detail",
+      "level": 1
+    },
+    {
+      "id": "toc_next",
+      "label": {
+        "en": "Next reads",
+        "ja": "次に読む"
+      },
+      "anchor": "section-next",
+      "level": 1
+    }
+  ],
+  "attributes": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "attr_events",
+              "name": "events",
+              "anchorId": "attr-events",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "object",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Batch-declare multiple event handlers in one object. Alternative to individual `onClick` / `onLongPress` attributes for readability.",
+                "ja": "複数のイベントハンドラを 1 オブジェクトでまとめて宣言。個別の `onClick` / `onLongPress` より読みやすいとき使う。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "object",
+              "required": ""
+            },
+            {
+              "id": "attr_onAppear",
+              "name": "onAppear",
+              "anchorId": "attr-onAppear",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Fired when the component becomes visible (mount / re-mount), on SwiftUI and Compose only: web and UIKit draw no call to the handler. A web build warns that the attribute is SwiftUI/Compose only.",
+                "ja": "コンポーネントが可視になったとき（マウント／再マウント時）に発火。SwiftUI と Compose だけで、web と UIKit はハンドラを呼ぶコードを出さない。web のビルドは、この属性は SwiftUI/Compose 専用だと警告する。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (SwiftUI mode only)",
+                "ja": "✓（SwiftUI モードのみ）"
+              },
+              "platformAndroidLabel": {
+                "en": "✓ (Compose mode only)",
+                "ja": "✓（Compose モードのみ）"
+              },
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_onClick",
+              "name": "onClick",
+              "anchorId": "attr-onClick",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Tap / click. Fires on single tap after gesture recognition (≈0–50 ms). Required on Button for interactivity.",
+                "ja": "タップ／クリック。ジェスチャ認識後（約 0〜50ms）、シングルタップで発火。Button では必須。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "`onClick` declares a binding only, so a bare handler name (`\"onClick\": \"onSave\"`) is warned as `binding-bare-event` — write `@{onSave}`. An event that also declares a string, such as lowercase `onclick`, still calls a bare name.",
+                "ja": "`onClick` は binding だけを宣言しているので、裸のハンドラ名（`\"onClick\": \"onSave\"`）は `binding-bare-event` として警告されます — `@{onSave}` と書いてください。小文字の `onclick` のように string も宣言しているイベントは、裸の名前でも呼ばれます。"
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onDisappear",
+              "name": "onDisappear",
+              "anchorId": "attr-onDisappear",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Fired when the component is unmounted, on SwiftUI and Compose only (as onAppear).",
+                "ja": "コンポーネントがアンマウントされたとき発火。SwiftUI と Compose だけ（onAppear と同じ）。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (SwiftUI mode only)",
+                "ja": "✓（SwiftUI モードのみ）"
+              },
+              "platformAndroidLabel": {
+                "en": "✓ (Compose mode only)",
+                "ja": "✓（Compose モードのみ）"
+              },
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "string",
+              "required": ""
+            },
+            {
+              "id": "attr_onLongPress",
+              "name": "onLongPress",
+              "anchorId": "attr-onLongPress",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Long-press event. Default threshold: iOS 500 ms / Android 500 ms / Web 600 ms.",
+                "ja": "長押しイベント。既定閾値は iOS 500ms / Android 500ms / Web 600ms。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onPan",
+              "name": "onPan",
+              "anchorId": "attr-onPan",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Pan gesture (drag) events. Receives a vector `{ dx, dy }` per frame.",
+                "ja": "パンジェスチャ（ドラッグ）イベント。フレームごとに `{ dx, dy }` を受け取る。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onPinch",
+              "name": "onPinch",
+              "anchorId": "attr-onPinch",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Pinch gesture (two-finger zoom). Receives a `scale` factor per frame.",
+                "ja": "ピンチジェスチャ（2 本指ズーム）。フレームごとに `scale` 係数を受け取る。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Declare the handler `((Double) -> Void)?`, or `((Double?) -> Void)?`, or `((String, Double) -> Void)?` to take the view's id first. One declaration serves both platforms: iOS hands the handler a CGFloat, which Swift passes to a Double parameter, and Compose's scale is a Float that the generated code passes as `.toDouble()` (KotlinJsonUI does the same in Dynamic). A `(Float)` or `(CGFloat)` handler takes the Float as it is on Android. The generated call was measured here; that it compiles, the iOS side and Dynamic are jsonui-cli's measurement.",
+                "ja": "ハンドラーは `((Double) -> Void)?` と宣言します。`((Double?) -> Void)?` でも、ビューの id を先に受け取る `((String, Double) -> Void)?` でも構いません。1 つの宣言が両プラットフォームに効きます: iOS はハンドラーに CGFloat を渡し、Swift はそれを Double の引数に渡せます。Compose の scale は Float ですが、生成されるコードはそれを `.toDouble()` で渡します（Dynamic では KotlinJsonUI が同じことをします）。`(Float)` や `(CGFloat)` のハンドラーは、Android では Float をそのまま受け取ります。生成される呼び出しはここで測りました。コンパイルが通ること、iOS 側、Dynamic は jsonui-cli の測定です。"
+              },
+              "type": "binding",
+              "required": ""
+            },
+            {
+              "id": "attr_onclick",
+              "name": "onclick",
+              "anchorId": "attr-onclick",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "visible",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "string",
+                          "background": "var(--color-chip_string_bg)",
+                          "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Selector-based click handler — a plain handler name, not a binding.",
+                "ja": "セレクタ形式のクリックハンドラ。ハンドラ名を直接書く（binding ではない）。"
+              },
+              "platformMatrixVisibility": "gone",
+              "platformIosLabel": "✓",
+              "platformAndroidLabel": "✓",
+              "platformWebLabel": "✓",
+              "note": {
+                "en": "Not an alias for `onClick` — a different face of the same event. `onClick` takes a binding (`@{handler}`); lowercase `onclick` takes a bare handler name resolved against the ViewModel, and it also accepts an array (`[\"a\", \"b\"]`), calling every handler in declared order on all three platforms. A binding on `onclick` makes `jui build` warn and reads as absent on every platform (in an array only the bound names go); write it on `onClick`.",
+                "ja": "`onClick` のエイリアスではなく、同じイベントの別の面です。`onClick` は binding（`@{handler}`）を取り、小文字の `onclick` は ViewModel に対して解決されるハンドラ名を直接取ります。配列（`[\"a\", \"b\"]`）も受け付け、3 プラットフォームとも宣言順に全ハンドラを呼びます。`onclick` に書いた binding は 3 面とも `jui build` が警告し、書いていないものとして扱われます（配列では binding の名前だけを落とす）。binding は `onClick` に書きます。"
+              },
+              "type": "string | array",
+              "required": ""
+            },
+            {
+              "id": "attr_scripts",
+              "name": "scripts",
+              "anchorId": "attr-scripts",
+              "requiredChipText": "",
+              "requiredChipVisibility": "gone",
+              "deprecatedChipVisibility": "gone",
+              "accentBarColor": "var(--color-border)",
+              "nameTextStyle": "normal",
+              "nameFontColor": "var(--color-ink)",
+              "defaultChipText": "",
+              "defaultChipVisibility": "gone",
+              "enumChipsVisibility": "gone",
+              "aliasChipsVisibility": "gone",
+              "noteVisibility": "gone",
+              "typeChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": [
+                        {
+                          "id": "tc_0",
+                          "label": "array",
+                          "background": "var(--color-surface_sunken)",
+                          "fontColor": "var(--color-ink)"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "enumChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "aliasChips": {
+                "sections": [
+                  {
+                    "cells": {
+                      "data": []
+                    }
+                  }
+                ]
+              },
+              "description": {
+                "en": "Inline scripts that run on specific lifecycle events (e.g., `onMount`). Use sparingly — prefer ViewModel event handlers.",
+                "ja": "特定のライフサイクルイベント（例: `onMount`）で実行されるインラインスクリプト。控えめに使い、通常は ViewModel のイベントハンドラを優先する。"
+              },
+              "platformMatrixVisibility": "visible",
+              "platformIosLabel": {
+                "en": "✓ (UIKit mode only)",
+                "ja": "✓（UIKit モードのみ）"
+              },
+              "platformAndroidLabel": "—",
+              "platformWebLabel": "—",
+              "note": {
+                "en": "",
+                "ja": ""
+              },
+              "type": "array",
+              "required": ""
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "breakpoints": null,
+  "nextReadLinks": {
+    "sections": [
+      {
+        "cells": {
+          "data": [
+            {
+              "id": "next_components",
+              "titleKey": {
+                "en": "Component reference",
+                "ja": "コンポーネントリファレンス"
+              },
+              "descriptionKey": {
+                "en": "The full 28-component catalog with type signatures, examples, and platform support.",
+                "ja": "28 コンポーネントの全カタログ。型・例・プラットフォーム対応を収録。"
+              },
+              "url": "/reference/components"
+            },
+            {
+              "id": "next_attributes_root",
+              "titleKey": {
+                "en": "All attribute categories",
+                "ja": "属性カテゴリ一覧"
+              },
+              "descriptionKey": {
+                "en": "Back to the full list of attribute categories (Layout, Style, Binding, Event, ...).",
+                "ja": "属性カテゴリ全一覧に戻る（Layout / Style / Binding / Event など）。"
+              },
+              "url": "/reference/attributes"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

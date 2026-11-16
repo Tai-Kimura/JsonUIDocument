@@ -1,0 +1,155 @@
+{
+  "component": "View",
+  "description": {
+    "en": "Generic container that arranges child components vertically or horizontally. The most-used component — every JsonUI screen has a View at the root of each layout segment.",
+    "ja": "子要素を垂直または水平に並べる汎用コンテナ。最も多用され、あらゆる JsonUI 画面の各セクションのルートに存在する。"
+  },
+  "usage": {
+    "en": "Use View whenever you need to group multiple components. Choose `orientation` (vertical/horizontal). For scrollable content use ScrollView; for dynamic lists use Collection.",
+    "ja": "複数の要素をまとめたいとき常に使う。`orientation` で方向を決める（vertical / horizontal）。スクロールが必要なら ScrollView、動的リストなら Collection を使う。"
+  },
+  "examples": [
+    {
+      "title": {
+        "en": "Vertical stack",
+        "ja": "垂直スタック"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/title\", \"fontSize\": 24 },\n    { \"type\": \"Label\", \"text\": \"@string/subtitle\", \"fontSize\": 16 },\n    { \"type\": \"Button\", \"text\": \"@string/action\", \"onClick\": \"@{onAction}\" }\n  ]\n}"
+    },
+    {
+      "title": {
+        "en": "Horizontal with weight",
+        "ja": "水平 + weight で中央を伸ばす"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Image\", \"source\": \"avatar\", \"width\": 40, \"height\": 40 },\n    { \"type\": \"Label\", \"text\": \"@{userName}\", \"weight\": 1 },\n    { \"type\": \"Label\", \"text\": \"@{timestamp}\", \"fontColor\": \"#9CA3AF\" }\n  ]\n}"
+    },
+    {
+      "title": {
+        "en": "Card with background and corners",
+        "ja": "背景色 + 角丸のカード"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"background\": \"#F3F4F6\",\n  \"cornerRadius\": 12,\n  \"paddings\": [16, 16, 16, 16],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@string/card_body\" }\n  ]\n}"
+    },
+    {
+      "title": {
+        "en": "Conditional show/hide",
+        "ja": "条件付き表示"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"visibility\": \"@{errorVisibility}\",\n  \"background\": \"#FEE2E2\",\n  \"paddings\": [12, 12, 12, 12],\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{errorMessage}\", \"fontColor\": \"#991B1B\" }\n  ]\n}",
+      "note": {
+        "en": "No expressions inside `@{…}` — derive the value in the ViewModel: `get errorVisibility() { return this.hasError ? \"visible\" : \"gone\"; }`.",
+        "ja": "`@{…}` の中に式は書けない — ViewModel 側で導出する: `get errorVisibility() { return this.hasError ? \"visible\" : \"gone\"; }`。"
+      }
+    },
+    {
+      "title": {
+        "en": "Linear gradient background",
+        "ja": "線形グラデーション背景"
+      },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"gradient\": [\"#6366F1\", \"#8B5CF6\"],\n  \"gradientDirection\": \"vertical\",\n  \"paddings\": [24, 24, 24, 24]\n}"
+    }
+  ],
+  "attributes": {
+    "orientation": {
+      "summary": {
+        "en": "Stack orientation (default: zstack).",
+        "ja": "スタックの向き（既定: zstack）。"
+      },
+      "note": {
+        "en": "`vertical` (default) / `horizontal`. Switches child layout axis. For grid layouts use Collection with `columnCount`.",
+        "ja": "`vertical`（デフォルト）/ `horizontal`。子要素の配置軸を決める。グリッドは Collection に `columnCount` を指定。"
+      }
+    },
+    "child": {
+      "note": {
+        "en": "Array of child components. Order determines layout order. A single node is accepted as a one-element array. For dynamic repetition from a bound array, use Collection instead of `child`.",
+        "ja": "子要素の配列。単一ノードは 1 要素の配列として受け付ける。順序がレイアウト順序を決定。バインドされた配列からの動的繰り返しは `child` ではなく Collection を使う。"
+      }
+    },
+    "distribution": {
+      "note": {
+        "en": "Main-axis distribution for stacks, and the four values fall into two families (all three platforms agree): `fill` / `fillEqually` distribute the children's sizes — children grow from their content to fill the axis, equally in the `fillEqually` case — while `equalSpacing` / `equalCentering` distribute the gaps between children whose sizes stay content-driven. A child's own size wins over that growth only when it is a number: a child whose width (in a vertical stack, its height) is `wrapContent` grows with the others.",
+        "ja": "スタックの主軸方向の配分。4 値は 2 系統に分かれます（3 プラットフォーム一致）— `fill` / `fillEqually` は子のサイズを配る系（子が content から伸びて軸を埋める。`fillEqually` は均等に）、`equalSpacing` / `equalCentering` は隙間を配る系（子のサイズは content のまま）。子自身のサイズがその伸長より優先されるのは数値のときだけで、width（縦のスタックでは height）が `wrapContent` の子は他の子と一緒に伸びます。"
+      }
+    },
+    "spacing": {
+      "note": {
+        "en": "Fixed gap between children along the main axis. Simpler alternative to using `distribution: spaceBetween`.",
+        "ja": "主軸方向の子要素間の固定ギャップ。`distribution: spaceBetween` より単純な指定。"
+      }
+    },
+    "gradient": {
+      "note": {
+        "en": "Array of 2+ color strings. Use `gradientDirection` to control direction. For multi-stop or radial gradients, use a dedicated GradientView.",
+        "ja": "2 色以上の配列。方向は `gradientDirection` で指定。多段 stop や放射状グラデは GradientView を使う。"
+      }
+    },
+    "gradientDirection": {
+      "note": {
+        "en": "iOS only (the View declaration is platform swift; Compose and web read GradientView's). `Vertical` (the fallback) / `Horizontal` / `Oblique`, with `LeftToRight`, `TopToBottom` and `Diagonal` as aliases of those three, and `RightToLeft` / `BottomToTop` as reversed directions of their own. Written as declared: a value is its declared spelling, case and all, so `horizontal` is undeclared and draws the Vertical fallback. There are no numeric degrees. From the declaration; this site draws no gradient on iOS.",
+        "ja": "iOS のみ（View の宣言は platform swift。Compose と web は GradientView のものを読む）。`Vertical`（フォールバック）/ `Horizontal` / `Oblique` と、それらの別名 `LeftToRight` / `TopToBottom` / `Diagonal`、そして逆向きの `RightToLeft` / `BottomToTop`。宣言どおりの綴りで書く: 値は大文字小文字まで宣言どおりの綴りなので、`horizontal` は宣言に無い綴りとして Vertical のフォールバックで描かれる。度数の指定は無い。宣言の記述で、このサイトは iOS でグラデーションを描かない。"
+      }
+    },
+    "flexWrap": {
+      "note": {
+        "en": "Web only, and a string rather than a boolean: `nowrap` / `wrap` / `wrap-reverse`, emitted as the matching Tailwind class. Meaningful on a horizontal row, where `wrap` lets overflow fall onto the next line. A `responsive` override compiles the same way any other attribute does, so a row can wrap on narrow screens and stay on one line above the breakpoint. The value was declared before it was implemented — until 2026-07-29 the web converter dropped it silently, so a layout that asked to wrap simply did not, without a warning.",
+        "ja": "Web 専用で、値は boolean ではなく文字列です — `nowrap` / `wrap` / `wrap-reverse` が対応する Tailwind クラスとして出力されます。効くのは horizontal の行で、`wrap` を指定すると溢れた子が次の行に落ちます。`responsive` での上書きも他の属性と同じ形でコンパイルされるので、狭い画面だけ折り返して、ブレークポイント以上では 1 行に保つ、という書き方ができます。なおこの値は実装より先に宣言されていました — 2026-07-29 までは web のコンバータが黙って捨てていたため、折り返しを指定しても警告なしに効きませんでした。"
+      }
+    },
+    "draggable": {
+      "note": {
+        "en": "Enables drag-and-drop. Used with the `onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` handlers.",
+        "ja": "ドラッグ&ドロップを有効化。`onDragStart` / `onDragEnter` / `onDragOver` / `onDragLeave` / `onDrop` ハンドラと組み合わせて使う。"
+      }
+    },
+    "accessibilityLabel": {
+      "summary": {
+        "en": "What a screen reader says for this View when the View is one button to it: a View with a tap of its own (`onClick`). A strings.json key or text, localized like `text`, or a binding. A View that taps nothing is not one element to a screen reader, and the name is not written (measured on web: `aria-label` on a View with `onClick`, nothing on one without). Also spelled `contentDescription`.",
+        "ja": "スクリーンリーダーにとってこの View が 1 つのボタンのとき（View 自身にタップ `onClick` があるとき）に読み上げる名前です。strings.json のキーか文字（`text` と同じようにローカライズされます）、または binding を書きます。何もタップしない View はスクリーンリーダーにとって 1 つの要素ではないので、名前は書かれません（Web で実測: `onClick` のある View には `aria-label`、無い View には何も出ませんでした）。`contentDescription` とも書けます。"
+      }
+    },
+    "accessibilityLiveRegion": {
+      "summary": {
+        "en": "Reads what this View holds out whenever it changes, without moving focus: `polite` waits for the screen reader to finish, `assertive` interrupts it, `off` (or leaving it out) reads nothing. Web writes `role` and `aria-live` on the View, Android `liveRegion`. iOS has no live region and a View holds no one text to announce, so on iOS it does nothing, and the build does not warn because one layout serves all three platforms (measured: nothing is written for it on iOS). To be read out on iOS too, put it on the Label whose text changes.",
+        "ja": "この View の中身が変わるたびに、フォーカスを動かさずに読み上げます。`polite` はスクリーンリーダーが読み終わるのを待ち、`assertive` は割り込み、`off`（または書かない）は何も読みません。Web は View に `role` と `aria-live` を、Android は `liveRegion` を書きます。iOS には live region が無く、View には読み上げる 1 つの文が無いので、iOS では何もしません。1 つのレイアウトを 3 つのプラットフォームで使うので、build も警告しません（実測: iOS では何も書かれませんでした）。iOS でも読み上げたいときは、文が変わる Label に付けてください。"
+      }
+    }
+  },
+  "commonAttributes": {
+    "background": {
+      "note": {
+        "en": "Hex string, color name, or @color/token. For gradients use the `gradient` attribute or GradientView.",
+        "ja": "hex 文字列、色名、または @color/token。グラデーションは `gradient` 属性または GradientView を使う。"
+      }
+    },
+    "cornerRadius": {
+      "note": {
+        "en": "Number (uniform) or array `[tl, tr, br, bl]` for per-corner control.",
+        "ja": "数値（全辺同一）または配列 `[左上, 右上, 右下, 左下]` で角ごとに指定。"
+      }
+    },
+    "borderColor": {
+      "note": {
+        "en": "Required together with `borderWidth` for a visible border.",
+        "ja": "border を表示するには `borderWidth` と両方指定が必要。"
+      }
+    },
+    "clipToBounds": {
+      "note": {
+        "en": "Boolean. When `true`, children that overflow the View are clipped. Required when child content has corners larger than the parent.",
+        "ja": "Boolean。`true` で境界を超える子を切り取る。子のコンテンツが親より大きい角丸を持つ場合に必要。"
+      }
+    }
+  },
+  "relatedComponents": [
+    "SafeAreaView",
+    "ScrollView",
+    "Collection",
+    "GradientView"
+  ]
+}

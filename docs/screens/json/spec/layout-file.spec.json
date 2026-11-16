@@ -1,0 +1,77 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "SpecLayoutFile",
+    "displayName": "Separating the layout file",
+    "description": "Pattern 1 of spec splitting — deep dive into metadata.layoutFile: why almost every screen on this site uses it, how layout_importer populates structure.components at generate time, directory conventions, and how the same Layout JSON can be reused by two or more specs.",
+    "platforms": ["web"],
+    "layoutFile": "spec/layout-file",
+    "createdAt": "2026-04-24",
+    "updatedAt": "2026-04-24"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      { "name": "nextReadLinks", "type": "[NextReadLink]", "initial": "[]", "description": "Follow-up cards." }
+    ],
+    "eventHandlers": [
+      { "name": "onAppear", "description": "Seed nextReadLinks." },
+      { "name": "onNavigate", "params": [{ "name": "url", "type": "String" }], "description": "Client-side navigation." }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[SpecLayoutFileView] --> VM[SpecLayoutFileViewModel]\n    VM -- nextReadLinks --> VIEW",
+    "viewModel": {
+      "methods": [
+        { "name": "onAppear", "description": "Seed nextReadLinks from NEXT_READ_ENTRIES." },
+        { "name": "onNavigate", "params": [{ "name": "url", "type": "String" }], "description": "router.push." }
+      ],
+      "vars": [
+        { "name": "nextReadLinks", "type": "Array(NextReadLink)", "observable": true, "description": "Closing cards." }
+      ]
+    },
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "customTypes": [
+      {
+        "name": "NextReadLink",
+        "properties": [
+          { "name": "id",             "type": "String" },
+          { "name": "titleKey",       "type": "String" },
+          { "name": "descriptionKey", "type": "String" },
+          { "name": "url",            "type": "String" }
+        ]
+      }
+    ]
+  },
+  "userActions": [
+    { "action": "Tap a NextReadLink card", "processing": "onNavigate(url)." }
+  ],
+  "validation": { "clientSide": [], "serverSide": [] },
+  "transitions": [
+    {
+      "trigger": "onNavigate(url)",
+      "condition": "url is /spec/split-overview or /spec/parent-sub-spec",
+      "destination": "Target spec screen",
+      "description": "v1 destinations: /spec/split-overview, /spec/parent-sub-spec."
+    }
+  ],
+  "relatedFiles": [
+    { "type": "Layout", "path": "docs/screens/layouts/spec/layout-file.json", "description": "Detail layout for Pattern 1." },
+    { "type": "ViewModel", "path": "jsonui-doc-web/src/viewmodels/spec/LayoutFileViewModel.ts", "description": "Essay VM." },
+    { "type": "View", "path": "jsonui-doc-web/src/app/spec/layout-file/page.tsx", "description": "Next.js route." }
+  ],
+  "notes": [
+    "Phase 2 article: first of the five per-pattern detail walkthroughs from docs/plans/spec-authoring-deep-dive.md.",
+    "Linked from /spec/split-overview Pattern 1; introduces the writer-facing mechanics that anatomy only summarizes."
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "name": "jsonui-doc-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "validate:strings": "tsx scripts/validate-strings.ts",
+    "build:attrs": "tsx scripts/build-attribute-reference.ts",
+    "build:cli": "tsx scripts/build-cli-commands.ts",
+    "check:cli-coverage": "tsx scripts/check-cli-coverage.ts",
+    "check:cli-example-shapes": "tsx scripts/check-cli-example-shapes.ts",
+    "check:cli-flags": "tsx scripts/check-cli-flags.ts",
+    "check:cli-invocations": "tsx scripts/check-cli-invocations.ts",
+    "check:branch-transcripts": "tsx scripts/check-branch-transcripts.ts",
+    "check:prose-markdown": "tsx scripts/check-prose-markdown.ts",
+    "check:article-claims": "tsx scripts/check-article-claims.ts",
+    "check:raw-string-keys": "tsx scripts/check-raw-string-keys.ts",
+    "check:parent-sub-sections": "tsx scripts/check-parent-sub-sections.ts",
+    "check:partial-ranges": "tsx scripts/check-partial-ranges.ts",
+    "check:vendored-tree": "tsx scripts/check-vendored-tree.ts",
+    "classify:help-stampability": "tsx scripts/classify-help-stampability.ts",
+    "stamp:cli-card": "tsx scripts/stamp-cli-card.ts",
+    "build:search": "tsx scripts/build-search-index.ts",
+    "build:metadata": "tsx scripts/gen-per-page-metadata.ts",
+    "build:og": "tsx scripts/gen-og-image.tsx",
+    "build:apple-icon": "tsx scripts/gen-apple-icon.tsx",
+    "prebuild": "npm run validate:strings && npm run build:attrs && npm run build:cli && npm run build:search && npm run build:metadata && npm run build:og && npm run build:apple-icon",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^16.0.5",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "flexsearch": "^0.7.43",
+    "shiki": "^1.0.0",
+    "redoc": "^2.1.5",
+    "lucide-react": "^0.400.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5.6.0",
+    "tsx": "^4.7.0",
+    "eslint": "^9",
+    "eslint-config-next": "^16.0.5"
+  }
+}

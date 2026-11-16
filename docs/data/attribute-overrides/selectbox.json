@@ -1,0 +1,169 @@
+{
+  "component": "SelectBox",
+  "description": {
+    "en": "Picker for choosing one value from a discrete list, or a date/time picker when `selectItemType` is `Date` (`datePickerMode` then picks date / time / dateAndTime). Renders as native picker on iOS/Android, `<select>` on Web.",
+    "ja": "離散的な選択肢から 1 件を選ぶピッカー。`selectItemType` が `Date` のとき日付／時刻ピッカーになる（`datePickerMode` はその中で date / time / dateAndTime を選ぶ）。iOS/Android ではネイティブピッカー、Web では `<select>`。"
+  },
+  "usage": {
+    "en": "Use SelectBox when the option count is >= 5 or the options are long strings. For 2-4 short options prefer Segment. For date/time input, set `selectItemType` to `Date` and `datePickerMode` to `date` / `time` / `dateAndTime`. On web, a focused SelectBox shows a blue ring outside its border, as a TextField does; a borderColor written in the layout, fixed or bound, stays while it has focus. Without one the border turns blue with the ring. The words on the sheet follow the app's language, and `sheetTitle`, `cancelButtonText` and `doneButtonText` replace them on one SelectBox. Unwritten, `cornerRadius` is 8 on all three platforms: the web writes `rounded-lg` (8px). No setting changes it. On the web a written corner is the only one (4 gives `rounded`, 16 `rounded-2xl`).",
+    "ja": "選択肢が 5 件以上、または各項目が長い場合に使う。2〜4 件の短い選択肢なら Segment。日付／時刻入力は `selectItemType` に `Date`、`datePickerMode` に `date` / `time` / `dateAndTime` を指定。web では、フォーカスのある SelectBox は TextField と同じく、枠の外に青い輪が出る。レイアウトに書いた borderColor（固定でも binding でも）は、フォーカスの間もそのまま残る。書いていなければ、枠も輪と一緒に青になる。シートの語はアプリの言語に従い、1 つの SelectBox では `sheetTitle`、`cancelButtonText`、`doneButtonText` で置き換えられる。 `cornerRadius` を書かないと、3 面とも 8 になる。web は `rounded-lg`（8px）を書く。設定では変えられない。web では書いた角だけになる（4 なら `rounded`、16 なら `rounded-2xl`）。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Static options", "ja": "静的選択肢" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\"Japan\", \"United States\", \"United Kingdom\"],\n  \"prompt\": \"@string/select_country\"\n}"
+    },
+    {
+      "title": { "en": "Bound options from ViewModel", "ja": "ViewModel 由来の選択肢" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{selectedCategory}\",\n  \"items\": \"@{categoryOptions}\",\n  \"onValueChange\": \"@{onCategoryChanged}\"\n}"
+    },
+    {
+      "title": { "en": "Date picker", "ja": "日付ピッカー" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"selectItemType\": \"Date\",\n  \"datePickerMode\": \"date\",\n  \"selectedDate\": \"@{birthDate}\",\n  \"minimumDate\": \"1900-01-01\",\n  \"maximumDate\": \"2025-12-31\",\n  \"dateStringFormat\": \"yyyy-MM-dd\"\n}"
+    },
+    {
+      "title": { "en": "Multi-select", "ja": "複数選択" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"multiple\": true,\n  \"items\": \"@{tagOptions}\",\n  \"selectedValue\": \"@{selectedTags}\"\n}"
+    },
+    {
+      "title": { "en": "Custom caret", "ja": "キャレットのカスタマイズ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"SelectBox\",\n  \"selectedValue\": \"@{country}\",\n  \"items\": [\"Japan\", \"United States\", \"United Kingdom\"],\n  \"caretAttributes\": { \"tintColor\": \"#555555\", \"rightMargin\": 12 }\n}",
+      "description": {
+        "en": "No `src`: the face's default chevron, tinted, 12 pt / dp / px in from the trailing edge. Omit the object and the native arrow stays where it was.",
+        "ja": "`src` 無し: 面の既定シェブロンに色を付け、末尾端から 12 pt / dp / px 内側へ。オブジェクトを書かなければネイティブの矢印は元の位置のまま。"
+      }
+    }
+  ],
+  "attributes": {
+    "hint": { "summary": { "en": "Hint text (alias for `prompt`).", "ja": "ヒント文字列（`prompt` のエイリアス）。" } },
+    "items": {
+      "note": {
+        "en": "Canonically an array of strings — the string IS the value — or a binding to a ViewModel string array. This is the shape that works on all three platforms. On Web only, entries may also be objects (`{ value, text }` / `{ id, label }`) — a web extension; keep object items out of cross-platform layouts. When `selectItemType` is `Date`, `items` is ignored in favor of the date range attributes. Entries are data, not strings keys. The attribute definition says so outright, and the web face agrees when measured: a key that is registered in strings.json, written as an item, renders as the key text itself. Translate the list in the view model before binding it.",
+        "ja": "正準形は文字列の配列 — 文字列そのものが値 — または ViewModel の文字列配列へのバインド。この形が 3 プラットフォーム全てで動きます。Web に限りオブジェクト要素（`{ value, text }` / `{ id, label }`）も受理されますが web 拡張です — クロスプラットフォームの layout ではオブジェクト items を使わないこと。`selectItemType` が `Date` のとき `items` は無視され日付範囲属性が優先される。　エントリはデータであって strings のキーではありません。属性宣言がそう明記しており、web 面で実測しても、strings.json に登録済みのキーを item に書くとキー文字列のまま描画されます。翻訳は bind する前に ViewModel 側で済ませてください。"
+      }
+    },
+    "selectedValue": {
+      "note": {
+        "en": "Two-way binding to the selected value (not label). With canonical string items it holds the selected string itself; with web object items it must match one of `items[].value`.",
+        "ja": "選択された**値**（ラベルではない）への two-way binding。正準の文字列 items では選択された文字列そのものを保持し、web のオブジェクト items では `items[].value` のいずれかと一致する必要がある。"
+      }
+    },
+    "selectedIndex": {
+      "note": {
+        "en": "Alternative to `selectedValue`: two-way binding to the index position. Use when index is more meaningful than value.",
+        "ja": "`selectedValue` の代替：インデックス位置への two-way binding。インデックスが値より意味を持つ場合に使う。"
+      }
+    },
+    "selectedItem": {
+      "note": {
+        "en": "Two-way binding to the selected item object (the entire `{ label, value, ... }` entry). Prefer this for custom item schemas.",
+        "ja": "選択中のアイテムオブジェクト（`{ label, value, ... }` 全体）への two-way binding。カスタムアイテムスキーマで使う。"
+      }
+    },
+    "prompt": {
+      "note": {
+        "en": "Leading title displayed above options (iOS picker header / web `<option disabled>` first entry). Accepts `@string/key`.",
+        "ja": "選択肢の先頭に表示するタイトル（iOS ピッカーヘッダ / web `<option disabled>` 先頭）。`@string/key` 対応。"
+      }
+    },
+    "placeholder": {
+      "summary": { "en": "Placeholder text (alias for `prompt`).", "ja": "プレースホルダー文字列（`prompt` のエイリアス）。" },
+      "note": {
+        "en": "Shown when no selection has been made. Not part of `items`.",
+        "ja": "未選択時に表示。`items` には含まれない。"
+      }
+    },
+    "multiple": {
+      "note": {
+        "en": "Boolean. Enables multi-selection. On iOS / Android uses a checkmark list; on Web uses `<select multiple>`.",
+        "ja": "Boolean。複数選択を有効化。iOS / Android はチェックマーク付きリスト、Web は `<select multiple>`。"
+      }
+    },
+    "onValueChange": {
+      "note": {
+        "en": "Fires after the user confirms a selection. What the handler receives is decided by its declared parameters, the same on every platform: `(() -> Void)?` receives nothing and the ViewModel reads the bound value back; a lone `(String)` receives the selected item; a lone `(Int)` receives the selected index; `(String, Int)` receives the viewId and the index; `(String, String)` receives the viewId and the item. The index is the picked row's place in `items`, whatever is bound. A date picker has no index: an `(Int)` handler there is a build warning and receives the value. The web generator and the Android Compose codegen follow this table. Read from the converter changes and the attribute definitions, not measured here.",
+        "ja": "選択確定後に発火。handler が受け取るものは、宣言した引数で決まり、全プラットフォームで同じ: `(() -> Void)?` は何も受け取らず、ViewModel が束縛値を読み戻す。単独の `(String)` は選んだ item、単独の `(Int)` は選んだ index、`(String, Int)` は viewId と index、`(String, String)` は viewId と item を受け取る。index は、何を束縛していても、選んだ行の `items` の中の位置。日付ピッカーには index が無く、`(Int)` の handler はビルドの警告になり、値を受け取る。web のジェネレータと Android の Compose codegen はこの表に従う。コンバータの変更と属性定義を読んだもので、こちらでは未測定。"
+      }
+    },
+    "caretAttributes": {
+      "summary": {
+        "en": "Styling for the closed select's caret (the arrow): `src`, `width`, `height`, `tintColor`, `background`, `rightMargin`.",
+        "ja": "閉じた状態の select のキャレット（矢印）のスタイル: `src` / `width` / `height` / `tintColor` / `background` / `rightMargin`。"
+      },
+      "note": {
+        "en": "Absent, every platform keeps its native indicator at its native inset, so existing layouts do not move. Present, the face draws the caret itself from these keys — the attribute reference does not list the keys of an object separately, so they are named here. `src` is optional: without it the face draws its own default chevron, so `{\"rightMargin\": 12}` alone moves a native-looking arrow 12 pt / dp / px in from the trailing edge. `rightMargin` defaults to 0, the caret flush against the edge, which is the UIKit contract the object came from. `tintColor` colours the default glyph and a template `src`; `background` fills the caret's own width × height box, not the select. The declaration is cross-platform: SJUISelectBox, SwiftUI, Compose and the web `<select>` draw it. Measured on the web face with the pinned toolchain: without the object the generated class list has no caret in it; with it the native arrow is removed (`appearance-none`) and the caret is painted as background layers at `right <rightMargin>px center`, the text's right padding following the caret; a `multiple` list box and a `selectItemType: Date` picker leave no caret in the output. `multiple` itself is a web-only declaration; upstream's report records that on Android a select carrying it stays a closed select and the caret is drawn — a face difference recorded there, not measured here. One web limit: a raster `src` is drawn as-is, so `tintColor` does not reach it. And one thing the exclusion does not say: date mode is declared with `selectItemType: Date` on every face and `datePickerMode` only chooses the picker inside it, so a caret declared next to a bare `datePickerMode` is still drawn.",
+        "ja": "未指定なら各プラットフォームはネイティブの矢印をネイティブの位置に描き続けるので、既存レイアウトは動きません。指定すると面がこのキー群から自前でキャレットを描きます — 属性リファレンスはオブジェクトのキーを個別に列挙しないため、ここに挙げます。`src` は省略可: 無ければ面の既定シェブロンが描かれるので、`{\"rightMargin\": 12}` だけでネイティブ風の矢印が末尾端から 12 pt / dp / px 内側に寄ります。`rightMargin` の既定は 0（端にぴったり付く）で、これはこのオブジェクトの出自である UIKit の契約です。`tintColor` は既定グリフとテンプレート `src` に効き、`background` はキャレット自身の width × height の箱を塗るもので select 全体ではありません。宣言はクロスプラットフォームで、SJUISelectBox、SwiftUI、Compose、web の `<select>` が描きます。pin されたツールチェーンで web 面を実測: オブジェクト無しでは生成されるクラス列にキャレットは入らず、有りではネイティブ矢印が消え（`appearance-none`）、キャレットは背景レイヤーとして `right <rightMargin>px center` に描かれ、テキストの右パディングがキャレットに追従します。`multiple` のリストボックスと `selectItemType: Date` のピッカーでは出力にキャレットが残りません。`multiple` 自体は web 限定の宣言で、上流の報告は Android ではこれを付けた select が閉じた select のままでキャレットが描かれることを面差として記録しています（こちらでは未測定）。web の制限が 1 つ: ラスターの `src` はそのまま描かれ `tintColor` は届かない。そして除外条件が言っていないこと: Date モードはどの面でも `selectItemType: Date` で宣言し、`datePickerMode` はその中のピッカー種別を選ぶだけなので、素の `datePickerMode` の横に書いたキャレットは描かれます。"
+      }
+    },
+    "selectItemType": {
+      "summary": {
+        "en": "The switch into date mode: `Normal` (default) is a list picker, `Date` a date/time picker, on every face.",
+        "ja": "Date モードへの切り替え: `Normal`（既定）はリストのピッカー、`Date` は日付／時刻ピッカー。どの面でも同じ。"
+      },
+      "note": {
+        "en": "`datePickerMode`, `datePickerStyle`, `minimumDate` / `maximumDate`, `minuteInterval`, `dateStringFormat` and `selectedDate` all describe the `Date` mode; none of them declares it. The three converters branch on this attribute (the web face measured with the pinned toolchain, the SwiftUI and Compose converters read), and the conformance fixtures for `datePickerMode` carry `selectItemType: Date` beside it for the same reason.",
+        "ja": "`datePickerMode` / `datePickerStyle` / `minimumDate` / `maximumDate` / `minuteInterval` / `dateStringFormat` / `selectedDate` はどれも `Date` モードの中身を記述する属性で、モードを宣言するものではありません。3 つのコンバータはこの属性で分岐します（web 面は pin されたツールチェーンで実測、SwiftUI と Compose のコンバータはソースを読んで確認）。conformance の `datePickerMode` fixture も同じ理由で `selectItemType: Date` を同伴しています。"
+      }
+    },
+    "datePickerMode": {
+      "note": {
+        "en": "Which picker a date-mode SelectBox shows. The declaration enumerates `date` / `time` / `dateAndTime` / `countDown`, with `datetime` a declared synonym of `dateAndTime`. It does not enter date mode by itself: every face branches on `selectItemType: Date` (measured on the web face, read in the SwiftUI and Compose converters), and a `datePickerMode` written alone leaves an ordinary select. This page said the opposite until 2026-09-17.",
+        "ja": "Date モードの SelectBox がどのピッカーを出すか。宣言の列挙は `date` / `time` / `dateAndTime` / `countDown` で、`datetime` は `dateAndTime` の宣言済み同義語。これ単独では Date モードに入りません: どの面も `selectItemType: Date` で分岐し（web 面は実測、SwiftUI と Compose のコンバータはソースを読んで確認）、`datePickerMode` だけを書いた SelectBox は通常の select のままです。このページは 2026-09-17 まで逆のことを書いていました。"
+      }
+    },
+    "datePickerStyle": {
+      "note": {
+        "en": "iOS 14+. `compact` / `wheels` / `graphical` / `inline`. Controls the visual style of the date picker.",
+        "ja": "iOS 14+。`compact` / `wheels` / `graphical` / `inline`。日付ピッカーの見た目を制御。"
+      }
+    },
+    "minimumDate": {
+      "note": {
+        "en": "Earliest selectable date. ISO 8601 string or date binding. Use with `selectItemType: Date`.",
+        "ja": "選択可能な最早日付。ISO 8601 文字列または日付バインド。`selectItemType: Date` と併用。"
+      }
+    },
+    "maximumDate": {
+      "note": {
+        "en": "Latest selectable date.",
+        "ja": "選択可能な最遅日付。"
+      }
+    },
+    "minuteInterval": {
+      "note": {
+        "en": "Minute step size for time pickers (1, 5, 10, 15, 30, 60). Default 1.",
+        "ja": "時刻ピッカーの分ステップ（1, 5, 10, 15, 30, 60）。デフォルト 1。"
+      }
+    },
+    "dateStringFormat": {
+      "note": {
+        "en": "Format string for displayed date when the value is bound as a String. Uses Unicode date format patterns (`yyyy-MM-dd`, etc.).",
+        "ja": "値を String でバインドした場合の表示フォーマット文字列。Unicode 日付フォーマットパターン（`yyyy-MM-dd` 等）。"
+      }
+    },
+    "selectedDate": {
+      "note": {
+        "en": "Two-way binding to the picked date (Date object). Alternative to `selectedValue` when in date-picker mode. **Nil binding stays nil**: when the bound value is `nil` or empty string, the picker shows no selection and emits `nil` back through the binding — it does NOT silently fall back to today's date. If a default is required, seed the ViewModel with an explicit Date value before the picker mounts.",
+        "ja": "選択された日付（Date オブジェクト）への two-way binding。日付ピッカーモード時の `selectedValue` 代替。**nil binding はそのまま nil**：binding 値が `nil` または空文字のときピッカーは未選択で描画され、binding にも `nil` が伝播する（暗黙的に今日の日付にフォールバックしない）。デフォルト値が必要なら、ピッカーが mount される前に ViewModel 側で明示的に Date を初期化すること。"
+      }
+    },
+    "sheetTitle": {
+      "summary": {"en": "Title of the picker sheet (Android).", "ja": "ピッカーのシートの題（Android）。"},
+      "note": {"en": "A text, a strings.json key or a binding, read as `prompt` is. Absent: the library's word in the app's language. On iOS and web `jui build` prints a Kotlin only warning and generates nothing. See Adding a new language for the words and for replacing them in the whole app.", "ja": "文、strings.json のキー、binding を受け取り、`prompt` と同じように読まれる。書かなければ、アプリの言語のライブラリの語。iOS と web では `jui build` が Kotlin only の警告を出し、何も生成しない。語とアプリ全体での置き換えは「Adding a new language」のガイドを参照。"}
+    },
+    "cancelButtonText": {
+      "summary": {"en": "Cancel button of the picker sheet (Android).", "ja": "ピッカーのシートのキャンセルのボタン（Android）。"},
+      "note": {"en": "Read as `sheetTitle` is. Absent: the library's word in the app's language (`kjui_sheet_cancel`). A calendar date sheet has no cancel button, so it changes nothing there. On iOS and web `jui build` prints a Kotlin only warning and generates nothing.", "ja": "`sheetTitle` と同じように読まれる。書かなければ、アプリの言語のライブラリの語（`kjui_sheet_cancel`）。カレンダーの日付のシートにはキャンセルのボタンが無いので、そこでは何も変えない。iOS と web では `jui build` が Kotlin only の警告を出し、何も生成しない。"}
+    },
+    "doneButtonText": {
+      "summary": {"en": "Button that closes the picker sheet with the choice (iOS, and an Android date sheet).", "ja": "選んでシートを閉じるボタン（iOS と Android の日付のシート）。"},
+      "note": {"en": "Read as `sheetTitle` is. Absent on iOS: the app's own `Done` key in Localizable.strings, then the library's word in the app's language. Absent on Android: `kjui_sheet_confirm`, or `kjui_sheet_select` on a calendar sheet. An Android list sheet has no such button, and the web has no sheet: there it generates nothing and `jui build` says nothing.", "ja": "`sheetTitle` と同じように読まれる。iOS で書かなければ、Localizable.strings のアプリの `Done` のキー、次にアプリの言語のライブラリの語。Android で書かなければ `kjui_sheet_confirm`、カレンダーのシートでは `kjui_sheet_select`。Android の一覧のシートにはこのボタンが無く、web にはシートが無いので、そこでは何も生成せず、`jui build` も何も言わない。"}
+    }
+  },
+  "relatedComponents": ["Segment", "Radio"]
+}

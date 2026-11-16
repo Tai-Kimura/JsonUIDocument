@@ -1,0 +1,23 @@
+# Whitelist approach: ignore everything, then re-include only what
+# jsonui-doc-web's prebuild scripts need from the repo root.
+
+*
+
+# Build target (the doc-web app itself)
+!jsonui-doc-web/
+
+# Repo-level inputs read by jsonui-doc-web/scripts/*.ts
+!docs/
+!tests/
+!jui.config.json
+
+# Always exclude these even within the whitelisted dirs
+**/node_modules
+**/.next
+**/.git
+**/.DS_Store
+**/*.log
+**/out
+jsonui-doc-web/Dockerfile
+jsonui-doc-web/docker-compose.yml
+jsonui-doc-web/.dockerignore

@@ -1,0 +1,80 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "TextSize",
+    "displayName": "Following the user's text size",
+    "description": "Guides > Following the user's text size. fontScaling and maxFontScale, on every component that draws text, and the app-wide defaults (SwiftJsonUIConfiguration.shared.font.scaling / maxScale, KotlinJsonUI Configuration.Font.scaling / maxScale, the web Configuration.Font.configureScaling). Five sections: the two attributes, what each platform writes, the app defaults, the web lengths measured in a browser, and what the page measured and did not.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "guides/text-size",
+    "createdAt": "2026-11-14",
+    "updatedAt": "2026-11-14"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "[NextReadLink]",
+        "initial": "[]",
+        "description": "Three closing cards: writing layouts, screen readers, the Label reference."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onAppear",
+        "description": "Seed nextReadLinks."
+      },
+      {
+        "name": "onNavigate",
+        "params": [
+          {
+            "name": "url",
+            "type": "String"
+          }
+        ],
+        "description": "Client-side navigation."
+      }
+    ],
+    "displayLogic": []
+  },
+  "customTypes": [
+    {
+      "name": "NextReadLink",
+      "fields": [
+        {
+          "name": "id",
+          "type": "String"
+        },
+        {
+          "name": "titleKey",
+          "type": "String"
+        },
+        {
+          "name": "descriptionKey",
+          "type": "String"
+        },
+        {
+          "name": "url",
+          "type": "String"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "2026-11-14 — New page (standing order: every new feature gets its article; the orchestrator asked for the attribute list and a Dynamic Type page). No earlier page covered text size.",
+    "Section 2's block is converter output for a Label with fontSize 13 under no declaration, fontScaling false, fontScaling true (web only) and maxFontScale 1.5: rjui LabelConverter, sjui ConverterFactory, kjui ComposeBuilder.generate_component, called directly.",
+    "Section 4's table: the four web lengths set as font-size on spans in headless Chromium (playwright, chromium_headless_shell), html font-size 16px and 32px, then --jui-font-unit: 1px and --jui-font-max: 1.5px as configureScaling writes them (read from the Configuration.ts template), read with getComputedStyle.",
+    "Read from source, not run: SwiftJsonUI FontScaling.swift (capStep rounds down to a Dynamic Type step; keepsEnvironmentFont), KotlinJsonUI Configuration.kt (Font.scaling, Font.maxScale). Android's non-linear scaling and three-platform parity at 2.0 are the libraries' and jsonui-cli's word.",
+    "This site sets neither custom property; its size classes each resolve to their plain size (every [font-size:min(...)] pairs with the Tailwind class of the same size, every text-[length:min(...)] reduces to a plain rem), and the built CSS contains all 17 distinct classes.",
+    "2026-11-14: section_defaults_bullet_provider added. rjui LabelConverter writes ...Configuration.Font.resolve({...}) for a text with or without fontSize; jui build on this site printed 'Updated Configuration template ... (it was an earlier rjui template, unchanged)'; every inline size and weight equals the classes beside it (4079 elements), the 104 family calls are unchanged, and the 5 with weight semibold map to 600, where the browser would drop 'semibold' (headless Chromium: style.fontWeight='semibold' -> dropped, computed 400). Android's routing is jsonui-cli's word."
+  ]
+}

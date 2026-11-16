@@ -1,0 +1,78 @@
+{
+  "category": "event",
+  "description": {
+    "en": "Event attributes bind user interactions to ViewModel methods. All are optional; their omission disables the corresponding interaction.",
+    "ja": "イベント属性はユーザー操作を ViewModel のメソッドにバインドする。全て任意、省略すれば該当操作は無効。"
+  },
+  "attributes": {
+    "onClick": {
+      "summary": {
+        "en": "Tap / click. Fires on single tap after gesture recognition (≈0–50 ms). Required on Button for interactivity.",
+        "ja": "タップ／クリック。ジェスチャ認識後（約 0〜50ms）、シングルタップで発火。Button では必須。"
+      },
+      "examples": [
+        { "language": "json", "code": "{ \"type\": \"Button\", \"onClick\": \"@{onSave}\" }" }
+      ],
+      "note": {
+        "en": "`onClick` declares a binding only, so a bare handler name (`\"onClick\": \"onSave\"`) is warned as `binding-bare-event` — write `@{onSave}`. An event that also declares a string, such as lowercase `onclick`, still calls a bare name.",
+        "ja": "`onClick` は binding だけを宣言しているので、裸のハンドラ名（`\"onClick\": \"onSave\"`）は `binding-bare-event` として警告されます — `@{onSave}` と書いてください。小文字の `onclick` のように string も宣言しているイベントは、裸の名前でも呼ばれます。"
+      }
+    },
+    "onclick": {
+      "summary": {
+        "en": "Selector-based click handler — a plain handler name, not a binding.",
+        "ja": "セレクタ形式のクリックハンドラ。ハンドラ名を直接書く（binding ではない）。"
+      },
+      "note": {
+        "en": "Not an alias for `onClick` — a different face of the same event. `onClick` takes a binding (`@{handler}`); lowercase `onclick` takes a bare handler name resolved against the ViewModel, and it also accepts an array (`[\"a\", \"b\"]`), calling every handler in declared order on all three platforms. A binding on `onclick` makes `jui build` warn and reads as absent on every platform (in an array only the bound names go); write it on `onClick`.",
+        "ja": "`onClick` のエイリアスではなく、同じイベントの別の面です。`onClick` は binding（`@{handler}`）を取り、小文字の `onclick` は ViewModel に対して解決されるハンドラ名を直接取ります。配列（`[\"a\", \"b\"]`）も受け付け、3 プラットフォームとも宣言順に全ハンドラを呼びます。`onclick` に書いた binding は 3 面とも `jui build` が警告し、書いていないものとして扱われます（配列では binding の名前だけを落とす）。binding は `onClick` に書きます。"
+      }
+    },
+    "onLongPress": {
+      "summary": {
+        "en": "Long-press event. Default threshold: iOS 500 ms / Android 500 ms / Web 600 ms.",
+        "ja": "長押しイベント。既定閾値は iOS 500ms / Android 500ms / Web 600ms。"
+      }
+    },
+    "onAppear": {
+      "summary": {
+        "en": "Fired when the component becomes visible (mount / re-mount), on SwiftUI and Compose only: web and UIKit draw no call to the handler. A web build warns that the attribute is SwiftUI/Compose only.",
+        "ja": "コンポーネントが可視になったとき（マウント／再マウント時）に発火。SwiftUI と Compose だけで、web と UIKit はハンドラを呼ぶコードを出さない。web のビルドは、この属性は SwiftUI/Compose 専用だと警告する。"
+      }
+    },
+    "onDisappear": {
+      "summary": {
+        "en": "Fired when the component is unmounted, on SwiftUI and Compose only (as onAppear).",
+        "ja": "コンポーネントがアンマウントされたとき発火。SwiftUI と Compose だけ（onAppear と同じ）。"
+      }
+    },
+    "onPan": {
+      "summary": {
+        "en": "Pan gesture (drag) events. Receives a vector `{ dx, dy }` per frame.",
+        "ja": "パンジェスチャ（ドラッグ）イベント。フレームごとに `{ dx, dy }` を受け取る。"
+      }
+    },
+    "onPinch": {
+      "summary": {
+        "en": "Pinch gesture (two-finger zoom). Receives a `scale` factor per frame.",
+        "ja": "ピンチジェスチャ（2 本指ズーム）。フレームごとに `scale` 係数を受け取る。"
+      },
+      "note": {
+        "en": "Declare the handler `((Double) -> Void)?`, or `((Double?) -> Void)?`, or `((String, Double) -> Void)?` to take the view's id first. One declaration serves both platforms: iOS hands the handler a CGFloat, which Swift passes to a Double parameter, and Compose's scale is a Float that the generated code passes as `.toDouble()` (KotlinJsonUI does the same in Dynamic). A `(Float)` or `(CGFloat)` handler takes the Float as it is on Android. The generated call was measured here; that it compiles, the iOS side and Dynamic are jsonui-cli's measurement.",
+        "ja": "ハンドラーは `((Double) -> Void)?` と宣言します。`((Double?) -> Void)?` でも、ビューの id を先に受け取る `((String, Double) -> Void)?` でも構いません。1 つの宣言が両プラットフォームに効きます: iOS はハンドラーに CGFloat を渡し、Swift はそれを Double の引数に渡せます。Compose の scale は Float ですが、生成されるコードはそれを `.toDouble()` で渡します（Dynamic では KotlinJsonUI が同じことをします）。`(Float)` や `(CGFloat)` のハンドラーは、Android では Float をそのまま受け取ります。生成される呼び出しはここで測りました。コンパイルが通ること、iOS 側、Dynamic は jsonui-cli の測定です。"
+      }
+    },
+    "events": {
+      "summary": {
+        "en": "Batch-declare multiple event handlers in one object. Alternative to individual `onClick` / `onLongPress` attributes for readability.",
+        "ja": "複数のイベントハンドラを 1 オブジェクトでまとめて宣言。個別の `onClick` / `onLongPress` より読みやすいとき使う。"
+      }
+    },
+    "scripts": {
+      "summary": {
+        "en": "Inline scripts that run on specific lifecycle events (e.g., `onMount`). Use sparingly — prefer ViewModel event handlers.",
+        "ja": "特定のライフサイクルイベント（例: `onMount`）で実行されるインラインスクリプト。控えめに使い、通常は ViewModel のイベントハンドラを優先する。"
+      }
+    }
+  }
+}

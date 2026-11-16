@@ -1,0 +1,98 @@
+{
+  "component": "Radio",
+  "description": {
+    "en": "Mutually exclusive selection within a group. Behaves as a standalone radio button; grouping is established via shared `group` attribute.",
+    "ja": "グループ内で排他的に 1 件を選択するボタン。単体のラジオボタンとして動作し、`group` 属性で排他グループに属するものを定義。"
+  },
+  "usage": {
+    "en": "Use Radio when 2–5 options must all be visible simultaneously and mutually exclusive. For 6+ options use SelectBox. All Radios with the same `group` automatically exclude each other.",
+    "ja": "排他的で全選択肢を同時表示したい 2〜5 件で使う。6 件以上は SelectBox。同じ `group` を持つ Radio は自動で排他関係になる。"
+  },
+  "examples": [
+    {
+      "title": { "en": "3-option group", "ja": "3 択グループ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"selectedValue\": \"@{size}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"selectedValue\": \"@{size}\", \"label\": \"@string/medium\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"L\", \"selectedValue\": \"@{size}\", \"label\": \"@string/large\" }\n  ]\n}",
+      "note": {
+        "en": "Each option compares its own `value` against the shared `selectedValue` binding at runtime — no expressions in the layout. Selecting an option writes its `value` back to `size`.",
+        "ja": "各選択肢は自分の `value` と共有の `selectedValue` バインディングをランタイムで突き合わせる — レイアウト側に式は不要。選択すると自分の `value` が `size` に書き戻される。"
+      }
+    },
+    {
+      "title": { "en": "Bound group (selectedValue)", "ja": "バインドされたグループ (selectedValue)" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"S\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/small\" },\n    { \"type\": \"Radio\", \"group\": \"size\", \"value\": \"M\", \"selectedValue\": \"@{size}\", \"onValueChange\": \"@{onSizeChanged}\", \"label\": \"@string/medium\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Custom icons", "ja": "カスタムアイコン" },
+      "language": "json",
+      "code": "{\n  \"type\": \"Radio\",\n  \"group\": \"option\",\n  \"value\": \"a\",\n  \"icon\": \"radio_off\",\n  \"selectedIcon\": \"radio_on\",\n  \"label\": \"Option A\"\n}"
+    }
+  ],
+  "attributes": {
+    "items": {
+      "note": {
+        "en": "Present only when one node stands for the whole group. Give a Radio an `items` array and the converter emits every button from it — measured on the web face, `items` together with `group` produced the full group from a single node. Leave it out and the node is one button, which is the form the examples above use. Entries are data, not strings keys: a key registered in strings.json, written as an item, renders as the key text itself, and the attribute definition says the same. Put translated text in the view model, or use the per-button `label`, which does resolve.",
+        "ja": "1 つのノードでグループ全体を表すときだけ使います。Radio に `items` 配列を渡すと converter はそこからボタンを全て生成します — web 面での実測では、`items` と `group` を与えた 1 ノードからグループ全体が出ました。省略すればそのノードは単独のボタンで、上の例はその形です。エントリはデータであって strings のキーではありません: strings.json に登録済みのキーを item に書いてもキー文字列のまま描画され、属性宣言も同じことを述べています。翻訳済みの文字列を ViewModel から渡すか、解決される per-button の `label` を使ってください。"
+      }
+    },
+    "group": {
+      "note": {
+        "en": "String identifier. All Radios with the same `group` within the same parent View form a mutually-exclusive set. Takes no binding: write the name out. A binding makes `jui build` warn on every platform and the default group is used.",
+        "ja": "文字列識別子。同一親 View 配下で同じ `group` を持つ Radio が排他グループを形成。 binding は受けられないので、名前を直接書く。binding は 3 面とも `jui build` が警告を出し、既定の群を使う。"
+      }
+    },
+    "value": {
+      "summary": { "en": "The value associated with this option when it is selected.", "ja": "この選択肢が選ばれたときに対応付く値。" },
+      "note": {
+        "en": "The value this Radio represents when selected. Bind `selectedValue` on the parent (or the ViewModel) to track which value is chosen.",
+        "ja": "この Radio が選ばれたときの値。親（または ViewModel）で `selectedValue` をバインドして選択値を管理。"
+      }
+    },
+    "checked": {
+      "summary": { "en": "Seeds which option starts selected; it is not the group's live state and it is not two-way. A bound `selectedValue` on the group wins, then a literal `selectedValue`, then `checked`.", "ja": "どの選択肢が最初に選ばれているかの初期値。グループの現在の状態ではなく、two-way でもない。グループの bound な `selectedValue` が最優先、次にリテラルの `selectedValue`、最後に `checked`。" },
+      "note": {
+        "en": "Boolean binding. Expressions are not allowed inside `@{…}` — if you need a per-option boolean, derive it in the ViewModel (e.g. `get isMediumSelected() { return this.size === \"M\"; }`). Tapping sets all other Radios in the same `group` to `false`. Binding `selectedValue` is usually the simpler pattern.",
+        "ja": "Boolean binding。`@{…}` 内に式は書けない — 選択肢ごとの boolean が必要なら ViewModel で導出する（例: `get isMediumSelected() { return this.size === \"M\"; }`）。タップで同 `group` の他の Radio は `false` になる。通常は `selectedValue` を使う方が簡潔。"
+      }
+    },
+    "selectedValue": {
+      "note": {
+        "en": "Two-way binding to the group's chosen value — the Radio whose `value` matches renders checked, and tapping a Radio writes its `value` back. Same shape as SelectBox.selectedValue; wired on all three platforms.",
+        "ja": "グループの選択値への two-way binding — `value` が一致する Radio がチェック表示になり、タップでその Radio の `value` が書き戻される。SelectBox.selectedValue と同型で、3 プラットフォームすべてで配線済み。"
+      }
+    },
+    "onValueChange": {
+      "note": {
+        "en": "Fires when a Radio in the group is tapped; receives that Radio's `value`. Binding-only (`@{handlerName}`).",
+        "ja": "グループ内の Radio がタップされたときに発火し、その Radio の `value` を受け取る。binding 専用（`@{handlerName}`）。"
+      }
+    },
+    "label": {
+      "summary": { "en": "Radio label (binding supported).", "ja": "ラジオのラベル（binding 可）。" },
+      "note": {
+        "en": "Inline label rendered to the right of the radio icon. For custom label layout, omit `label` and wrap Radio + Label in a horizontal View.",
+        "ja": "ラジオアイコンの右に表示するインラインラベル。独自配置が必要なら `label` を省略し、水平 View で Radio + Label を並べる。"
+      }
+    },
+    "icon": {
+      "note": {
+        "en": "Unselected icon image name. Defaults to the platform standard radio-off glyph.",
+        "ja": "非選択アイコン画像名。省略時はプラットフォーム標準の radio-off グリフ。"
+      }
+    },
+    "selectedIcon": {
+      "note": {
+        "en": "Selected icon image name. Defaults to the platform standard radio-on glyph.",
+        "ja": "選択中アイコン画像名。省略時はプラットフォーム標準の radio-on グリフ。"
+      }
+    },
+    "spacing": {
+      "note": {
+        "en": "Gap between the icon and the label (pt/dp/px). Default 8.",
+        "ja": "アイコンとラベルの間隔（pt/dp/px）。デフォルト 8。"
+      }
+    }
+  },
+  "relatedComponents": ["Segment", "SelectBox", "CheckBox"]
+}

@@ -1,0 +1,108 @@
+{
+  "component": "ScrollView",
+  "description": {
+    "en": "Vertically (default) or horizontally scrollable container. Children that exceed the visible bounds become scrollable.",
+    "ja": "垂直（デフォルト）または水平にスクロール可能なコンテナ。可視領域を超えた子要素がスクロール対象になる。"
+  },
+  "usage": {
+    "en": "Use ScrollView for static-sized content that may overflow (forms, long articles, long card stacks). For large dynamic lists use Collection — it virtualizes. An iOS ScrollView that is wrapContent along its scroll axis (a vertical one with height wrapContent, a horizontal one with width wrapContent) is as long as its content there, or shorter and scrolling when its parent offers less, as Android and the web draw it. The generator measures the content into a state named after the ScrollView's id (<id>ContentLength) and frames the ScrollView at it; SwiftJsonUI's Dynamic mode draws the same. Read from sjui's ScrollViewConverter with a vertical ScrollView of height wrapContent.",
+    "ja": "オーバーフローする可能性のある静的コンテンツ（フォーム、長文、長いカードスタック）に使う。大量の動的リストは仮想化される Collection を使う。 iOS の ScrollView がスクロールの向きに wrapContent のとき（縦なら height が wrapContent、横なら width が wrapContent）、その向きの長さは中身の長さになり、親がそれより短くしか取れないときは短くなって中でスクロールします。Android と web と同じ描き方です。generator は中身の長さを ScrollView の id から名付けた state（<id>ContentLength）に測り、ScrollView をその長さで枠取ります。SwiftJsonUI の Dynamic も同じに描きます。sjui の ScrollViewConverter に height が wrapContent の縦の ScrollView を渡して読んだもの。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Vertical scroll", "ja": "垂直スクロール" },
+      "language": "json",
+      "code": "{\n  \"type\": \"ScrollView\",\n  \"width\": \"matchParent\",\n  \"height\": \"matchParent\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Horizontal carousel without indicators", "ja": "水平カルーセル・スクロールバー非表示" },
+      "language": "json",
+      "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"showsHorizontalScrollIndicator\": false,\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"horizontal\", \"child\": [ ] }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Paging per screen", "ja": "画面単位のスナップ" },
+      "language": "json",
+      "code": "{\n  \"type\": \"ScrollView\",\n  \"orientation\": \"horizontal\",\n  \"paging\": true,\n  \"child\": [\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" },\n    { \"type\": \"View\", \"width\": \"matchParent\" }\n  ]\n}"
+    },
+    {
+      "title": { "en": "Form with keyboard avoidance", "ja": "キーボード回避を有効にしたフォーム" },
+      "language": "json",
+      "code": "{\n  \"type\": \"ScrollView\",\n  \"keyboardAvoidance\": true,\n  \"keyboardDismissMode\": \"interactive\",\n  \"child\": [\n    { \"type\": \"View\", \"orientation\": \"vertical\", \"child\": [ ] }\n  ]\n}"
+    }
+  ],
+  "attributes": {
+    "orientation": {
+      "note": {
+        "en": "`vertical` (default) / `horizontal`. For both-axis scrolling, nest two ScrollViews. The axis comes only from this attribute and `horizontalScroll`, never from the children. A ScrollView that writes neither scrolls vertically, even when its only child is a horizontal View, which is then laid out inside a vertical scroll. To scroll sideways, write `orientation: \"horizontal\"` on the ScrollView itself.",
+        "ja": "`vertical`（デフォルト）/ `horizontal`。両軸スクロールは 2 つの ScrollView をネスト。スクロールの向きは、この属性と `horizontalScroll` だけで決まり、子からは決めない。どちらも書かない ScrollView は縦にスクロールし、唯一の子が横並びの View でも、その子は縦スクロールの中に置かれる。横にスクロールさせるには、ScrollView 自身に `orientation: \"horizontal\"` を書く。"
+      }
+    },
+    "horizontalScroll": {
+      "note": {
+        "en": "Boolean. `true` is the same as `orientation: \"horizontal\"`; `false` or absent leaves the axis to `orientation`, which is vertical when it is not written either. Written together with `orientation`, the two must agree: `orientation: \"horizontal\"` with `horizontalScroll: false`, or `\"vertical\"` with `true`, is refused by `jui build` with `ERROR [scrollview]`, under a responsive key too.",
+        "ja": "Boolean。`true` は `orientation: \"horizontal\"` と同じ。`false` または書かなければ向きは `orientation` に任され、それも書かなければ縦。`orientation` と一緒に書くときは一致していなければならない: `orientation: \"horizontal\"` に `horizontalScroll: false`、または `\"vertical\"` に `true` を組み合わせると、`jui build` が `ERROR [scrollview]` で拒否する。responsive のキーの中でも同じ。"
+      }
+    },
+    "paging": {
+      "note": {
+        "en": "`true` snaps to child boundaries (each child = one page). Usually paired with children sized to the parent.",
+        "ja": "`true` で子要素境界にスナップ（子要素 1 つ = 1 ページ）。通常は子要素を親サイズに揃える。"
+      }
+    },
+    "scrollEnabled": {
+      "note": {
+        "en": "Boolean. When `false`, ScrollView acts as a plain View. Useful when scroll behavior is conditional.",
+        "ja": "Boolean。`false` で通常の View として振る舞う。スクロール挙動を条件付きで変えたいときに使う。"
+      }
+    },
+    "bounces": {
+      "note": {
+        "en": "iOS-specific bounce behavior at scroll edges. Default `true`. Set `false` to remove the rubber-band effect.",
+        "ja": "iOS 固有のスクロール端バウンス挙動。デフォルト `true`。ラバーバンド効果を消すには `false`。"
+      }
+    },
+    "keyboardAvoidance": {
+      "default": "true",
+      "note": {
+        "en": "Boolean, default `true`: absent means on. When on, the ScrollView keeps the focused text field above the soft keyboard. iOS uses the keyboard-avoiding scroll view and disables its configuration when `false`. Android applies KotlinJsonUI's Modifier.keyboardAvoidance only when not `false`: imePadding(), the `keyboardAvoidancePadding` clearance, and scrolling the focused field up once the IME is showing. Both the generated code and the dynamic ScrollView call it. Read from the codegen and the upstream report, not measured here.",
+        "ja": "Boolean、既定 `true`: 書かなければ有効。有効ならフォーカス中のテキストフィールドがソフトキーボードの上に来るよう ScrollView が保つ。iOS はキーボード回避付きの scroll view を使い、`false` で構成を無効化。Android は `false` でない場合だけ KotlinJsonUI の Modifier.keyboardAvoidance を適用する: imePadding()、`keyboardAvoidancePadding` の余白、そして IME が出たあとフォーカス中のフィールドを上へスクロールする追従。生成コードと dynamic の ScrollView の両方がこれを呼ぶ。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
+      }
+    },
+    "keyboardAvoidancePadding": {
+      "summary": {
+        "en": "Clearance, in points/dp, that a focused text field keeps from the ScrollView's visible bottom edge while the soft keyboard is up.",
+        "ja": "ソフトキーボード表示中、フォーカス中のテキストフィールドが ScrollView の見えている下端から保つ余白（pt / dp）。"
+      },
+      "default": "20",
+      "note": {
+        "en": "Number. Absent means 20, not 0. The visible bottom edge is whatever bounds the scroll area at that moment: the top of a fixed footer laid out below the ScrollView, or the keyboard itself when the ScrollView meets it directly. iOS applies it as a bottom safe-area inset (KeyboardAvoidanceConfiguration.additionalPadding). The inset is there while the keyboard is visible, and also from the moment a text input inside the ScrollView begins editing, so it is in place before SwiftUI scrolls the focused field. With a hardware keyboard, where no software keyboard shows, the inset is there while an input inside is being edited. Android's Modifier.keyboardAvoidance ends the scrollable's viewport that far above the IME while it is visible and scrolls the focused field to that edge once the IME is up. The follow itself is done by KotlinJsonUI, not left to Compose's built-in tracking. Ignored when `keyboardAvoidance` is `false`. Not applicable on Web, which has no soft-keyboard avoidance. Read from the codegen and the upstream report, not measured here.",
+        "ja": "Number。書かなければ 20 であって 0 ではない。「見えている下端」はその瞬間にスクロール領域を区切っているもの: ScrollView の下に置いた固定フッターの上端、または ScrollView がキーボードに直接接しているならキーボードそのもの。iOS では bottom safe-area inset として適用（KeyboardAvoidanceConfiguration.additionalPadding）。この inset はキーボードが見えている間に加え、ScrollView の中の入力欄が編集を始めた時点から入る。そのため SwiftUI がフォーカス中のフィールドをスクロールする前に inset が揃っている。ソフトキーボードが出ないハードウェアキーボードの場合も、中の入力欄を編集している間は inset が入る。Android では Modifier.keyboardAvoidance が IME 表示中にスクロール領域の viewport をその分だけ IME の上で終わらせ、IME が出たあとフォーカス中のフィールドをその縁までスクロールする。追従そのものは KotlinJsonUI が行い、Compose 組み込みの追跡には任せていない。`keyboardAvoidance` が `false` なら無視される。Web は非対応（ソフトキーボード回避が無い）。codegen と上流の修正レポートを読んだもので、こちらでは未測定。"
+      }
+    },
+    "keyboardDismissMode": {
+      "note": {
+        "en": "`none` / `onDrag` / `interactive`. Controls when the keyboard dismisses during scroll. `interactive` lets a drag pull the keyboard down with the finger.",
+        "ja": "`none` / `onDrag` / `interactive`。スクロール中のキーボード閉じ挙動を制御。`interactive` は指のドラッグに合わせてキーボードを引き下ろせる。"
+      }
+    },
+    "showsVerticalScrollIndicator": {
+      "note": {
+        "en": "Boolean. On iOS SwiftUI, hiding requires iOS 16+ (earlier versions ignore the setting).",
+        "ja": "Boolean。iOS SwiftUI で非表示にするには iOS 16+ が必要（それ以前は無視される）。"
+      }
+    },
+    "contentInsetAdjustmentBehavior": {
+      "note": {
+        "en": "`automatic` / `never` / `scrollableAxes` / `always`: whether the content clears the safe area (the system bars). On iOS the system adjusts by default and `never` stops it. On Android (kjui and KotlinJsonUI Dynamic) `always` / `automatic` pad the content by the safe area, `scrollableAxes` only on the scroll axis, and `never` or no declaration by nothing. That padding is only the part of the safe area the scroll view's own frame overlaps, as on iOS, so inside a SafeAreaView or below a header it is 0. kjui's output calls KotlinJsonUI's rememberSafeAreaOverlap. The web draws no safe area for it; `never` writes `scroll-p-0`. Read from kjui's ScrollViewComponent (`rememberSafeAreaOverlap()`) and from rjui's converter; the drawing on a device is jsonui-cli's word.",
+        "ja": "`automatic` / `never` / `scrollableAxes` / `always`: 内容がセーフエリア（システムバー）を避けるかどうか。iOS は既定でシステムが調整し、`never` で止まる。Android（kjui と KotlinJsonUI Dynamic）は、`always` / `automatic` でセーフエリアの分、`scrollableAxes` でスクロール方向の分だけ内容に余白を足し、`never` か宣言なしなら足さない。その余白はスクロールビュー自身の枠がセーフエリアと重なる分だけ（iOS と同じ）。SafeAreaView の内側やヘッダーの下では 0。kjui の生成物は KotlinJsonUI の rememberSafeAreaOverlap を呼ぶ。web はセーフエリアを描かず、`never` で `scroll-p-0` を書く。kjui の ScrollViewComponent（`rememberSafeAreaOverlap()`）を、rjui の converter とあわせて読んだもの。端末での描かれ方は jsonui-cli の言葉。"
+      }
+    },
+    "indicatorStyle": {
+      "note": {
+        "en": "iOS-only. `default` / `black` / `white`. Scroll indicator color.",
+        "ja": "iOS 専用。`default` / `black` / `white`。スクロールバーの色。"
+      }
+    }
+  },
+  "relatedComponents": ["Collection", "View", "SafeAreaView"]
+}

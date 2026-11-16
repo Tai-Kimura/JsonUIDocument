@@ -1,0 +1,137 @@
+{
+  "component": "TextField",
+  "description": {
+    "en": "Single-line text input for short user-entered strings. For multi-line input use TextView. For secure input toggle `secure: true`.",
+    "ja": "短い文字列を受け取る単一行の入力フィールド。複数行は TextView を使う。パスワード入力は `secure: true` を指定。"
+  },
+  "usage": {
+    "en": "TextField owns its text state via two-way binding. The ViewModel declares the property as mutable (`@Published var text: String` on iOS / `MutableStateFlow<String>` on Android / plain mutable on web). TextField writes back through the bound property on every commit. On Android, `borderWidth` sets the outline's width: the declared width unfocused, the larger of it and 2dp under focus, and no line at 0. A bound width with no value yet draws 1dp. A TextView takes it the same way. The widths are read from KotlinJsonUI's source; no screen was drawn here. On Android, a bound `text` in generated Compose code follows the view model when it takes an edit back to a value it already held (say `12年` corrected to `12`), and a key typed while the screen is busy is not overwritten by an older value. Dynamic mode leaves a correction to the same value in the field. The typing behaviour is jsonui-cli's measurement with an app's own IME and adb input, not a real keyboard. The value and the handler come from the data the view is given (`rememberUpdatedState(data)` in the generated code), so a field drawn from data a parent view model passes in (a sheet, say) keeps the parent's initial value and its edits reach the parent. That is jsonui-cli's measurement on an app. Unwritten, `cornerRadius` is 0, a square corner, on all three platforms. No setting changes the default. rjui.config's `defaults.textField.cornerRadius` is not read, and written it draws no corner; the same block's `fontColor`, `padding` and `background` are applied to a TextField that does not write them, the layout's own keys winning. SwiftJsonUIConfiguration.shared has no button or textField; a line that sets them does not compile.",
+    "ja": "TextField は two-way binding で自身の text 状態を保持する。ViewModel 側で mutable プロパティ（iOS なら `@Published var text: String`、Android なら `MutableStateFlow<String>`、Web は通常の mutable）を宣言すると、確定ごとに書き戻される。Android では `borderWidth` が枠の太さになる。未フォーカスは宣言の太さ、フォーカス中は宣言の太さと 2dp の大きいほう、0 は線なし。binding の値がまだ無いときは 1dp。Android の TextView も同じように受ける。太さは KotlinJsonUI のソースから読んだ。画面は描いていない。Android では、Compose の生成コードで binding した `text` が、ViewModel が前と同じ値へ訂正したとき（`12年` を `12` にするなど）にも欄に従い、画面が詰まっている間に打ったキーが古い値で上書きされない。Dynamic モードでは、同じ値への訂正は欄に残る。入力の動きは jsonui-cli がアプリ自作の IME と adb の入力で測ったもので、本物のキーボードではない。値も handler も、ビューに渡された data から取る（生成コードの `rememberUpdatedState(data)`）ので、親の ViewModel が渡した data で描く欄（シートなど）でも、親が入れた初めの値が残り、打った字も親に届く。これは jsonui-cli がアプリで測ったもの。 `cornerRadius` を書かないと、3 面とも 0、つまり四角になる。既定は設定では変えられない。rjui.config の `defaults.textField.cornerRadius` は読まれず、書いても角は付かない。同じ所の `fontColor`・`padding`・`background` は、それを書いていない TextField に付き、レイアウトに書いた値が勝つ。 SwiftJsonUIConfiguration.shared に button と textField は無く、これらに値を入れる行はコンパイルが通らない。"
+  },
+  "examples": [
+    {
+      "title": { "en": "Minimum two-way binding", "ja": "最小の two-way binding" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{email}\",\n  \"hint\": \"@string/email_placeholder\",\n  \"contentType\": \"email\",\n  \"width\": \"matchParent\"\n}"
+    },
+    {
+      "title": { "en": "With validation error", "ja": "バリデーションエラー表示付き" },
+      "language": "json",
+      "code": "{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    {\n      \"type\": \"TextField\",\n      \"text\": \"@{email}\",\n      \"hint\": \"@string/email_placeholder\",\n      \"contentType\": \"email\",\n      \"onTextChange\": \"@{onEmailChanged}\"\n    },\n    {\n      \"type\": \"Label\",\n      \"text\": \"@{emailError}\",\n      \"visibility\": \"@{emailErrorVisibility}\",\n      \"fontColor\": \"#EF4444\",\n      \"fontSize\": 12\n    }\n  ]\n}",
+      "note": {
+        "en": "`visibility` takes the `visible` / `invisible` / `gone` enum, so the empty-check lives in the ViewModel: `get emailErrorVisibility() { return this.emailError ? \"visible\" : \"gone\"; }`.",
+        "ja": "`visibility` は `visible` / `invisible` / `gone` の enum を取るので、空チェックは ViewModel 側に置く: `get emailErrorVisibility() { return this.emailError ? \"visible\" : \"gone\"; }`。"
+      }
+    },
+    {
+      "title": { "en": "Password", "ja": "パスワード" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{password}\",\n  \"secure\": true,\n  \"contentType\": \"password\",\n  \"hint\": \"@string/password_placeholder\"\n}"
+    },
+    {
+      "title": { "en": "Numeric with max length", "ja": "数値入力・最大文字数付き" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{age}\",\n  \"pattern\": \"^[0-9]*$\",\n  \"maxLength\": 3,\n  \"hint\": \"18\"\n}"
+    },
+    {
+      "title": { "en": "Submit on return", "ja": "リターンキーで送信" },
+      "language": "json",
+      "code": "{\n  \"type\": \"TextField\",\n  \"text\": \"@{query}\",\n  \"hint\": \"@string/search_placeholder\",\n  \"returnKeyType\": \"search\",\n  \"onShouldReturn\": \"@{onSubmitSearch}\"\n}"
+    }
+  ],
+  "attributes": {
+    "hideOnFocused": { "summary": { "en": "Hide other elements while the field is focused.", "ja": "フィールドにフォーカスがある間、他の要素を隠す。" } },
+    "placeholder": { "summary": { "en": "Placeholder text (alias for `hint`).", "ja": "プレースホルダー文字列（`hint` のエイリアス）。" } },
+    "input": {
+      "note": {
+        "en": "When the field also declares `contentType`, the keyboard still comes from `input` on every platform (see `contentType`). Cross-platform keyboard hint. The date family (`date` / `time` / `datetime`) reaches a native keyboard only in Android's generated code on Compose 1.12 or newer: the Android dynamic renderer has no case for them and shows a plain text keyboard, iOS has no matching keyboard type and falls back to the default one, and web changes the input element's type instead of setting an input mode. `signedDecimal` shares its web `inputmode` with `decimal`, so on web the two are indistinguishable; iOS maps it to the punctuation keyboard because the decimal pad has no minus key. A project that declares a Compose version below 1.12.0 gets exactly these four degraded to plain text; one that declares nothing and builds against an older Compose gets a compile error instead, because the generated Kotlin names the member.",
+        "ja": "`contentType` も宣言した欄でも、キーボードはどの面でも `input` から取る（`contentType` を参照）。クロスプラットフォームのキーボード指定。`date` / `time` / `datetime` の 3 つがネイティブのキーボードになるのは、Compose 1.12 以降の Android 生成コードだけ: Android の dynamic レンダラーには分岐が無くプレーンなテキストになり、iOS には対応するキーボード種別が無いので既定に落ち、web は input mode ではなく要素の type が変わる。`signedDecimal` は web では `decimal` と `inputmode` を共有するため区別がつかない。iOS は記号キーボードに割り当てる — decimal pad にマイナスキーが無いため。Compose のバージョンを 1.12.0 未満と宣言したプロジェクトでは、この 4 つだけがプレーンなテキストに縮退する。何も宣言せず古い Compose でビルドした場合は縮退ではなくコンパイルエラーになる — 生成された Kotlin がそのメンバーを名指しするため。"
+      }
+    },
+    "text": {
+      "note": {
+        "en": "Always two-way. Must bind to a mutable ViewModel property. Use `onTextChange` for non-binding side effects.",
+        "ja": "常に two-way。ViewModel の mutable プロパティにバインドする必要がある。binding 以外の副作用が必要なら `onTextChange` を使う。"
+      }
+    },
+    "inputType": {
+      "note": {
+        "en": "Android-style keyboard hint hoisted from the EditText alias: `text` / `number` / `phone` / `email` / `password` / `textMultiLine`. Android-only — `input` is the cross-platform attribute.",
+        "ja": "EditText エイリアスから正準へ昇格した Android 風キーボード指定。`text` / `number` / `phone` / `email` / `password` / `textMultiLine`。Android 専用 — クロスプラットフォームは `input` を使う。"
+      }
+    },
+    "contentType": {
+      "note": {
+        "en": "Hints the keyboard and autofill. Common values: `email`, `password`, `username`, `usernameWebauthn`, `telephoneNumber`, `URL`, `streetAddress`, `postalCode`, `creditCardNumber`; `emailAddress` is an alias of `email`, and `tel` and `phone` of `telephoneNumber`. Maps to `UITextContentType` on iOS, the keyboard type on Android, and `autocomplete` on web. The keyboard comes from `input` when the field declares one, and from `contentType` only when it does not, on every platform. Dynamic mode takes the same order (jsonui-cli's measurement). In a Layout, `jui build` rewrites an alias to its canonical spelling with a warning, so a written alias draws the same on every platform. `jui build` also rewrites a Style's alias in the copy it distributes, with the same warning as a Layout's, and leaves your Style as written. A bound value on web takes `emailAddress` and `phone` too. Android also gives the field Compose's autofill hint (`.semantics { contentType = ContentType.Username }` and so on, a bound value through a `when`) for every value but `URL`, which Compose has no type for. `usernameWebauthn` is a username field that also offers passkeys: web writes `autocomplete=\"username webauthn\"`, iOS `.textContentType(.username)`, and Android draws it as `username` with no warning, because a passkey on Android comes from the app's own credential request, not from the field. Generated code compared on a scratch three-platform project; no keyboard was drawn and no password manager was run here.",
+        "ja": "キーボードと自動入力のヒント。主な値: `email`、`password`、`username`、`usernameWebauthn`、`telephoneNumber`、`URL`、`streetAddress`、`postalCode`、`creditCardNumber`。`emailAddress` は `email` の、`tel` と `phone` は `telephoneNumber` の別名。iOS では `UITextContentType`、Android ではキーボードの種類、web では `autocomplete` にマップする。キーボードは、欄が `input` を宣言していれば `input` から取り、無いときだけ `contentType` から取る。どの面でも同じ。Dynamic モードも同じ順になる（jsonui-cli の実測）。Layout に書いた別名は `jui build` が警告を出して正規の綴りに書き換えるので、どの面でも同じに描かれる。`jui build` は Style の別名も、Layout と同じ警告を出して、配る写しの中で書き換える。元の Style は書いたまま。web の binding の値も `emailAddress` と `phone` を受ける。Android は Compose の自動入力の印（`.semantics { contentType = ContentType.Username }` など。binding の値は `when` を通す）も欄に付ける。`URL` だけは Compose に型が無いので付かない。`usernameWebauthn` はパスキーも出すユーザー名の欄: web は `autocomplete=\"username webauthn\"`、iOS は `.textContentType(.username)` を書き、Android は警告なしで `username` と同じに描く。Android のパスキーは欄ではなくアプリ自身の資格情報の要求から出るため。生成コードは使い捨ての 3 面プロジェクトで比べた。キーボードは描いておらず、パスワード マネージャも動かしていない。"
+      }
+    },
+    "secure": {
+      "note": {
+        "en": "Boolean. When `true`, characters are obscured. Required for password fields. Pair with `contentType: 'password'` for autofill. A binding follows the data on all three platforms' generated code. Until the bound value arrives the field is not obscured: Android and iOS read a missing value as false and web as falsy, so give a password field a written `true` rather than a binding that starts empty. Android Dynamic follows too, jsonui-cli's measurement; iOS Dynamic is not measured.",
+        "ja": "Boolean。`true` で入力文字を伏せ字に。パスワードには必須。自動入力のために `contentType: 'password'` と併用する。 binding は 3 面の生成コードともデータに従う。値が届くまでは伏せ字にならない。Android と iOS は値が無いと false、web は偽として読むので、パスワードの欄には、空で始まる binding ではなく `true` を直接書く。Android の Dynamic も従う（jsonui-cli の測定）。iOS の Dynamic は未測定。"
+      }
+    },
+    "maxLength": {
+      "note": {
+        "en": "Positive integer. Enforced at platform level; paste beyond limit is truncated silently.",
+        "ja": "正の整数。プラットフォーム側で強制される。超過ペーストは silent に切り詰められる。"
+      }
+    },
+    "hint": {
+      "note": {
+        "en": "Placeholder shown when empty. Accepts `@string/key`. Color controlled by `hintColor`.",
+        "ja": "空欄時に表示するプレースホルダ。`@string/key` 対応。色は `hintColor` で制御。"
+      }
+    },
+    "returnKeyType": {
+      "note": {
+        "en": "`default` / `go` / `done` / `next` / `send` / `search`. Affects the keyboard's return-key label. Maps to `enterkeyhint` on Web. Not written, iOS shows the system's own return key: the generated code puts no label on, and iOS Dynamic mode does the same. Dynamic also applies a declared returnKeyType to a secure field with an `id`.",
+        "ja": "`default` / `go` / `done` / `next` / `send` / `search`。キーボードのリターンキー表記を変える。Web では `enterkeyhint` にマップ。書かないときの iOS は、システムの既定のリターンキーになる。生成コードは表記を付けず、iOS の Dynamic モードも同じ。また Dynamic は `id` のある secure の欄でも、書いた returnKeyType を付ける。"
+      }
+    },
+    "onShouldReturn": {
+      "note": {
+        "en": "Handler fired when user presses return/enter. Return value controls whether the field resigns focus (Swift convention).",
+        "ja": "リターン／エンター押下時に発火。戻り値でフォーカスを離すか制御（Swift 流）。"
+      }
+    },
+    "onTextChange": {
+      "note": {
+        "en": "Fires on user edits with the new value: typing, paste or the clear button. It does not fire when the bound value changes from elsewhere, such as the ViewModel's updateData or a test's initialState, so a handler that writes the field back does not call itself. Android, web and iOS (generated code and Dynamic) all work this way. On iOS the handler runs on the main queue's next turn after the edit, so a handler that narrows the value and writes it back (digits only, a length cap) is shown in the field. If more edits land before that turn, as in fast typing or a test runner's clear, iOS makes one call with the last value and drops the calls that a later edit or a ViewModel write overtook. The call is also compared with the value the burst started from: a burst that ends where it began makes no call, and a ViewModel write in the middle of a burst makes the written value the new start. That is the comparison Android makes with the bound data (`newValue != data`). Use it sparingly: the `text` binding already syncs, so `onTextChange` is for extra side effects such as validation or a debounced search. Read from the sjui converter and SwiftJsonUI's UserEditBinding, not measured here.",
+        "ja": "ユーザーの編集（入力、貼り付け、消去ボタン）で新しい値とともに発火。ViewModel の updateData やテストの initialState など、外から束縛値が変わったときは発火しないので、入力欄に書き戻す handler が自分自身を呼ぶことはない。Android、web、iOS（生成コードと Dynamic）のどれもこの動き。iOS では handler は編集の次のメインキューの順番で走るので、値を絞って書き戻す handler（数字だけ、長さの上限）の結果が入力欄に表示される。その順番より前に次の編集が重なったとき（速い入力や、テストランナーの clear）、iOS は最後の値で 1 回だけ呼び、後の編集や ViewModel の書き込みに追い越された呼び出しは捨てる。呼ぶ前にはその連続した編集の始まりの値とも比べる。始まりの値に戻って終わったら呼ばず、途中で ViewModel が書いたら、書かれた値を新しい始まりにする。Android が束縛データと比べる（`newValue != data`）のと同じ意味。`text` の binding で既に同期されるので、`onTextChange` はバリデーションや debounce 検索など追加の副作用が要るときだけ使う。sjui のコンバータと SwiftJsonUI の UserEditBinding を読んだもので、こちらでは未測定。"
+      }
+    },
+    "onFocus": {
+      "note": {
+        "en": "Focus gained. Fires before first keystroke.",
+        "ja": "フォーカス取得時。最初のキー入力より前に発火。"
+      }
+    },
+    "onBlur": {
+      "note": {
+        "en": "Focus lost. Good place to run validation.",
+        "ja": "フォーカス離脱時。バリデーション実行に適している。"
+      }
+    },
+    "nextFocus": {
+      "note": {
+        "en": "ID of the next TextField to focus when user taps `next` key. Enables keyboard-driven form traversal without tapping each field. Takes no binding: write the id out. A binding makes `jui build` warn on every platform and reads as absent.",
+        "ja": "`next` キー押下で次にフォーカスする TextField の ID。各フィールドをタップせずキーボードだけでフォーム移動できる。 binding は受けられないので、ID を直接書く。binding は 3 面とも `jui build` が警告を出し、書いていない扱いになる。"
+      }
+    },
+    "pattern": {
+      "note": {
+        "en": "Regex string. Input is restricted to matching characters on commit. Use in combination with `maxLength` for strict format fields.",
+        "ja": "正規表現文字列。確定時に適合文字のみ許可。厳格なフォーマットには `maxLength` と併用する。"
+      }
+    },
+    "required": {
+      "note": {
+        "en": "Boolean. When `true`, web forms mark the field as required (HTML `required` attribute). Not enforced at runtime on native platforms — ViewModel must validate.",
+        "ja": "Boolean。`true` で web フォームでは HTML `required` 属性を付与。ネイティブでは実行時強制されないため ViewModel で検証する。"
+      }
+    }
+  },
+  "relatedComponents": ["TextView", "EditText", "Input", "Label"]
+}

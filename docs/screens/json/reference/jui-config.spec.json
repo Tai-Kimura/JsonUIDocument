@@ -1,0 +1,112 @@
+{
+  "type": "screen_spec",
+  "version": "1.0",
+  "metadata": {
+    "name": "JuiConfig",
+    "displayName": "jui.config.json — Reference",
+    "description": "Single-page reference for the jui.config.json keys a project most often sets (not every key the toolchain reads — e.g. lint.strings, verify.requireSpecPerScreen, spec.transitionAliases, test.artifacts and mock.* are not listed yet): core directories, platforms.*, build.normalizeLayouts, api.*, test.*, checks[] + databases{}, and lint.*. Collects what was previously scattered across the pages that use each key. Content is hand-maintained against jui_tools ConfigManager and each key's consumer.",
+    "platforms": [
+      "web"
+    ],
+    "layoutFile": "reference/jui-config",
+    "createdAt": "2026-08-01",
+    "updatedAt": "2026-09-30"
+  },
+  "structure": {
+    "components": [],
+    "layout": {},
+    "collection": null,
+    "tabView": null
+  },
+  "stateManagement": {
+    "states": [],
+    "uiVariables": [
+      {
+        "name": "nextReadLinks",
+        "type": "CollectionDataSource",
+        "initial": "[]",
+        "description": "Bottom next-read cards (CLI command reference, DB schema check)."
+      }
+    ],
+    "eventHandlers": [
+      {
+        "name": "onNavigateReference",
+        "description": "Breadcrumb tap — router.push('/reference')."
+      }
+    ],
+    "displayLogic": []
+  },
+  "dataFlow": {
+    "diagram": "flowchart TD\n    VIEW[JuiConfigView] --> VM[JuiConfigViewModel]\n    VM -- nextReadLinks --> VIEW",
+    "repositories": [],
+    "useCases": [],
+    "apiEndpoints": [],
+    "viewModel": {
+      "methods": [
+        {
+          "name": "onAppear",
+          "description": "Seed nextReadLinks from the static pair (cli-commands, db-schema-check)."
+        }
+      ],
+      "vars": [
+        {
+          "name": "nextReadLinks",
+          "type": "CollectionDataSource",
+          "observable": true,
+          "description": "Next-read cards."
+        }
+      ]
+    },
+    "customTypes": []
+  },
+  "userActions": [
+    {
+      "action": "Tap the breadcrumb",
+      "processing": "router.push('/reference')."
+    },
+    {
+      "action": "Tap a next-read card",
+      "processing": "router.push(card.url)."
+    }
+  ],
+  "validation": {
+    "clientSide": [],
+    "serverSide": []
+  },
+  "transitions": [
+    {
+      "trigger": "onNavigateReference",
+      "condition": "always",
+      "destination": "ReferenceIndex",
+      "description": "Back to /reference."
+    }
+  ],
+  "relatedFiles": [
+    {
+      "type": "Layout",
+      "path": "docs/screens/layouts/reference/jui-config.json",
+      "description": "Prose + CodeBlock sections with a right-rail TOC, following the json-schema page skeleton."
+    },
+    {
+      "type": "ViewModel",
+      "path": "jsonui-doc-web/src/viewmodels/reference/JuiConfigViewModel.ts",
+      "description": "Next-read seeder, same shape as JsonSchemaViewModel."
+    },
+    {
+      "type": "View",
+      "path": "jsonui-doc-web/src/app/reference/jui-config/page.tsx",
+      "description": "Next.js App Router entry for /reference/jui-config."
+    }
+  ],
+  "notes": [
+    "Key facts sourced from jui_tools ConfigManager (DEFAULT_CONFIG, API_PLATFORM_DEFAULTS), lint_generated_cmd, test_tools install resolution, and jsonui-doc project_config — verify against those when the config surface changes.",
+    "Strings prefix: `reference_jui_config_*`.",
+    "document_tools_path caveat added 2026-09-09 to the core-directories section. The page had stated only when the key is NEEDED (jsonui-doc not importable from the standard install) and said nothing about what setting it DOES: with a path that exists, document_tools resolves to that working copy rather than the installed distribution, so jui --version stops describing what runs; with a path that does not exist the setting has no effect at all. jsonui-cli prints a NOTE on stderr naming which case occurred. The second paragraph records that jui build reports only the broken case and stays silent when the path exists, because it never prepends it -- a command that did not do the work does not report having done it.",
+    "2026-09-25 — test.appOwnedIds (ids the app draws outside every layout; a trailing `*` is a prefix; a declaration no step names is listed) added to the test section and the example; the lint section now names lint.stringsUsage and lint.stringsUsageTestPaths. Both keys are read from the shipped README and source. The element-id check they serve was measured on this site's own tests (see the testing guide's note).",
+    "2026-09-30 — The lead said 'every key'; the page does not list lint.strings / lint.stringsAllowlist, test.artifacts, verify.requireSpecPerScreen, spec.transitionAliases, mock.* or server.port, which jsonui-cli reads. The lead is narrowed rather than the keys added in this pass.",
+    "2026-11-10 — section_platforms_images_body added under the platforms CodeBlock: what jui build writes per platform from docs/screens/images, iOS writing a raster-only SVG's PNG/JPEG (scale 2x/3x) instead of a PDF under four conditions, Android's WARNINGs, and the vector/raster switch removing the other form's file. Measured by calling ImageConverter.convert_ios / convert_android on 9 scratch SVGs plus a vector-raster-vector switch; no app compiled; the site builds web only.",
+    "2026-11-10 — section_platforms_images_body rewritten. Android draws an SVG's picture (whole-canvas PNG/JPEG/WebP to drawable-nodpi as is; mixed, two pictures, moved to drawable-xxhdpi at 3x), the URL-href WARNING on all three platforms, and stale removal limited to files jui wrote (iOS: named by a jui-authored Contents.json; Android: .jsonui-cli/image-outputs.json, nothing on the first build). Measured by calling ImageConverter the way jui build does (ImageOutputs load/save) on scratch SVGs with planted files: an Xcode-authored set, an unnamed png in a jui set, a user png in drawable-nodpi before the first build, a three-build switch. The no-converter fallback is jsonui-cli's statement, not run.",
+    "2026-11-10: section_platforms_images_body adds that jui build names a same-named drawable and removes nothing: ERROR line in the folder jui wrote to (build continues, exit 1, 0 with --allow-partial), WARNING in another folder with the density a device shows it at, WARNING for a lone density folder, silence for a project's two-density set and other names. Measured by calling the shipped converter plus same_name_drawables as build does; exit read via the stage ledger; aapt2 stopping and density choice are jsonui-cli's measurement.",
+    "2026-11-12: section_api_body names api.platforms.ios.modules and links /concepts/data-models-from-openapi, where it is measured."
+  ]
+}

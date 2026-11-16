@@ -1,0 +1,331 @@
+{
+  "type": "View",
+  "id": "concepts_screen_composition_root",
+  "orientation": "vertical",
+  "width": "matchParent",
+  "height": "matchParent",
+  "background": "#F9FAFB",
+  "child": [
+    {
+      "data": [
+        { "name": "nextReadLinks",      "class": "CollectionDataSource" },
+        { "name": "onNavigateConcepts", "class": "() -> Void" }
+      ]
+    },
+    {
+      "type": "Scroll",
+      "id": "concepts_screen_composition_scroll",
+      "width": "matchParent",
+      "weight": 1,
+      "child": [
+        {
+          "type": "View",
+          "orientation": "vertical",
+          "id": "concepts_screen_composition_header",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "paddings": [24, 32, 24, 32],
+          "child": [
+            {
+              "type": "Label",
+              "height": "wrapContent",
+              "fontSize": 13,
+              "fontWeight": "semibold",
+              "fontColor": "#64748B",
+              "tapBackground": "#F3F4F6",
+              "onClick": "@{onNavigateConcepts}",
+              "text": "breadcrumb",
+              "width": "wrapContent"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 36,
+              "fontWeight": "bold",
+              "fontColor": "#0B1220",
+              "text": "title"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 16,
+              "fontSize": 17,
+              "fontColor": "#475467",
+              "text": "lead"
+            },
+            {
+              "type": "Label",
+              "width": "matchParent",
+              "height": "wrapContent",
+              "topMargin": 12,
+              "fontSize": 13,
+              "fontColor": "#64748B",
+              "text": "read_time"
+            }
+          ]
+        },
+        {
+          "type": "View",
+          "id": "concepts_screen_composition_content_with_rail",
+          "orientation": "horizontal",
+          "width": "matchParent",
+          "height": "wrapContent",
+          "child": [
+            {
+              "type": "View",
+              "id": "concepts_screen_composition_body_column",
+              "orientation": "vertical",
+              "weight": 1,
+              "height": "wrapContent",
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_problem",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_problem_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_problem_body" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_include",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_include_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_include_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// recent_activity.json — a stand-alone sub-layout\n{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"type\": \"Label\", \"text\": \"@{title}\", \"fontSize\": 20, \"fontWeight\": \"bold\" },\n    { \"type\": \"Label\", \"text\": \"@{subtitle}\", \"fontSize\": 14 }\n  ]\n}\n\n// home.json — pulls recent_activity in by reference\n{\n  \"type\": \"View\",\n  \"orientation\": \"vertical\",\n  \"child\": [\n    { \"include\": \"recent_activity\" },\n    { \"type\": \"Button\", \"text\": \"See all\", \"onClick\": \"@{onSeeAllTap}\" }\n  ]\n}\n\n// Codegen expands `include` inline — the resulting View binds to the\n// PARENT VM's `@{title}` / `@{subtitle}` / `@{onSeeAllTap}`. There is no\n// second VM. The included file is a code-reuse artifact.",
+                      "language": "json",
+                      "filename": "include (codegen inlines)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_include_note" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_tabview",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_tabview_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_tabview_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "{\n  \"type\": \"TabView\",\n  \"selectedIndex\": \"@{activeTab}\",\n  \"tabs\": [\n    { \"label\": \"@string/home\",    \"icon\": \"house\",        \"include\": \"home\" },\n    { \"label\": \"@string/search\",  \"icon\": \"magnifyingglass\",\"include\": \"search\" },\n    { \"label\": \"@string/profile\", \"icon\": \"person\",       \"include\": \"profile\" }\n  ]\n}\n\n// One ViewModel drives all three tabs. `@{activeTab}` is owned by that\n// VM; `@string/home` resolves against the same StringManager. The tabs\n// share state — switching tabs does NOT re-create their state.",
+                      "language": "json",
+                      "filename": "TabView.tabs[].include",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_tabview_note" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_embed",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_embed_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_embed_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "// Parent spec — declares the embed in structure.embeds[]\n{\n  \"metadata\": { \"name\": \"OrdersDashboard\", \"layoutFile\": \"orders/dashboard\" },\n  \"structure\": {\n    \"embeds\": [\n      {\n        \"regionId\":       \"detailPane\",\n        \"screen\":         \"order_detail\",\n        \"params\":         { \"orderId\": \"@{selectedOrderId}\" },\n        \"events\":         { \"onOrderUpdated\": \"handleOrderUpdated\" },\n        \"navigationMode\": \"delegate\"\n      }\n    ]\n  }\n}\n\n// Parent layout — places the Embed in the visual tree\n{\n  \"type\": \"View\",\n  \"orientation\": \"horizontal\",\n  \"child\": [\n    { \"type\": \"Collection\", \"id\": \"orderList\", \"weight\": 1, \"items\": \"@{orders}\" },\n    { \"type\": \"Embed\",      \"id\": \"detailPane\", \"screen\": \"order_detail\",\n      \"params\": { \"orderId\": \"@{selectedOrderId}\" }, \"weight\": 2 }\n  ]\n}\n\n// order_detail.json + OrderDetailViewModel are UNCHANGED. The embedded\n// screen does not know it is embedded — it runs the same way it would\n// as a stand-alone screen.",
+                      "language": "json",
+                      "filename": "Embed (child owns its own VM)",
+                      "showLineNumbers": false,
+                      "copyable": true
+                    },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_embed_note" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_comparison",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_comparison_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_comparison_body" },
+                    {
+                      "type": "CodeBlock",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 16,
+                      "code": "                             include      TabView.tabs[].include      Embed\n──────────────────────────  ───────────  ────────────────────────  ──────────\nVM ownership                shared       shared (one parent VM)    child has its own VM\nReused layout file          yes          yes                       yes\nParams (parent → child)     n/a (1 VM)   n/a (1 VM)                params: { ... }\nEvents (child → parent)     n/a (1 VM)   n/a (1 VM)                events: { onX → handler }\nIndependent lifecycle       no           no (tabs co-exist)         yes (mount / unmount per id)\nMultiple instances          rare         no (one per tab)          yes (each gets its own VM)\nNavigation                  parent       parent                    parent (delegate, bounded pop)\nCodegen output              inline tree  inline tree per tab       <EmbedContainer screen=…>",
+                      "language": "text",
+                      "filename": "comparison.txt",
+                      "showLineNumbers": false,
+                      "copyable": false
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_lifecycle",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#FFFFFF",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_lifecycle_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_lifecycle_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_lifecycle_bullet_params" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6,  "fontSize": 14, "fontColor": "#475467", "text": "section_lifecycle_bullet_events" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6,  "fontSize": 14, "fontColor": "#475467", "text": "section_lifecycle_bullet_navigation" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6,  "fontSize": 14, "fontColor": "#475467", "text": "section_lifecycle_bullet_multiple" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "section_when",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 24, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "fontSize": 26, "fontWeight": "bold", "fontColor": "#0B1220", "text": "section_when_heading" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 16, "fontColor": "#475467", "text": "section_when_body" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 12, "fontSize": 14, "fontColor": "#475467", "text": "section_when_bullet_include" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6,  "fontSize": 14, "fontColor": "#475467", "text": "section_when_bullet_tabview" },
+                    { "type": "Label", "width": "matchParent", "height": "wrapContent", "topMargin": 6,  "fontSize": 14, "fontColor": "#475467", "text": "section_when_bullet_embed" }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_screen_composition_next",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [32, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 24,
+                      "fontWeight": "bold",
+                      "fontColor": "chrome_ink",
+                      "text": "next_heading"
+                    },
+                    {
+                      "type": "Collection",
+                      "id": "concepts_screen_composition_next_collection",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "topMargin": 20,
+                      "columnCount": 2,
+                      "lineSpacing": 16,
+                      "itemSpacing": 16,
+                      "lazy": "none",
+                      "scrollEnabled": false,
+                      "items": "@{nextReadLinks}",
+                      "cellIdProperty": "id",
+                      "sections": [
+                        { "cell": "cells/next_step_card" }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_screen_composition_footer",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 32, 32],
+                  "background": "chrome_fill",
+                  "child": [
+                    {
+                      "type": "Label",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "fontSize": 12,
+                      "fontColor": "#94A3B8",
+                      "text": "footer_copyright"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "View",
+              "id": "concepts_screen_composition_rail_column",
+              "orientation": "vertical",
+              "width": 260,
+              "height": "wrapContent",
+              "paddings": [24, 16, 24, 16],
+              "child": [
+                {
+                  "type": "View",
+                  "orientation": "vertical",
+                  "id": "concepts_screen_composition_toc_wrap",
+                  "width": "matchParent",
+                  "height": "wrapContent",
+                  "paddings": [24, 32, 0, 32],
+                  "background": "#F9FAFB",
+                  "child": [
+                    {
+                      "type": "TableOfContents",
+                      "width": "matchParent",
+                      "height": "wrapContent",
+                      "title": "toc_title",
+                      "sticky": true,
+                      "maxDepth": 1,
+                      "items": [
+                        { "id": "toc_problem",    "label": "toc_row_problem",    "anchor": "section_problem",    "level": 1 },
+                        { "id": "toc_include",    "label": "toc_row_include",    "anchor": "section_include",    "level": 1 },
+                        { "id": "toc_tabview",    "label": "toc_row_tabview",    "anchor": "section_tabview",    "level": 1 },
+                        { "id": "toc_embed",      "label": "toc_row_embed",      "anchor": "section_embed",      "level": 1 },
+                        { "id": "toc_comparison", "label": "toc_row_comparison", "anchor": "section_comparison", "level": 1 },
+                        { "id": "toc_lifecycle",  "label": "toc_row_lifecycle",  "anchor": "section_lifecycle",  "level": 1 },
+                        { "id": "toc_when",       "label": "toc_row_when",       "anchor": "section_when",       "level": 1 }
+                      ],
+                      "stickyOffset": 80
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
