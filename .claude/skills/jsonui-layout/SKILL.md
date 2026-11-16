@@ -332,7 +332,7 @@ The `data: [...]` block in a Collection cell Layout only DECLARES the variable n
 
 Only write `@{bindingName}`. Type definitions live in the spec's `stateManagement.uiVariables` and `dataFlow.viewModel.vars` — see the `jsonui-dataflow` skill.
 
-### Canonical Expression Forms (SwiftJsonUI ≥ 10.6.0 / KotlinJsonUI ≥ 2.13.0)
+### Canonical Expression Forms
 
 The resolution semantics are SSoT-declared (`shared/core/binding_semantics.json`;
 `get_binding_rules` returns them under `semantics`). Canonical forms:
