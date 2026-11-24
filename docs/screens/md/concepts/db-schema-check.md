@@ -138,7 +138,7 @@ _Handlers kept inside the View layer. ViewModel public API lives under `dataFlow
 - Section 5 — section_run: `check --list` / `check db` / `check db:<name>`, report at docs/db/.check-report.json (named DB subdir), rendered by `generate html` (--with-checks sugar) as the Implementation contract page, exit codes 0/1/2 as the CI gate, input_hashes stale banner.
 - Section 6 — section_limits: structure only, not data; semantic invariants are full-checker territory; family-based type matching unless x-db-type pins the column.
 - Strings prefix: concepts_db_schema_check_ (namespace). en + ja owned by jsonui-localize.
-- Public repo hygiene: no consumer project names; generic domain examples only (users / plans).
+- Public repo hygiene: no names from other projects; generic domain examples only (users / plans).
 - Cross-links: /concepts/implementation-contract-check gained a third next-read card pointing here (next_db_schema).
 
 <!-- jsonui-doc-producer: jsonui-doc:spec -->

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Single-page reference for the jui.config.json keys a project most often sets (not every key the toolchain reads — e.g. lint.strings, verify.requireSpecPerScreen, spec.transitionAliases, test.artifacts and mock.* are not listed yet): core directories, platforms.*, build.normalizeLayouts, api.*, test.*, checks[] + databases{}, and lint.*. Collects what was previously scattered across the pages that use each key. Content is hand-maintained against jui_tools ConfigManager and each key's consumer.
+Single-page reference for the jui.config.json keys a project most often sets (not every key the toolchain reads — e.g. lint.strings, verify.requireSpecPerScreen, spec.transitionAliases, test.artifacts and mock.* are not listed yet): core directories, platforms.*, build.normalizeLayouts, api.*, test.*, checks[] + databases{}, and lint.*. Collects what was previously scattered across the pages that use each key. Content is hand-maintained against jui_tools ConfigManager and the code that reads each key.
 
 | | |
 |---|---|

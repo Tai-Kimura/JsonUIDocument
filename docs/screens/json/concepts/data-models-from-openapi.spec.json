@@ -4,7 +4,7 @@
   "metadata": {
     "name": "DataModelsFromOpenapi",
     "displayName": "Data models from OpenAPI",
-    "description": "Concept essay: how `jui build` reads OpenAPI files in docs/api/ and emits two layers per platform — a fully regenerated DTO (wire-shape 1:1) plus a one-time Domain scaffold (user-owned). Explains why this kills the 3-platform schema-drift problem, how per-consumer `api.schemas.*` path filters scope what gets generated when many apps share one swagger, and how MCP Group E lets an agent discover and dry-run filter changes. Ten H2 sections, ~9-min read. Companion to /guides/api-data-models which is the cookbook.",
+    "description": "Concept essay: how `jui build` reads OpenAPI files in docs/api/ and emits two layers per platform — a fully regenerated DTO (wire-shape 1:1) plus a one-time Domain scaffold (user-owned). Explains why this kills the 3-platform schema-drift problem, how per-app `api.schemas.*` path filters scope what gets generated when many apps share one swagger, and how MCP Group E lets an agent discover and dry-run filter changes. Ten H2 sections, ~9-min read. Companion to /guides/api-data-models which is the cookbook.",
     "platforms": [
       "web"
     ],
@@ -543,7 +543,7 @@
   "notes": [
     "Eighth concept essay. Companion to the cookbook at /guides/api-data-models — this page explains the why (drift problem, two-layer split, lifecycle), the guide explains the how (commands, filter syntax, customization patterns).",
     "Ten H2 sections per plan 2026-05-27 swagger-models-doc-additions §1.2: (1) The drift problem, (2) DTO + Domain — two layers one boundary, (3) What the DTO looks like, (4) What the Domain scaffold looks like, (5) The customization zone, (6) Scope what gets generated — path filter, (7) Discovery from your agent — MCP Group E, (8) Lifecycle — what happens on every build, (9) What v1 does NOT support, (10) Where to go next.",
-    "Code samples in sections 3, 4, and 5 use generic example schemas (User, Order, LoginRequest) and generic example paths (/api/auth/*, /api/users/*, /api/admin/*). No consumer-project schema names per the project's no-local-project-refs memory rule.",
+    "Code samples in sections 3, 4, and 5 use generic example schemas (User, Order, LoginRequest) and generic example paths (/api/auth/*, /api/users/*, /api/admin/*). No schema names taken from other projects.",
     "Section 5 (customization zone) holds ONE complete worked example in Swift — proxy + computed + Date conversion in one Domain extension. Kotlin / TS get a 2-line teaser each that links to the guide §8 for the matching pattern.",
     "Section 6 path filter coverage is one paragraph + one minimal include_paths snippet only. The full filter mechanics (evaluation order, glob rules, 0-schema warning) live in /guides/api-data-models §3 — single source of truth, no duplicate.",
     "Section 7 (MCP Group E) names list_api_specs / list_api_models / preview_api_model_sync, one paragraph each. Detail (input schema / output schema / agent-loop pattern) lives in /guides/api-data-models §5 and §6. This section primarily exists to surface the discovery surface to readers who are not running through an agent today.",

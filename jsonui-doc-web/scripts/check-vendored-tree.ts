@@ -32,7 +32,7 @@ const CWD = process.cwd();
 // the web platform today, so `rjui_tools` is the only one — but naming it in the
 // script would mean that adding an ios or android platform to jui.config.json
 // vendors a tree this gate silently does not look at. A gate that covers "the tool
-// I happened to write down" is the shape this lane keeps finding elsewhere.
+// I happened to write down" is the shape this site keeps finding elsewhere.
 function vendoredTools(): string[] {
   return fs
     .readdirSync(CWD, { withFileTypes: true })
