@@ -155,7 +155,7 @@
                   "width": "matchParent",
                   "height": "wrapContent",
                   "topMargin": 16,
-                  "code": "# app_contracts.texts.yaml — beside app_contracts.spec.json\noverview: |\n  この面の app が所有し、単一の画面が所有しない unit target の契約。\n\n  ### ネットワーク層の規則\n  **(1)** 426: どの API 要求でも ForceUpdateManager を立てる。\n\n  **(2)** 401（/api/auth/* 以外）: refresh は 1 本にまとめる（single-flight）。\n\ncases:\n  user_repository:\n    health_check_timeout: |\n      **`[api.healthCheck=default]`** GET /api/health は要求単位で **10 秒**。\n\n      - iOS: `URLRequest.timeoutInterval == 10`\n      - Android: chain の connect / read / write timeout が 10 秒\n\n      > 実装前の状態: 両 OS 赤 — 2026-09-25 に実装済み",
+                  "code": "# app_contracts.texts.yaml — beside app_contracts.spec.json\noverview: |\n  この面の app が所有し、単一の画面が所有しない unit target の契約。\n\n  ### ネットワーク層の規則\n  **(1)** 426: どの API 要求でも強制アップデートの画面を出す。\n\n  **(2)** 401（/api/auth/* 以外）: refresh は 1 本にまとめる（single-flight）。\n\ncases:\n  user_repository:\n    health_check_timeout: |\n      **`[api.healthCheck=default]`** GET /api/health は要求単位で **10 秒**。\n\n      - iOS: `URLRequest.timeoutInterval == 10`\n      - Android: chain の connect / read / write timeout が 10 秒\n\n      > 実装前の状態: 両 OS 赤 — 2026-09-25 に実装済み",
                   "language": "yaml",
                   "filename": "app_contracts.texts.yaml",
                   "showLineNumbers": false,
