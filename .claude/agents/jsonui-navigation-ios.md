@@ -7,7 +7,9 @@ tools: >
   mcp__jui-tools__list_screen_specs,
   mcp__jui-tools__read_spec_file,
   mcp__jui-tools__read_layout_file,
-  mcp__jui-tools__get_platform_mapping
+  mcp__jui-tools__get_platform_mapping,
+  mcp__jui-tools__get_screen_identity,
+  mcp__jui-tools__jui_build
 ---
 
 # Navigation — iOS
@@ -180,7 +182,7 @@ Do NOT add a new public method/var to VM without going through `jsonui-define` t
 
 ### 6. Verify
 
-Request that `jsonui-implement` (or the user) re-run `jui build`:
+Re-run the build gate yourself (or ask `jsonui-implement` / the user to):
 
 ```
 mcp__jui-tools__jui_build
@@ -247,7 +249,7 @@ When the spec contains `structure.embeds[]`, navigation involving the embedded s
 - **`delegate` (default)** — embedded screen's `navigate(...)` drives the **parent's** `NavigationStack` / `UINavigationController`. The runtime threads `parentNavigation` into `EmbedContainer`; you do not write extra plumbing in the parent. The embedded screen's `userActions[]` / `transitions[]` targets are pushed onto the parent stack as usual.
   - `pop` / `dismiss` / `navigateBack` are **bounded at the embed** — calling them inside the embedded screen does NOT close the embed. The runtime enforces this; do not work around it.
   - If the user wants the embedded screen to be popped together with the parent (e.g. tapping back on the parent should also close any pushed destination originating from the embed), that's standard parent stack behavior — no extra code needed.
-- **`isolated`** — the embed owns a private `NavigationStack`. Generated code passes `navigationMode: .isolated, isolatedNavigation: .automatic`; don't delete the argument.
+- **`isolated` (requires SwiftJsonUI >= 10.5.0)** — the embed owns a private `NavigationStack`. Generated code passes `navigationMode: .isolated, isolatedNavigation: .automatic` and a `// Requires SwiftJsonUI >= 10.5.0` header; compiling against an older library **fails deliberately** (version-skew guard) — bump the pin, don't delete the argument.
   - Semantics (conformance-tested on all 3 platforms): `push` stays inside the embed; `pop` stops at the embed root — the embed never closes itself; stack lifetime == container view identity (resets when the embed leaves the tree). Deep links address the host router only — there is no addressing into an embed stack.
   - Pushed screens: screen-name pushes resolve through the built-in `EmbedDestination` destination — DEBUG builds fall back to `DynamicView`, release builds render an explicit error unless you pass a `destinationResolver` at the embed call site. App-defined `Hashable` routes: attach `.navigationDestination(for:)` **inside** the embed content as usual.
   - Driving the stack from OUTSIDE the embed (parent VM resetting a pane on tab switch, etc.): `EmbedNavigatorRegistry.shared.navigator(for: embedId)` — the container registers its navigator while mounted; last mount wins per embedId.

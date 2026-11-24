@@ -1,13 +1,15 @@
 ---
 name: jsonui-navigation-web
-description: Implements Web navigation code (React Router or Next.js App Router) from spec userActions / transitions. Spec is platform-agnostic; this agent is the TypeScript-specific writer. Never edits spec or Layout JSON.
+description: Implements Web navigation code (React Router, Next.js App Router, or any React-family framework via the rjui.config.json web_framework adapter) from spec userActions / transitions. Spec is platform-agnostic; this agent is the TypeScript-specific writer. Never edits spec or Layout JSON.
 tools: >
   Read, Write, Edit, Glob, Grep, Bash,
   mcp__jui-tools__get_project_config,
   mcp__jui-tools__list_screen_specs,
   mcp__jui-tools__read_spec_file,
   mcp__jui-tools__read_layout_file,
-  mcp__jui-tools__get_platform_mapping
+  mcp__jui-tools__get_platform_mapping,
+  mcp__jui-tools__get_screen_identity,
+  mcp__jui-tools__jui_build
 ---
 
 # Navigation — Web
@@ -67,7 +69,17 @@ Check `mode` and project files:
 - `package.json` has `react-router-dom` → React Router SPA
 - Both → ask (rare, usually one or the other)
 
-If the project `rjui.config.json` has a `framework` hint, use that.
+Check `rjui.config.json` `web_framework` FIRST — it is authoritative when present:
+
+- `"web_framework": "next"` (or absent) → Next.js emit (the default)
+- `"web_framework": { ... }` → a **custom framework adapter**: the project targets another
+  React-family framework (Remix, TanStack Start, …). The object declares the exact
+  strings codegen emits — `link_import_line` / `link_href_attribute` (e.g. `to`),
+  `router_hook_import` / `router_hook_statement` (e.g. `useNavigate`),
+  `router_type` / `router_type_import`, and `use_client_directive` (empty = no RSC
+  directive). Generated components/ViewModels/hooks already follow that adapter;
+  author navigation code in the SAME framework's conventions and idioms, taking the
+  router identity from the adapter declaration, not from Next.js assumptions.
 
 ### React Router v6+ path
 
@@ -206,7 +218,7 @@ Do NOT add new public members without `jsonui-define`.
 
 ### 6. Verify
 
-Ask `jsonui-implement` (or user) to re-run:
+Re-run the build gate yourself (or ask `jsonui-implement` / the user to):
 
 ```
 mcp__jui-tools__jui_build
@@ -267,7 +279,7 @@ When the spec contains `structure.embeds[]`, navigation involving the embedded s
 - **`delegate` (default)** — embedded component's `navigate(...)` drives the **parent's** router. The generated `<EmbedContainer>` either receives `routerOverride` (when isolation is needed by other parts of the system) or transparently uses the parent's `useRouter` / `useNavigate`. Add any new routes triggered by the embedded screen's `userActions[]` to the route tree as you normally would for the parent screen.
   - `pop` / dismiss / `navigateBack` semantics are **bounded at the embed** — calling them inside the embedded component does NOT unmount the embed. Runtime enforces this; do not work around it.
   - VM isolation comes from hook closure scoping — embedding the same screen twice naturally yields two hook instances. No extra wiring needed on the web side.
-- **`isolated`** — the embed owns a private **in-memory stack**: the URL is never synced, and the browser back button always drives the HOST history (measured 2026-07-24: back after an embed push moves only the host history; the embed stack stays put). Generated code emits `screenResolver={buildEmbedScreenResolver({ '<root>': RootComponent })}` and imports `useEmbedNavigator` and `buildEmbedScreenResolver` from the `EmbedContainer.tsx` template. The template lives in the consumer's `extensions/`, which `jui sync_tool` preserves, so a project whose copy lacks these exports re-vendors it from `rjui_tools/lib/react/templates/EmbedContainer.tsx`.
+- **`isolated` (requires the `EmbedContainer` template v2 — `EmbedContainer.tsx`, or `.jsx` in a JavaScript project)** — the embed owns a private **in-memory stack**: the URL is never synced, and the browser back button always drives the HOST history (measured 2026-07-24: back after an embed push moves only the host history; the embed stack stays put). Generated code emits `screenResolver={buildEmbedScreenResolver({ '<root>': RootComponent })}` and imports v2-only exports (`useEmbedNavigator`, `buildEmbedScreenResolver`) — in a TypeScript project, type-checking against a v1 template **fails deliberately** (version-skew guard). The template lives in the consumer's `extensions/` which `jui sync_tool` preserves, so **existing projects must update the vendored template manually** (re-vendor from `rjui_tools/lib/react/templates/EmbedContainer.tsx`, or its JavaScript twin `rjui_tools/lib/react/templates/js/EmbedContainer.jsx`).
   - Semantics (conformance-tested on all 3 platforms): push stays inside the embed; pop stops at the embed root — the embed never closes itself; the root child stays mounted under pushed entries so its hook state survives push/pop round trips; stack resets on unmount. Deep links address the host router only.
   - Pushed-screen resolution: the per-embed `screenResolver` table (codegen emits the root screen only) is consulted first, then the **app-wide table** — call `registerEmbedScreens({ screen_name: Component, … })` once in app bootstrap to register every pushable screen instead of enumerating them at each call site. An unresolvable screen renders an explicit error box, never a silent no-op.
   - In-embed access: `useEmbedNavigator()` (null in delegate/standalone). Access from OUTSIDE the embed (parent driving a pane): `getEmbedNavigator(embedId)` — registered while the isolated embed is mounted.

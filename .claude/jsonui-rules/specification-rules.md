@@ -68,6 +68,24 @@ What this means in practice:
 
 The one legitimate exception: `screen_parent_spec` index files, where `structure` can hold a brief `rootComponents` summary for human readers, but the real UI still lives in the referenced Layout JSON.
 
+### Every name the Layout binds is declared by the spec
+
+The Layout JSON is written by hand, so nothing generates its bindings from the spec — the spec has to declare them. `jui verify` checks every externally authored layout against its spec (`checked against the spec's declarations: K of E externally authored layout(s) — F finding(s)`; a WARNING, counted by `--fail-on-diff` when `jui.config.json` has `"verify": {"external": "gate"}`). A name is declared only by what goes into the data section `jui g project` writes:
+
+- `stateManagement.uiVariables`
+- what the spec's `displayLogic`, `collection` or `tabView` generate
+
+`dataFlow.viewModel.vars` / `methods` and `stateManagement.eventHandlers` are the view model's and the view's own and never go into data ("a value the view does not use must not be in data"), so a name the Layout binds that is only there is reported (`declared only in dataFlow.viewModel.vars, which never goes into the data section`). Keeping it there as well is fine; it must also be in `uiVariables`.
+
+It is checked for each `@{…}` binding in the layout (its root name) and each entry of the layout file's own `data` section.
+
+**Where to declare a name the Layout binds: `stateManagement.uiVariables`.** A layout's bindings resolve against the data section `jui g project` writes, and that is built from `uiVariables` (plus what `displayLogic` / `collection` / `tabView` generate). A handler the Layout binds (`"onClick": "@{onSaveTap}"`) is a `uiVariables` entry with a callback type — `"(() -> Void)?"` or the `callback` alias. A screen's `stateManagement.eventHandlers` are view-local: they never go into the data section, and doc validate requires their names to match `^on[A-Z]`.
+
+Two rules decide the cases that are not obvious:
+
+1. **An include's bindings are declared by the screen that includes it.** At runtime the including screen's view model receives them, and `jui build` writes that view model's protocol from that screen's spec. An include with an `id` spells what is inside it with the id in front — `{"id": "pager", "include": "common/pager"}` binding `@{summaryText}` is `pagerSummaryText` — and that prefixed name is what the including spec declares, in `stateManagement.uiVariables` (a handler such as `pagerOnNextTap` with a callback type — it is a camelCase variable name, not an `on…` event handler name). A partial shared by several screens is declared in each of them; there is no separate spec for a partial. A sub spec's screen is checked as its parent after the merge: the declaration can sit in the parent or in the sub spec.
+2. **Do not use `stateManagement.cellData`.** It is not a JsonUI field: no generator, validator or check reads it, so a name written only there is not declared (`jui verify` says `declared only under stateManagement.cellData, which jui does not read`). Declare such names in `stateManagement.uiVariables` (with the include's prefix when they are bound inside an include). Collection cells keep their own `cell.uiVariables` / `cell.eventHandlers`, as below.
+
 The rest of this document is the reference for the spec fields that remain (metadata, dataFlow, stateManagement, relatedFiles, etc.). Layout itself is documented in `rules/file-locations.md` + the Layout JSON files themselves.
 
 ---
@@ -171,9 +189,9 @@ Single-cell Collection:
   "components": [],
   "layout": {},
   "collection": {
-    "id": "bars_collection",
+    "id": "items_collection",
     "cell": {
-      "viewName": "BarCellView",
+      "viewName": "ItemCellView",
       "root": "item_cell_root",
       "layoutFile": "item_list/item_cell",   // external Layout JSON
       "generateCellLayout": true,          // true → jui writes the cell Layout JSON on generate
@@ -281,7 +299,7 @@ Sub-specs never duplicate the parent's `layoutFile`. Parent authors the Layout; 
 
 Use the `Embed` view type when a parent screen hosts another screen as a region of its layout (tablet master/detail, dashboard panels). The embedded screen owns its own ViewModel — independent from the parent VM.
 
-**Canonical reference**: JsonUIDocument [`specification-rules.md` (5) section](../../../JsonUIDocument/.claude/jsonui-rules/specification-rules.md) (the file authored at distribution time). Treat that section as authoritative for the JSON shape, attribute table, and validation rules.
+**Canonical reference**: the JsonUIDocument repository's `specification-rules.md` (5) section (the file authored at distribution time). Treat that section as authoritative for the JSON shape, attribute table, and validation rules.
 
 **Quick recap of the rules (mirror these in spec / Layout JSON authoring):**
 
@@ -293,7 +311,7 @@ Use the `Embed` view type when a parent screen hosts another screen as a region 
 | `Embed.screen` value | spec & layout | **snake_case layout JSON filename** (no extension) — codegen converts to PascalCase View name | `order_detail` |
 | `params` keys | spec & layout | camelCase | `orderId` |
 | `events` keys | spec | `^on[A-Z][a-zA-Z0-9]*$` | `onOrderUpdated` |
-| `navigationMode` | spec & layout | **v1: `"delegate"` only** (`"isolated"` deferred to v1.5) | `delegate` |
+| `navigationMode` | spec & layout | `"delegate"` or `"isolated"` (in a spec from jsonui-cli 1.9.0; an earlier spec validator accepts `"delegate"` only) | `delegate` |
 
 **Local-only validation** — `doc_validate_spec` checks the Embed block in isolation; the embedded screen's spec is NOT required to declare anything special. Type contracts beyond key/binding existence are runtime responsibilities (v1 scope). See `validator.py :: _validate_embed`.
 
@@ -317,7 +335,24 @@ Agents have shipped specs with empty or missing `dataFlow` even when the screen 
 | `dataFlow.useCases[]` | Screen has orchestration across multiple repositories, multi-step validation, or business logic that doesn't belong in either the VM or a Repo. | Declare the UseCase and link it to Repositories via `useCase.repositories` or `methods[].calls`. Skip the UseCase for 1-API single-repo screens. |
 | `dataFlow.apiEndpoints[]` | Every endpoint referenced by `repositories[*].methods[*].endpoint` must have a matching entry here. | `{path, method, request, response, notes}`. Paths must match repo entries exactly. |
 
-> **Swagger-driven Data Models** — When a Repository method's `returnType` (or a param type) is the name of a schema declared under `docs/api/*.json#components.schemas.*`, the type resolves to the **Domain wrapper** (`User`), not the DTO (`UserDto`). `jui build` auto-registers swagger schema names in TypeMapper, so no manual `.jsonui-type-map.json` entry is needed. To declare a return type as the raw DTO, write `returnType: "UserDto"` explicitly. See `file-locations.md` (API Specifications + Data Model section) for the DTO ↔ Domain layout and `invariants.md` (rules 5-8) for the editing contract.
+**Reference the API document rather than copying it.** Once a method declares
+`endpoint`, write `"params": "@canonical"` instead of restating the operation's
+parameters; `doc_validate_spec` and `jui build` expand it from one shared
+implementation. Mix in hand-written entries for arguments the API never declares
+(`["@canonical", {"name": "onProgress", ...}]`), and write the list out in full
+when the method deliberately differs from the document. `returnType` takes
+`@canonical.wire` — never plain `@canonical` — because a spec's return type is
+the domain type and the document's is the wire type. An unresolvable mark is an
+ERROR, and omitting `params` still means "no parameters", not "resolve it".
+Naming follows `spec.canonical_param_case` in `jui.config.json` (`asIs` by
+default; set it before converting a project). Full rules: `jsonui-dataflow` skill.
+
+**共有コンポーネントが呼ぶメソッドは、そのコンポーネントを使っている画面 spec すべてに
+宣言する。**1 箇所にまとめない。spec を読んで「どこから呼ばれているか」が確認できる状態を
+保つため。同じメソッドが複数 spec に出るのは正常で、**食い違いが異常**(実装は 1 つ)。
+`jsonui-doc validate spec <dir>` が突き合わせて ERROR にする。
+
+> **Swagger-driven Data Models** — When a Repository method's `returnType` (or a param type) is the name of a schema declared under `docs/api/*.json#components.schemas.*`, the type resolves to the **Domain wrapper** (`User`), not the DTO (`UserDto`). `jui build` auto-registers swagger schema names in TypeMapper, so no manual `.jsonui-type-map.json` entry is needed. To declare a return type as the raw DTO, write `returnType: "UserDto"` explicitly. See `file-locations.md` (API Specifications + Data Model section) for the DTO ↔ Domain layout and `invariants.md` (rules 6-9) for the editing contract.
 
 **Pure-static display screens** (no interaction, no dynamic data, no observable state — e.g. a help page with hard-coded text) are the ONE exception. For those, still write `dataFlow.viewModel: { methods: [], vars: [] }` **explicitly** — do not omit the `dataFlow` key entirely, so the next editor can see it was a considered choice rather than a skip.
 
@@ -410,7 +445,7 @@ Do this BEFORE writing `dataFlow`. Do not guess method names / var names / repo 
     {
       "condition": "loadingVisibility == 'visible'",
       "effects": [
-        { "element": "loading_indicator", "state": "visible",
+        { "element": "loadingIndicator", "state": "visible",   // the layout's id, as written
           "variableName": "loadingIndicatorVisibility" }   // optional; auto-derived from element_id
       ]
     }
@@ -419,7 +454,7 @@ Do this BEFORE writing `dataFlow`. Do not guess method names / var names / repo 
   "states": [
     { "name": "LoginFormState",
       "values": [
-        { "value": "loginForm", "description": "…", "visibleElements": ["login_form_container"] }
+        { "value": "loginForm", "description": "…", "visibleElements": ["loginFormContainer"] }
       ] }
   ]
 }
@@ -428,6 +463,8 @@ Do this BEFORE writing `dataFlow`. Do not guess method names / var names / repo 
 **The distinction that trips agents up:**
 - `uiVariables` = typed data bound into the Layout JSON. Callbacks go here with `type: "(() -> Void)?"` or `"callback"`.
 - `eventHandlers` = View-local handlers only (name + description, no type). Anything that needs to be called from the ViewModel or bound via `@{...}` must be a `uiVariables` entry, not an `eventHandler`.
+
+**`defaultValue` (1.9.0+).** The code generators and dynamic mode read a default from the Layout JSON `data` entry's `defaultValue`, which `jui g project` writes from a spec uiVariable's `default` or `defaultValue` (`default` when both are given). A `String` or `String?` default is written bare — the text as it is (`"defaultValue": "gone"`, `""` for empty). The code generators and dynamic mode (SwiftJsonUI 10.29.0 / KotlinJsonUI 2.42.0) also read `''` as empty, `"\"…\""` with JSON's escapes (as the text between the quotes when the escapes are not JSON's), and `"'…'"` as the text between the quotes. Bare is the spelling to write. A text of two or more characters that starts and ends with the same quote, `"` or `'`, is read as one of these spellings and loses those quotes. To keep them, write it `"\"…\""`, whose inside is read with JSON's escapes, so double any `\` in the text: `"\"'Tis'\""` is the text `'Tis'`. For a `String?` with no value, leave the default out. Do not write `"nil"`: the SwiftUI and Compose code read it as no value, but UIKit, web and dynamic mode show the text "nil". A value written per platform uses the keys `swift` / `kotlin` / `typescript` (optionally split by mode: `{"swift": {"swiftui": …, "uikit": …}}`), not a node's `ios` / `android` / `web`. A dictionary with none of those three keys is one value on every platform. For a String, the generated iOS and Android code shows its text and the web data model does not parse. For other types, the generated code does not build. A dictionary that mixes one of the three keys with other keys gives that platform its entry and gives the other platforms the whole dictionary, with no warning. A platform it does not name gets the type's default (`""` / 0 / 0.0 / false / []; none for an optional type, or for a type outside that list, which the SwiftUI data model then declares optional), and the SwiftUI, Compose and web builds warn: `<layout>: data '<name>' defaultValue is given for <platforms> but not <platform> — <platform> gets …` (UIKit mode prints nothing). Name every platform, or write one value.
 
 ## `userActions` / `transitions` / `validation`
 
@@ -450,6 +487,88 @@ Cross-references to generated and hand-written files. Accepted `type` values (`v
 ]
 ```
 
+## Long prose: texts files (`<name>.texts.yaml`) — jsonui-cli 1.9.3+
+
+A prose field may point into a YAML file instead of holding the text inline.
+The prose fields:
+
+| Field | Where |
+|---|---|
+| `description`, `notes` (or one entry of a `notes` array) | anywhere |
+| `intent` | a unit case |
+| `purpose` | `structure.decorativeElements[]`, `structure.wrapperViews[]` |
+| `processing` | `userActions[]` |
+| `rule` / `handling` | `validation.clientSide[]` / `validation.serverSide[]` |
+| `meaning` | `branchContracts.conditions.<name>` |
+| `note` | a note-only branch (`branchContracts.methods.<m>.branches[]`) |
+| `reason` | `apiOutcomeRules[]`, `excludedOutcomes`, `unreachedOps` — **not** under `harnessConditions` or `canonicalDivergence` |
+| `condition` | `transitions[]` only — **not** `validation.serverSide[]` or `stateManagement.displayLogic[]` |
+
+Anywhere else — a name, a destination, `displayName`, `action`, `diagram`, a
+component `example` — a reference is an error: a tool reads that value as a
+name, a key or code.
+
+Use it when the text is longer than a few lines or needs structure (headings,
+lists, per-rule paragraphs, a quoted "before" state). Keep short prose inline: an inline string is plain text and
+its line breaks are shown as written.
+
+```json
+{ "metadata": { "description": { "md": "overview" } } }
+{ "name": "healthCheck_timeout", "intent": { "md": "cases.user_repository.health_check_timeout" } }
+{ "intent": { "md": "shared/network.texts.yaml#timeouts.default" } }
+```
+
+```yaml
+# app_contracts.texts.yaml — beside app_contracts.spec.json
+overview: |
+  この面の app が所有する unit target の契約。
+
+  ### ネットワーク層の規則
+  **(1)** 426: 強制アップデートの画面を出す。
+cases:
+  user_repository:
+    health_check_timeout: |
+      **`[api.healthCheck=default]`** GET /api/health は要求単位で **10 秒**。
+
+      - iOS: `URLRequest.timeoutInterval == 10`
+      - Android: chain の connect / read / write timeout が 10 秒
+```
+
+- Without `#`, the key is read from the spec's **paired** file:
+  `foo.spec.json` → `foo.texts.yaml` in the same directory (`.component.json`
+  → `.texts.yaml` too). With `#`, from the named file: a relative path ending
+  in `.texts.yaml` (`../shared/x.texts.yaml` is fine).
+- The key is a `.`-separated path through nested mappings. The value at its
+  end is a string — use `|` so Markdown needs no escaping — and it renders as
+  **Markdown** (CommonMark + tables; raw HTML is not rendered).
+- `jsonui-doc validate spec` (`doc_validate_spec`) **errors** on: an undefined
+  key, a key naming a mapping, a missing file, an absolute path or a file not
+  ending in `.texts.yaml` before `#`, an empty file part (`#key` — write
+  `{"md": "key"}` for the paired file), a non-string key (`yes:` / `on:` /
+  `1:` — quote it), a key containing `.`, a duplicate key, a merge key (`<<:`
+  — write each key out), a list or empty value, a reference in a field that
+  is not prose. A paired-file key no field references is a **warning** —
+  delete it or reference it; it is usually a rename done on one side only.
+- Needs `PyYAML` and `markdown-it-py` only for a spec with a reference;
+  without them such a spec fails validation, naming the `pip install`. A
+  spec with no reference needs neither.
+- `jsonui-test` (`generate branch-tests`, `contracts coverage`,
+  `generate unit-stubs`) refuses a spec with an unresolved reference, with
+  the same message. A sub-spec's reference reads the sub-spec's own texts
+  file.
+- `search_specs` does not search texts-file text: it matches the `{"md": ...}`
+  key, not the prose. Grep the `.texts.yaml` files for words in the text.
+- `read_spec_file` returns each reference expanded as
+  `{"md": "<key>", "text": "<the text>"}`. **Edit the text in the YAML file.**
+  `text` is for reading only — never write it into the spec (validate refuses
+  it).
+- Renaming a key is two edits: the YAML key and every `{"md": ...}` naming it.
+  Validate after either.
+- ⛔ Never move a text back inline to "simplify": the page loses its Markdown
+  structure and the JSON becomes one escaped line again. Moving a long inline
+  text OUT to the texts file is fine; confirm with the user when it is not
+  your text.
+
 ## Naming regex summary
 
 Enforced by the schema. Violations are validation errors, not warnings:
@@ -461,6 +580,8 @@ Enforced by the schema. Violations are validation errors, not warnings:
 | Any `component.id` | `^[a-z][a-z0-9_]*$` | `item_cell_root` |
 | `uiVariable.name` | `^[a-z][a-zA-Z0-9]*$` | `loadingVisibility` |
 | `eventHandler.name` | `^on[A-Z][a-zA-Z0-9]*$` | `onLoginTap` |
+
+With `metadata.layoutFile` (the spec's own or its parent's — every screen spec has one), `displayLogic.effects[].element` and `states[].values[].visibleElements` are **Layout JSON ids, spelled exactly as the layout declares them** — the `component.id` pattern above is for `structure.components` and does not apply to them. `doc_validate_spec` checks them against the resolved layout (1.8.119+: reported as info; from 1.9.0 a WARNING when the id is not in the layout). An id inside an include is checked as the resolved layout spells it (`hero` + `type_badge` → `heroTypeBadge`). Web's old spelling of it — the included layout's own id — is reported as `cannot check` before 1.9.0 (the message names the spelling web uses from then) and as a mismatch from 1.9.0, when web generated by that release's `jui build` (with the project's rjui_tools synced) spells it the resolved way too. UIKit's spelling (the include's id in camelCase, then `_`, then the child's id) is always reported as `cannot check`: UIKit and XML layouts are outside the change. An id inside a cell layout, and every id when an include does not resolve, are reported as `cannot check`. When the message names layout ids (`the layout has '…'`), they are candidates, not matches: confirm which node the rule means — the one that carries the visibility binding — before changing the spec, and ask the user when there is no candidate. Never delete an effect or a `visibleElements` entry to clear the message.
 
 ---
 
@@ -512,9 +633,9 @@ on `structure.collection.cell` using the same shape as the screen's
 
 ```json
 "collection": {
-  "id": "bars_collection",
+  "id": "items_collection",
   "cell": {
-    "viewName": "BarCellView",
+    "viewName": "ItemCellView",
     "layoutFile": "item_list/item_cell",
     "generateCellLayout": true,
     "root": "item_cell_root",
@@ -555,10 +676,10 @@ and cell Layout generation (`jui g project` emits a cell Layout for each
 entry with `generateCellLayout: true`):
 
 ```json
-"collection": { "id": "item_sections_collection", "cell": { ... } },
+"collection": { "id": "items_collection", "cell": { ... } },
 "collections": [
-  { "id": "note_sections_collection", "cell": { ... } },
-  { "id": "tag_chip_row", "cell": { ... } }
+  { "id": "notes_collection", "cell": { ... } },
+  { "id": "thumbnails_collection", "cell": { ... } }
 ]
 ```
 
@@ -566,16 +687,24 @@ Screens using `collections` are expected to author the screen Layout JSON
 externally (`metadata.layoutFile`) — the auto-generated layout only places
 the primary `collection`.
 
-## Collection: `lazy: true` (default) vs `lazy: false`
+## Collection: `lazy` — `"lazy"` (default), `"eager"`, `"none"`
 
-`Collection` components default to lazy/virtualized containers
+`lazy` takes a string (or a binding to one): `"lazy"`, `"eager"` or
+`"none"`. A boolean is none of them: `lazy: false` gets the build warning
+`Attribute 'lazy' in 'Collection' expects string or binding, got boolean`,
+and every generator draws it as `"lazy"` — with its own scroll, the
+opposite of what it is written for.
+
+`Collection` components default to `"lazy"`: lazy/virtualized containers
 (`LazyVStack` / `LazyColumn` / `LazyVerticalGrid`) with their own internal
-scroll. Set `lazy: false` only when you know the Collection is already nested
-inside a scrollable parent — the generated code then uses plain
+scroll. `"eager"` keeps the scroll and draws every cell (no
+virtualization), for heavy cells that suffer from lazy re-evaluation. Set
+`"none"` only when you know the Collection is already nested inside a
+scrollable parent — the generated code then uses plain
 `VStack` / `HStack` / `Column` / `Row` + `ForEach` with **no enclosing
 ScrollView / verticalScroll**, so the outer scroll handles the viewport.
 
-Use `lazy: false` when:
+Use `"none"` when:
 - The Collection sits inside an outer `ScrollView` / `verticalScroll` /
   Compose `Column { Modifier.verticalScroll() }` and nesting a Lazy container
   would break layout (Compose infinite-height constraint crash; SwiftUI
@@ -583,22 +712,22 @@ Use `lazy: false` when:
 - You know the item count is small and fixed (e.g. a few cards in a section
   on a screen that already scrolls as a whole).
 
-Do NOT use `lazy: false` when:
+Do NOT use `"none"` when:
 - The list can grow to hundreds of items — eager rendering has no
   virtualization and will load everything at once.
-- You need sticky headers, programmatic `scrollTo`, `defaultScrollAnchor`,
-  or `paging` — those all require the lazy path to stay active. The
-  generator/runtime silently ignores those attributes under `lazy: false`.
+- You need sticky headers or `paging` — they require `"lazy"`. Under
+  `"none"`, `scrollTo` and `defaultScrollAnchor` move nothing: the parent
+  owns the scrolling.
 
 Platform details worth knowing when reviewing output:
-- **SwiftUI** `lazy: false` → `VStack` / `HStack` (or `LazyVGrid` without
+- **SwiftUI** `"none"` → `VStack` / `HStack` (or `LazyVGrid` without
   an outer `ScrollView` for multi-column), no `ScrollView`.
-- **Compose** `lazy: false` → `Column` / `Row` + `forEachIndexed`, no
+- **Compose** `"none"` → `Column` / `Row` + `forEachIndexed`, no
   `LazyColumn` / `LazyVerticalGrid`, no `verticalScroll`.
-- **React** `lazy: false` → the same `div` + `.map()`, but
+- **React** `"none"` → the same `div` + `.map()`, but
   `overflow-y-auto` / `overflow-x-auto` / `flex-nowrap` Tailwind classes
-  are dropped.
-- **UIKit** (generated) ignores `lazy: false` silently — `UICollectionView`
+  are dropped (`"lazy"` and `"eager"` draw the same DOM on web).
+- **UIKit** (generated) does not read `lazy` — `UICollectionView`
   is inherently lazy.
 
 ## Custom Components — spec first, then `jui g converter`
@@ -646,10 +775,13 @@ at minimum:
 Naming:
 - `metadata.name` → PascalCase (`^[A-Z][a-zA-Z0-9]*$`).
 - `props.items[].name` → camelCase (`^[a-z][a-zA-Z0-9]*$`).
-- `props.items[].type` → any spec type (`String`, `Int`, `Bool`, `String?`,
-  `[String]`, `(() -> Void)?`, etc.).
+- `props.items[].type` → a type `g converter` knows (*Prop types*, below);
+  `jsonui-doc validate component` accepts any string here.
 - `slots.items[]` non-empty → the component is a **container** (children
-  get rendered inside it). Empty → `--no-container`.
+  get rendered inside it). Empty or absent → no mode flag: the tool's
+  default, which also draws children a layout gives it. `--from` / `--all`
+  do not make a leaf of an empty `slots`; a leaf is declared once with
+  `--no-container` (*Leaf components*, below), and later runs keep it.
 
 Validate with `mcp__jui-tools__doc_validate_component`. Fix any violations.
 
@@ -660,36 +792,165 @@ hand; drive it from the spec so the attribute list and types stay in sync
 with the component's contract.
 
 **You must run this explicitly** — `jui build` does NOT auto-run
-converter scaffolding. That was tried and reverted: the downstream
-component generators (React/Swift/Kotlin component + adapter +
-dynamic-component scaffolders) all prompt interactively on overwrite,
-which blocks MCP / CI callers even when the outer `jui g converter`
-honors `--skip-existing`. Keep `jui build` focused on "build what's
-written"; scaffold explicitly when you add or change a spec.
+converter scaffolding. That was tried and reverted: at the time the
+downstream component generators (React/Swift/Kotlin component + adapter +
+dynamic-component scaffolders) each prompted interactively on overwrite,
+which blocked MCP / CI callers even when the outer `jui g converter`
+honored `--skip-existing` (fixed in jsonui-cli 1.8.112, but the decision
+stands). Keep `jui build` focused on "build what's written"; scaffold
+explicitly when you add or change a spec.
 
 ```bash
 jui g converter --from codeblock.component.json   # single spec
 jui g converter --all                             # every component spec
-jui g converter --all --skip-existing             # idempotent (skip existing
-                                                   #   converter files silently)
+jui g converter --all --skip-existing             # keep every existing
+                                                   #   scaffold file, no prompts
+jui g converter --all --force                     # replace every scaffold
+                                                   #   file, no prompts (>= 1.8.113)
 ```
 
 Under the hood (`generate_cmd.py::_cmd_generate_converter`):
-- Reads `props.items[]` → `--attributes name:type,…`
-- Reads `slots.items[]` non-empty → `--container`, empty → `--no-container`
+- Reads `props.items[]` → `--attributes name:type,…`, and (jsonui-cli
+  >= 1.8.113) each prop's `description` → `--attribute-descriptions`, so
+  `attribute_definitions/<Name>.json` keeps the spec's sentence
+- Reads `slots.items[]` non-empty → `--container`; empty or absent → no mode flag (the tool's default)
 - Calls `sjui g converter` / `kjui g converter` / `rjui g converter` with
   the same args per platform listed in `jui.config.json::platforms`
-- `--skip-existing` exports `JUI_SKIP_EXISTING=1` to each platform
-  subprocess. That bypasses the interactive prompt in the outer
-  `converter_generator.rb` only — the React/Swift/Kotlin component
-  generators invoked downstream still prompt, so `--skip-existing` is
-  **best-effort idempotency**, not a full non-interactive guarantee.
-  Use it for agent/CI runs when you expect every converter to already
-  exist; fall back to answering `n` for any leftover prompt.
+- Every scaffold file (the converter and the downstream component /
+  adapter scaffolds) goes through one overwrite decision (jsonui-cli
+  >= 1.8.112): `--skip-existing` (exported as `JUI_SKIP_EXISTING=1`)
+  keeps existing files without asking, and `--force` (>= 1.8.113;
+  `sjui` / `kjui g converter` accept it too) replaces them without
+  asking. With neither, the run asks only on a terminal: from jsonui-cli
+  1.9.0 any other stdin (the MCP tool's, an agent's shell, CI) is
+  not read, and each existing file is kept and named (`Kept existing
+  <noun>: <path> (stdin is not a terminal; --force replaces it)`);
+  before it, a closed stdin answered "no" and the MCP tool's open one
+  waited until the call timed out. Scaffolds are the project's code once
+  generated, so `--force` discards hand edits.
 
 The direct form `jui g converter CodeBlock --attributes …` exists but is
 only for one-off prototyping. **Production code always uses `--from` or
-`--all`.**
+`--all`** — except to declare a leaf, once (below).
+
+**Leaf components (1.9.0+).** A component that must never take
+children keeps `slots.items` empty in its spec and is declared a leaf once,
+by hand: `jui g converter <Name> --no-container` (an earlier `jui` rejects
+the flag), or the MCP tool `jui_generate_converter` with `container: false`
+from jsonui-mcp-server 2.14.0 — an earlier server passes
+nothing and scaffolds the default form without an error. Then run `jui g
+converter --from <name>.component.json --force`: it keeps the declaration,
+says so (`<Name> is declared a leaf in attribute_definitions/<Name>.json —
+kept (pass --container to change it)`), and writes the definition and the
+scaffolds from the spec, leaf-shaped. `--force` is needed because the
+direct run has already written the scaffolds, with placeholder descriptions
+and only the attributes it was given (none without `--attributes`); without
+it they are kept, and a prop missing from them is dropped from the view
+without a warning. `--force` discards hand edits in the scaffolds. Later runs with neither flag —
+`--from`, `--all`, with or without `--skip-existing` — keep the leaf; a
+spec with slots makes `--from` pass `--container`, which turns it into a
+container. The declaration is written by the project's own `sjui` / `kjui`
+/ `rjui`, so run `jui sync_tool` after upgrading first — with older copies
+`--no-container` exits 0 and declares nothing. Each platform tool's
+`attribute_definitions/<Name>.json` then carries `"_children": "none"`,
+and a layout that gives the component `child` / `children` (a node with a
+`type` or an `include`, also through a style or inside an include) fails
+the build by name:
+
+`'<Name>' (id=<id>) takes no children — it is declared a leaf (`g converter <Name> --no-container`), so child[0] (id=<childId>) would be dropped. Remove the children, or regenerate the component with --container.`
+
+That screen's view is not regenerated (web removes the one an earlier build
+wrote; iOS and Android keep it), and `jui build` exits 1 (`… Pass
+--allow-partial to accept a partial tree.` — never pass it to get past
+this). When the children sit inside an included file, fix them there, in the file that holds the node. On iOS and Android the error is printed for that file and again for every layout that includes it, and none of those screens is regenerated (a partial is listed as `<file> (a partial, drawn by the layouts that include it) is refused: …`); web refuses the included file alone. The included file's own line names the node's `id=` as written there; a line for a layout that includes it names the id as that layout draws it — through an include with an `id`, prefixed (`<includeId><Id>`, e.g. `incBadge2` for `badge2`) — so look for the unprefixed id in the included file. Once it is fixed, the next `jui build` converts the refused layouts again — no `--clean`, also when only the component changed (on iOS and Android it then prints `The tool, a component or the config changed since the last build — every layout is converted`; web converts every layout on every build). Remove the children, or make the component a container: give its
+spec `slots.items` entries and run `jui g converter --from
+<name>.component.json --force`. Without `--force` the run keeps the
+leaf-shaped scaffolds, names each of them (`<Name> would take children (…),
+but this run kept … in the leaf form: … attribute_definitions/<Name>.json
+still declares a leaf, so the build refuses children …`), and the component
+stays a leaf. A platform tool run on its own (`sjui` / `kjui` / `rjui build`) prints the error and, in place of its success line, `Build finished with N stage(s) incomplete — see above` (sjui and kjui print their validation summary after it when there are warnings), but exits 0 — so judge by `jui build`, whose exit code is the verdict.
+
+From 1.9.0 a component in the default mode or `--container`
+declares `child` / `children` in its definition, which every `g converter`
+run rewrites (`--skip-existing` keeps only the scaffolds). So `Unknown
+attribute 'child' for component type '<Name>'` no longer appears for it.
+Nothing in the build flags a layout that gives children to a default-mode
+component whose spec lists no slots: the children are drawn. Read the
+component spec before giving a custom component children.
+
+**Prop types (1.9.0+).** `--from` / `--all` pass each
+`props.items[].type` to `sjui` / `kjui` / `rjui g converter` as written. From
+jsonui-cli 1.9.0, `sjui` in SwiftUI mode, `kjui` and `rjui`
+read it through one table, so a component and its Dynamic adapter / wrapper
+declare the same type (in UIKit mode `sjui g converter` writes a binding
+handler and reads no table). Names are case-insensitive:
+
+| Spec type | Swift | Kotlin | TypeScript |
+|---|---|---|---|
+| `String` | `String` | `String` | `string` |
+| `Int` | `Int` | `Int` | `number` |
+| `Long` | `Int` | `Long` | `number` |
+| `Float` | `Double` | `Float` | `number` |
+| `Double` | `Double` | `Double` | `number` |
+| `CGFloat` | `CGFloat` | `Float` | `number` |
+| `Bool` | `Bool` | `Boolean` | `boolean` |
+| `Color` | `Color` | `Color` | `string` |
+| `CollectionDataSource` | `CollectionDataSource?` | `CollectionDataSource?` | `any` |
+| `Object` | `[String: Any]` | `Map<String, Any?>` | `Record<string, any>` |
+| a callback: a closure type (`(() -> Void)?`, `((String) -> Void)?`), or `Callback` / `Action` / `Event` | that closure, optional (`(() -> Void)?` for the names) | `(() -> Unit)?` | `(...args: any[]) => void` |
+| `T?` | `T?` | `T?` | as `T` (every React prop is optional) |
+| `[T]` or `Array(T)` | `[T]` | `List<T>` — `List<Any?>` unless `T` is one of the first ten rows | `T[]` — `any[]` likewise |
+| `Array` (a list of anything) | `[Any]` | `List<Any?>` | `any[]` |
+
+`text`, `Integer`, `Number` (= `Double`), `Boolean`, `Hash` and
+`Dictionary` are aliases; write the names in the table.
+
+- A prop the layout leaves out takes the default its scaffold declares, never the spec's `default` (`g converter` reads neither `required` nor `default`). In Swift every `init` parameter of a new scaffold declares one: `""`, `0`, `0.0`, `false`, `.clear`, `[:]`, `[]`, and `nil` for an optional type. The Kotlin composable declares the same values (`Color.Unspecified` for a `Color`, `null` for an optional type). On web the prop is not passed, so it is `undefined` whatever its type. Type a prop `T?` when "not given" must read differently from that value, and have a web component handle `undefined`. A component scaffolded before 1.9.0 keeps its Swift `init`, which makes each `String`, `Int`, `Float` / `Double`, `Bool` and `Color` prop a required parameter: there a layout that leaves one out fails the iOS build (`missing argument for parameter …`, or `missing arguments for parameters …` for several).
+- A literal the layout gives a prop is written only when it is of the
+  prop's type: a string for `String` / `Color`, a whole number for `Int` /
+  `Long`, a number for `Float` / `Double` / `CGFloat`, `true` / `false` for
+  `Bool`, an object for `Object`, a JSON list of those for `[T]`. A
+  callback, a `CollectionDataSource` and an app type take a binding
+  (`@{…}`) — web alone writes an app type's JSON as it is. Any other value,
+  and `null` for a type that is not optional, is not passed, and the build
+  that converts the layout warns: `<Name>.<prop>: the layout's <value> is
+  not a <type> literal this converter can write — …`. Only that build
+  prints it — one that finds the layout cached does not — so read it again
+  from `jui build --clean`. A converter scaffolded before
+  1.9.0 keeps its own rules and names nothing.
+- A callback's parameters reach Swift only: Kotlin gets `(() -> Unit)?` and
+  TypeScript `(...args: any[]) => void`. Each `stateManagement.exposedEvents` entry is
+  scaffolded as `Callback` unless `props.items[]` declares the same name.
+- Any other type is an app type the app declares (`Row`, `[Row]`, `Date`).
+  It is not refused: Swift gets `Row?` / `[Row]`, Kotlin `Any?` /
+  `List<Any?>`, TypeScript `any` / `any[]`, and `sjui` (SwiftUI mode),
+  `kjui` and `rjui` each print one line per such prop on every `g converter`
+  run, and still exit 0: `Attribute '<name>': '<type>' is not in the
+  attribute type vocabulary (…) — it is scaffolded as … Declare that type
+  in the app, or use a vocabulary type.` (for a list: `Attribute '<name>':
+  the element type of '<type>' is not …`; on a run that kept the scaffold:
+  `… — the existing scaffold was kept (this run wrote none), so it declares
+  whatever type it already did; a new scaffold would declare …`). Nothing else names it: `jsonui-doc validate component`
+  does not check types, and a build names it only when a layout gives that
+  prop a literal (the line above).
+- Existing scaffolds are the project's code: `--skip-existing` keeps them
+  byte for byte, and so does a run without a terminal (from
+  1.9.0; before it, a closed stdin did): `--all` with neither
+  flag asks per file only on a terminal. A scaffold made before 1.9.0 still compiles as it did
+  but keeps that version's rules (its Swift `init`, its converter's
+  literals, above): regenerate a component's scaffolds together with
+  `--force` (hand edits are lost) when a layout leaves out such a prop or
+  gives it literals. A new component, or `--force`, gets the table; deleting
+  one scaffold file regenerates only that file, which then disagrees with
+  the component's other scaffolds, so replace them together.
+
+**A tap on a custom component.** A layout's `onClick` on a custom component
+makes the tap, but JsonUI gives the component no screen-reader role — the
+tap rule treats a type it does not declare as a control itself, on every
+path, because it cannot see what the component holds. When the component is
+operated as one control, give it the role in its own code: in the SwiftUI
+view `.accessibilityAddTraits(.isButton)`, in the composable
+`Modifier.semantics { role = Role.Button }`.
 
 ### 3. Register in `.jsonui-doc-rules.json` (doc-site projects only)
 

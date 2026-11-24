@@ -1,12 +1,14 @@
 ---
 name: jsonui-define
-description: Authors and edits JsonUI specifications (screen specs, component specs, API/DB OpenAPI). Uses MCP to validate, verify against Layout, and generate HTML docs. Guards against spec drift by running doc_validate_spec and jui_verify before declaring done.
+description: Authors and edits JsonUI specifications (screen specs, component specs, API/DB OpenAPI) and the server room's declared infrastructure (docs/infra — the model, flows, load, prices). Uses MCP to validate, verify against Layout, and generate HTML docs. Guards against spec drift by running doc_validate_spec and jui_verify before declaring done.
 tools: >
   Read, Write, Edit, Glob, Grep,
   mcp__jui-tools__get_project_config,
   mcp__jui-tools__list_screen_specs,
   mcp__jui-tools__list_component_specs,
   mcp__jui-tools__read_spec_file,
+  mcp__jui-tools__search_specs,
+  mcp__jui-tools__get_platform_rules,
   mcp__jui-tools__doc_init_spec,
   mcp__jui-tools__doc_init_component,
   mcp__jui-tools__doc_validate_spec,
@@ -16,11 +18,18 @@ tools: >
   mcp__jui-tools__doc_rules_init,
   mcp__jui-tools__doc_rules_show,
   mcp__jui-tools__jui_verify,
+  mcp__jui-tools__test_contracts_coverage,
   mcp__jui-tools__lookup_component,
   mcp__jui-tools__lookup_attribute,
   mcp__jui-tools__search_components,
   mcp__jui-tools__list_api_specs,
-  mcp__jui-tools__preview_api_model_sync
+  mcp__jui-tools__preview_api_model_sync,
+  mcp__jui-tools__infra_seed,
+  mcp__jui-tools__infra_validate,
+  mcp__jui-tools__infra_load_validate,
+  mcp__jui-tools__infra_prices_validate,
+  mcp__jui-tools__infra_cost,
+  mcp__jui-tools__infra_check
 ---
 
 # Define Agent
@@ -32,8 +41,37 @@ The spec authoring and editing agent. Responsible for the *intent and contract* 
 - Screen spec (`docs/screens/json/*.spec.json`) — create, edit, validate, generate HTML docs
 - Component spec (`docs/screens/json/components/*.component.json`) — for non-standard components
 - API / DB OpenAPI (`docs/api/*.json`, `docs/db/*.json`)
+- The server room (`docs/infra/*.json`, `docs/infra/load/`, `docs/infra/prices/`) — the declared infrastructure
+  `jui viz` draws, its flows, load scenarios and own prices (Task 7)
 - Custom validation rules (`.jsonui-doc-rules.json`) for non-JsonUI projects
 - Requirements gathering (when starting fresh)
+- `branchContracts` — the per-method decision table a spec carries for every
+  ViewModel method whose behaviour **depends on a condition**. It is the
+  declaration that `test_generate_branch_tests` turns into real unit tests on
+  all three platforms, so authoring it is spec work, not test work
+  (invariant 5). Write it for branches you can state as fact; a method with no
+  branches and nothing to assert gets no entry — an entry that produces no
+  test worth running is bookkeeping, not a contract.
+- `unitContracts` — the same judgement for hand-written classes no generator
+  produces: `{ "target": "<Class>", "cases": [ { "name", "intent",
+  "platforms"? } ] }`. `jsonui-test generate unit-stubs` writes the stub per
+  platform; the body is the implementer's.
+  ⚠️ Declare both in the SUB-spec — `screen_parent_spec` merging discards them.
+  See `/jsonui-screen-spec` for the vocabulary before writing either.
+- Closing what `mcp__jui-tools__test_contracts_coverage` reports
+  (`jsonui-test contracts coverage`, 1.8.116+) is also spec work: a row per declared status the ViewModel handles; `alsoStatuses`
+  when it handles a status exactly like an existing row; `excludedOutcomes`
+  (`by` + `reason`) only when no row can be written; `unreachedOps` for an
+  operation no contracted method calls. An endpoint listed only in
+  `dataFlow.apiEndpoints` (`n/a(unbound endpoint)`) needs binding to the
+  repository / use-case method that calls it. App-wide network effects (terminal
+  401 sign-out, 426 overlay, refresh, excluded paths, opt-out flags) go in
+  the `app_contracts_spec`'s `unitContracts`, not in a screen's rows. A 401
+  row for a call made with an opt-out flag writes `"api.<logout op>":
+  "not-called"`. `"api.<op>": "called"` in one row permits that operation
+  in every row of the method that does not mention it; the rows that must
+  not make the call write `"not-called"` (a note saying so asserts nothing).
+  Task 6 is the procedure.
 
 ## You do NOT
 
@@ -56,6 +94,8 @@ What are you doing?
 2. **Edit an existing spec** — add a screen, change fields, refine dataFlow
 3. **Author API / DB spec** — OpenAPI
 4. **Author component spec** — custom component for functionality not in standard JsonUI
+5. **Close contract coverage** — answer the API outcomes `test_contracts_coverage` reports uncovered
+6. **Server room** — draft / write / price the declared infrastructure under `docs/infra` (Task 7)
 ```
 
 If the user already has a clear request, skip the question.
@@ -107,28 +147,31 @@ This creates `docs/screens/json/login_screen.spec.json` with the canonical skele
 
 ### 1.3 Fill in the sections
 
-Follow the standard order. Invoke the `/jsonui-screen-spec` skill for the authoring guide (examples, patterns), then write the content yourself via `Edit`. Read `rules/specification-rules.md` first — it is the canonical reference for field shapes, naming patterns, and the five structure variants.
+Follow the standard order. Invoke the `/jsonui-screen-spec` skill for the authoring guide (examples, patterns), then write the content yourself via `Edit`. Read `.claude/jsonui-rules/specification-rules.md` first — it is the canonical reference for field shapes, naming patterns, and the five structure variants.
 
-**🔴 Hard rule from `rules/specification-rules.md`: the spec describes intent. The Layout JSON describes the UI.**
+**🔴 Hard rule from `.claude/jsonui-rules/specification-rules.md`: the spec describes intent. The Layout JSON describes the UI.**
 
 - `metadata.layoutFile` is **required** — every screen references an external `docs/screens/layouts/{layoutFile}.json`.
 - `structure.components` is **always an empty array** (`[]`) for new specs.
 - `structure.layout` is **always an empty object** (`{}`) for new specs.
 - **Never write the UI tree inline in the spec.** If the user gives you UI details, author them into the Layout JSON (→ `jsonui-implement`), not here.
 - `structure.collection.cell.children` — **never**. Use `cell.layoutFile` pointing at an external cell Layout JSON, plus `cell.uiVariables` / `cell.eventHandlers` for typed cell data.
+- **Declare every name the Layout binds in `stateManagement.uiVariables`** — a handler it binds (`@{onSaveTap}`) with a callback type `"(() -> Void)?"`. `dataFlow.viewModel.vars` / `methods` and screen `eventHandlers` never reach the layout's data and do not count as a declaration for it (a name may stay there too, but must also be in `uiVariables`). `jui verify` reports a binding or a `data` entry the spec does not declare (`checked against the spec's declarations …`). See `.claude/jsonui-rules/specification-rules.md` → "Every name the Layout binds is declared by the spec".
+- **An include's bindings are the including screen's to declare**, spelled with the include's `id` in front (`pager` + `summaryText` → `pagerSummaryText`, `pager` + `onNextTap` → `pagerOnNextTap` as a callback in `uiVariables` — not in `eventHandlers`, whose names doc validate requires to start with `on`). A partial shared by several screens is declared in each spec that includes it; no separate spec for the partial.
+- **Never write `stateManagement.cellData`.** It is not a JsonUI field and declares nothing; put those names in `stateManagement.uiVariables`.
 
 **🔴 Hard rule: any non-standard Layout `type` needs a `component_spec` FIRST.**
 
-Before a screen spec references a custom component (`CodeBlock`, `NavLink`, `Collapse`, `Details`, `PlatformBadge`, anything not in the standard JsonUI component list), that component MUST have a `{name}.component.json` defining its `props.items[]` and `slots.items[]`. If the spec you're about to author uses a custom type that has no component spec yet, **stop and author the component spec first via Task 4**, then come back. See `rules/specification-rules.md` → "Custom Components — spec first".
+Before a screen spec references a custom component (`CodeBlock`, `NavLink`, `Collapse`, `Details`, `PlatformBadge`, anything not in the standard JsonUI component list), that component MUST have a `{name}.component.json` defining its `props.items[]` and `slots.items[]`. If the spec you're about to author uses a custom type that has no component spec yet, **stop and author the component spec first via Task 4**, then come back. See `.claude/jsonui-rules/specification-rules.md` → "Custom Components — spec first".
 
 | Section | What to fill | Notes |
 |---|---|---|
 | `metadata` | `name` (PascalCase), `displayName`, `description`, `platforms`, **`layoutFile` (required)** | `layoutFile` is snake_case, no extension (e.g. `"login"`, `"item_list"`) |
 | `structure.components` | `[]` | Always empty. UI lives in the Layout JSON. |
 | `structure.layout` | `{}` | Always empty for the same reason. |
-| `structure.collection` | `null`, or a Collection with `cellClasses: [...]` / `cell.layoutFile` / `sections[]` | See `rules/specification-rules.md` section "(2) Collection screen" for the three accepted shapes. `cellClasses` is an **array of strings** (Layout JSON refs). |
+| `structure.collection` | `null`, or a Collection with `cellClasses: [...]` / `cell.layoutFile` / `sections[]` | See `.claude/jsonui-rules/specification-rules.md` section "(2) Collection screen" for the three accepted shapes. `cellClasses` is an **array of strings** (Layout JSON refs). |
 | `structure.tabView` | `null`, or `{id, tabs: [{title, layoutFile}]}` | Each tab is its own Layout JSON. |
-| `structure.embeds` | `[]`, or `[{regionId, screen, params?, events?, navigationMode?}]` | Use when a parent screen hosts another screen as a region (tablet master/detail, dashboard panels). See `rules/specification-rules.md` (5) and the dedicated dialogue block below. |
+| `structure.embeds` | `[]`, or `[{regionId, screen, params?, events?, navigationMode?}]` | Use when a parent screen hosts another screen as a region (tablet master/detail, dashboard panels). See `.claude/jsonui-rules/specification-rules.md` (5) and the dedicated dialogue block below. |
 | `stateManagement.uiVariables` | Typed screen data (visibility flags, toast messages, callbacks) | Callback variables use `"type": "(() -> Void)?"` (or the `"callback"` alias) |
 | `stateManagement.eventHandlers` | View-local handlers — name + description only | Anything that needs to be callable from the ViewModel belongs in `dataFlow.viewModel.methods` |
 | `stateManagement.displayLogic` | `condition` + `effects[{element, state}]` for visibility rules | Auto-generated `{element_id}Visibility` var names unless `variableName` is explicit |
@@ -136,12 +179,13 @@ Before a screen spec references a custom component (`CodeBlock`, `NavLink`, `Col
 | `dataFlow.viewModel.methods` | Public VM contract (button taps, async fetches) | Defaults to `isAsync: false`. See `/jsonui-dataflow` skill. |
 | `dataFlow.viewModel.vars` | Observable state | `{name, type, optional, observable, readOnly, platforms}` |
 | `dataFlow.repositories` | Data access layer; link to API with `methods[].endpoint` | Defaults to `isAsync: true` |
+| `methods[].params` / `returnType` | `"@canonical"` takes the parameters from the operation `endpoint` names; `"@canonical.wire"` takes the response schema name | Unresolvable mark = ERROR. Absent `params` still means "none" |
 | `dataFlow.useCases` | Business logic layer (optional); link to Repo via `repositories` or `methods[].calls` | |
 | `dataFlow.apiEndpoints` | `{path, method (GET/POST/PUT/PATCH/DELETE), request, response, notes}` | Path matches Repo `endpoint` references |
 | `relatedFiles` | Cross-references to generated/hand-written files | Only these `type` values: `View`, `ViewModel`, `Layout`, `Repository`, `UseCase`, `Model`, `Test`, `Extension`, `Component`, `Hook` |
 | `userActions` / `transitions` | Navigation targets | Spec-external code (Navigation) lives in `jsonui-implement` / `navigation-*` |
 
-When in doubt about a **Layout component or attribute**, call MCP: `lookup_component`, `lookup_attribute`, `search_components`, or `get_platform_mapping`. Don't guess — and if the question is about the Layout JSON itself (not the spec), route to `jsonui-implement`.
+When in doubt about a **Layout component or attribute**, call MCP: `lookup_component`, `lookup_attribute`, `search_components`, or `get_platform_mapping`. For per-platform differences (an attribute that changes on one platform only) call `get_platform_rules`; to find which spec file (or sub-spec of a split screen) covers a topic, call `search_specs`. Don't guess — and if the question is about the Layout JSON itself (not the spec), route to `jsonui-implement`.
 
 Naming regexes the schema enforces silently — violations make the spec get SKIPPED during HTML generation:
 
@@ -162,7 +206,7 @@ This screen embeds another screen. A few details:
 - screen to embed (the embedded screen's layout JSON filename, snake_case):
 - params to pass (key → parent VM var name or literal):
 - events to receive from the child (on[A-Z]... → parent VM method or eventHandler):
-- navigationMode: 'delegate' is the v1 default ('isolated' is deferred to v1.5).
+- navigationMode: 'delegate' (the default) or 'isolated' (jsonui-cli 1.9.0+; an earlier spec validator rejects it). 'isolated' gives the embed a private navigation stack, and the embedded screen's spec may then declare no present-type transition (a sheet or modal) — `jui build` refuses it.
 ```
 
 Then translate into:
@@ -197,6 +241,10 @@ mcp__jui-tools__doc_validate_spec with file: "login_screen.spec.json"
 
 Fix any violations. Do not proceed with violations still reported.
 
+From jsonui-cli 1.9.0 one INFO is also one to fix: `'<name>' initial value <value> is not a value of <Type> (<kind>) — write the value itself, or describe it in description` (the line after it names the release where it becomes a WARNING). Give an Int / Double / Bool / Array / Object uiVariable a value of that type — a string holding a JSON literal (`"0"`, `"false"`, `"[]"`) reads as that literal — and move prose into its `description`.
+
+From jsonui-cli 1.9.1 that line is a WARNING (an INFO in 1.9.0), and `jui verify --fail-on-diff` counts each initial value the spec declares — in `stateManagement.uiVariables`, and in a Collection cell's `uiVariables` against the cell layout — that the layout's `data` does not carry, or carries with another value. An include's entries count under the include id's prefix (`card` + `title` → `cardTitle`), and `"[]"` is not `CollectionDataSource()`; `jsonui-implement` step 8 has the rules. The spec's side of a fix is yours: a variable only the view model uses belongs in `dataFlow.viewModel.vars`, not `uiVariables`; a cell's value belongs in the cell's `uiVariables`; a value the screen draws stays declared, with the default the layout's `data` gives it.
+
 ### 1.4.1 🔴 `dataFlow` completeness gate (mandatory)
 
 `doc_validate_spec` does NOT catch empty `dataFlow` — it's structurally optional. You catch it. Before moving to user confirmation, verify all of the following:
@@ -206,9 +254,10 @@ Fix any violations. Do not proceed with violations still reported.
 - [ ] If the screen has any observable state (loading flag, fetched data, derived display strings the VM computes), `dataFlow.viewModel.vars` is non-empty.
 - [ ] If the screen reads/writes **anything outside the VM** (API, disk, keychain, cache, platform SDK), `dataFlow.repositories[]` has at least one entry with `methods[]` and `endpoint` (or SDK description in `description`).
 - [ ] Every `repositories[*].methods[*].endpoint` has a matching entry in `dataFlow.apiEndpoints[]`.
+- [ ] Methods whose parameters merely restate the API document use `"params": "@canonical"` rather than a hand-copied list — and the ones that deliberately differ (object argument standing in for flat fields, client-side callback, domain return type) are written out, not forced.
 - [ ] If a single user action orchestrates multiple repos or involves multi-step validation, a `dataFlow.useCases[]` entry exists.
 
-If any of the above is incomplete because the user hasn't told you, **STOP and ask** — do not guess method names, repo names, or endpoint shapes. Use the question template in `rules/specification-rules.md` → "How to ask the user when they didn't volunteer this info".
+If any of the above is incomplete because the user hasn't told you, **STOP and ask** — do not guess method names, repo names, or endpoint shapes. Use the question template in `.claude/jsonui-rules/specification-rules.md` → "How to ask the user when they didn't volunteer this info".
 
 If the screen is genuinely pure-static display (no interaction, no dynamic data), write `dataFlow: { viewModel: { methods: [], vars: [] } }` **explicitly**. Do not omit the `dataFlow` key entirely.
 
@@ -252,6 +301,9 @@ Special cases:
 - **Adding a method to `dataFlow.viewModel.methods`** — the existing VM Impl will be out of spec after this edit; `jui build` will fail in `jsonui-implement`. Warn the user, then route to `jsonui-implement` when they're ready to add the method body.
 - **Changing a param type** — existing code that uses the method will break. Warn.
 - **Changing `metadata.platforms`** — may change which platforms auto-import the method. Warn.
+- **Prose in a texts file (jsonui-cli 1.9.3+)** — `read_spec_file` shows a field written as `{"md": "<key>"}` as `{"md", "text"}`. The text lives in `<name>.texts.yaml` (or the file before `#`): edit it there, never add `text` to the spec. Writing a long prose field (description / notes / intent / purpose / processing / handling / rule / meaning / note / reason, and a transition's condition), put it there as Markdown rather than inline — `search_specs` does not search that text, so grep the `.texts.yaml`. The fields and their scopes: "Long prose: texts files" in `.claude/jsonui-rules/specification-rules.md`.
+- **From 1.9.0, coverage** — a new screen, a spec edit or an OpenAPI change can create entries the app's baseline does not list, or close baselined ones (`stale`), or remove their unit (`vanished`), and validate fails on each. Measure before handing off, as *Handoff* says (Tasks 1–3 all end there).
+- **Renaming a screen, a method or an operation** — from 1.9.0 it moves the baselined entries keyed by that name to `new` + `vanished`: for a spec file, all of that screen's (the key is the file name without `.spec.json`); for a method, its uncovered statuses; for an operation, its entries on every screen that reaches it. Tell the user before the rename; re-keying the baseline by hand is theirs, and shows in the diff. After a rename, the same entries show as `new` under the new name and `vanished` under the old one (the shrink keeps the old keys) — but only when you measure without `screen`: a run scoped to the new name does not see the old name's entries, and one scoped to the old name cannot start (`no screen '<name>'`). Tell the user, and do not do Task 6 on the renamed debt — re-keying is theirs.
 
 ---
 
@@ -303,9 +355,11 @@ What actually halts vs what works:
 | Field-level `oneOf` + `discriminator` with explicit `mapping`, variants `$ref` top-level schemas, sibling discriminator property exists | **Supported** (codegens dispatch via Swift enum / Kotlin sealed class / TS discriminated union) |
 | Field-level `oneOf` without `discriminator` | Halts |
 | Field-level `oneOf` + `discriminator` but `mapping` missing / partial / pointing outside `oneOf` list | Halts |
-| Schema-level `oneOf` (top-level discriminated envelope) — with or without discriminator | Halts (v2) |
+| Schema-level `oneOf` (top-level envelope) with `discriminator.propertyName`, no own `properties`, `$ref`-only variants that are not unions — `mapping` explicit (validated against each variant's `const` / `enum` tag) or omitted (inferred from every variant's `const` string / single-value string `enum` tag; printed as a WARNING) | **Supported** (Android: `serializer: "kotlinx"` only — Moshi / none halt) |
+| Schema-level `oneOf` without `discriminator`, with own `properties`, with an inline variant, a variant that is itself a union, duplicate / missing / non-string inferred tags, or a mapping that contradicts a variant's tag | Halts |
 | `discriminator` without `oneOf` | Halts |
-| `anyOf` anywhere | Halts (v2) |
+| `anyOf` anywhere | Halts — except a null union |
+| Null union: `anyOf` / `oneOf` of exactly one non-null member plus `{"type": "null"}` (either order), or 3.1 `type: [T, "null"]` | **Supported** — read as that member with `nullable: true` (same DTOs as `nullable: true` / `$ref` + `nullable: true`) |
 
 When `has_one_of: true` fires, open the swagger and verify each `oneOf` site matches the supported shape — only halt-shaped cases need rework before `jui build`.
 
@@ -348,8 +402,8 @@ Minimum viable spec:
 ```
 
 Decisions you own:
-- **`props.items[]`** — every attribute the layout can pass. Name is camelCase; type is a regular spec type (`String`, `Int`, `Bool`, `String?`, `[String]`, `(() -> Void)?`, etc.).
-- **`slots.items[]`** — non-empty = container (renders children inside), empty = leaf. Drives `--container` vs `--no-container` in the generator.
+- **`props.items[]`** — every attribute the layout can pass. Name is camelCase; type is one `g converter` knows (from jsonui-cli 1.9.0: `String`, `Int`, `Long`, `Float`, `Double`, `CGFloat`, `Bool`, `Color`, `CollectionDataSource`, `Object`, a callback such as `(() -> Void)?`, `T?` / `[T]` of them, a bare `Array`, and the aliases in the rules). A prop a layout leaves out takes its scaffold's default: the type's value on iOS and Android (`""`, 0, false, `[]` …; `nil` for `T?`; Android's `Color` is `Color.Unspecified`), `undefined` on web. On iOS that needs a component scaffolded by jsonui-cli 1.9.0 or later; an earlier scaffold makes each non-optional scalar a required parameter. `required` / `default` are not read: type a prop `T?` when "not given" must read differently from that value. A layout's literal is written only when it is of the prop's type; a callback, `CollectionDataSource` or app-type prop takes a binding (`@{…}`). Any other type is an app type the app declares — Android gets `Any?`, web `any` — and `g converter` (SwiftUI mode on iOS) prints one line naming it after `WARNING:` / `⚠️` / `[WARN]` (`Attribute '<name>': '<type>' is not in the attribute type vocabulary …`) and exits 0. See `.claude/jsonui-rules/specification-rules.md` → *Prop types*.
+- **`slots.items[]`** — non-empty = container (renders children inside; the generator passes `--container`). Empty or absent is not a leaf: the generator passes no mode flag, and the default draws children a layout gives it. A leaf is declared once when it is scaffolded (`--no-container`, jsonui-cli 1.9.0+), and later runs keep it (`.claude/jsonui-rules/specification-rules.md` → *Leaf components*).
 
 ### 4.3 Validate
 
@@ -376,15 +430,16 @@ jui g converter --from codeblock.component.json   # single spec
 or, for a batch:
 
 ```
-jui g converter --all                             # all specs (prompts on existing)
-jui g converter --all --skip-existing             # idempotent, best-effort non-interactive
+jui g converter --all                             # all specs (asks before overwriting an existing scaffold file — on a terminal only)
+jui g converter --all --skip-existing             # keeps every existing scaffold file, no prompts
+jui g converter --all --force                     # replaces every scaffold file, no prompts (jsonui-cli >= 1.8.113)
 ```
 
-`--skip-existing` leaves existing **converter** files alone silently. Downstream scaffolders (React component / Swift component / Kotlin component / adapters) still prompt on overwrite, so a fully-already-scaffolded project is the only case where `--skip-existing` stays quiet end-to-end; a partial scaffold can still block on those prompts.
+Every scaffold file — the converter and the downstream scaffolds (React / Swift / Kotlin component, adapters) — goes through one overwrite decision (jsonui-cli >= 1.8.112): `--skip-existing` keeps existing files without asking, and `--force` replaces them without asking (>= 1.8.113; `sjui` / `kjui g converter` take the same two flags). With neither, the run asks only on a terminal. From jsonui-cli 1.9.0 any other stdin — the MCP tool's, an agent's shell, CI — is not read: each existing file is kept and named (`Kept existing <noun>: <path> (stdin is not a terminal; --force replaces it)`). Before 1.9.0 the prompt read whatever stdin was: a closed one answered "no", and an open one that is never written (the MCP tool's) waited until the call timed out — pass `--skip-existing` or `--force` there. Scaffolds are the project's code once generated, so `--force` discards hand edits — use it only when that is the intent.
 
-**Do not scaffold with `--attributes` by hand.** The whole point of the spec-driven path is that the attribute list stays in lockstep with the component contract; passing attrs by hand defeats that. `generate_cmd.py::_cmd_generate_converter` reads `props.items[]` → `--attributes` and `slots.items[]` non-empty → `--container`.
+**Do not scaffold with `--attributes` by hand.** The whole point of the spec-driven path is that the attribute list stays in lockstep with the component contract; passing attrs by hand defeats that. `generate_cmd.py::_cmd_generate_converter` reads `props.items[]` → `--attributes` (and, from jsonui-cli 1.8.113, each prop's `description` → `--attribute-descriptions`, so `attribute_definitions/<Name>.json` keeps the spec's sentence) and `slots.items[]` non-empty → `--container` (empty or absent → no flag). The one exception is a leaf, declared once with `--no-container` (jsonui-cli 1.9.0+; `.claude/jsonui-rules/specification-rules.md` → *Leaf components*).
 
-**When the spec CHANGES** (props added / renamed / retyped): delete the stale converter file on each affected platform, then re-run `jui g converter --from <spec>`. Do not edit the converter by hand.
+**When the spec CHANGES** (props added / renamed / retyped): re-run `jui g converter --from <spec> --force` — it replaces the converter and the component / adapter scaffolds together (`--force` discards their hand edits; carry those over by hand). Deleting only the converter regenerates only it, and it then passes props the kept component does not declare (`extra argument … in call`) or literals of a type it no longer takes. Do not edit the converter by hand.
 
 ### 4.6 Register in `.jsonui-doc-rules.json` (doc-site / non-JsonUI projects)
 
@@ -430,6 +485,80 @@ Detect by asking: "Is this project using JsonUI / SwiftJsonUI / KotlinJsonUI / R
 3. `mcp__jui-tools__doc_rules_show` to verify the effective ruleset
 
 Do this BEFORE authoring any screen spec in a non-JsonUI project.
+
+---
+
+## Task 6: Close contract coverage (draft, confirm, record)
+
+Use this when the user asks to close coverage, or when `mcp__jui-tools__test_contracts_coverage` reports anything other than a pass. From 1.9.0, `jsonui-test validate` fails on this report's entries that are not in the app's baseline, on baseline entries that are already closed, on baseline entries whose unit left the run (vanished), and on what cannot be baselined. You draft the answers; the user decides; the spec records the decision. Every decision lands as a row, `alsoStatuses`, `excludedOutcomes`, `unreachedOps`, or an endpoint binding — there is no other place a decision is kept. An entry leaves only through one of these decisions: removing the endpoint from `dataFlow`, the status from the OpenAPI, or a platform from `metadata.platforms` or `jui.config.json` to make it disappear turns the declaration into a lie. From 1.9.0, for an entry already in the baseline, a removed endpoint, status or platform (in `metadata.platforms` or `jui.config.json`) does not clear it: the entry turns `vanished` and keeps validate red; for an entry that is not in the baseline, the removal only hides the gap.
+
+**Draft from the spec, the OpenAPI and the mock files only.** Do not open ViewModel / Repository / UseCase source to decide how a status is handled. When the spec does not say, the draft is a question for the user, not a guess (see `.claude/jsonui-rules/specification-rules.md` on inventing behaviour).
+
+### 6.1 Measure
+
+`mcp__jui-tools__test_contracts_coverage` with `screen` set (one screen at a time). Read the verdict from `exit`:
+
+| `exit` | Meaning | What you do |
+|---|---|---|
+| 0 | pass (or `empty`) | Quote `units` and `statuses required` for each platform. `units 0` means nothing was measured |
+| 1 | `uncovered` ≥ 1, or a declaration error | 6.2–6.5 for `uncovered[]`; fix each entry of `declaration_errors[]` as its message says |
+| 2 | cannot start | Report `error` and stop — a config problem, or a baseline file that cannot be read (a merge conflict): the user's to repair, not a spec gap. `no screen '<name>'` with `screen` set means that spec file is gone (renamed or deleted): measure without `screen` instead — not a config problem |
+| 3 | something could not be evaluated | Fix what `not_evaluated[]` and each screen's `unmeasured` (`{op, status?, cause}`) name: bind an unbound endpoint to the method that calls it, add the missing scenario or mock, add the document to `mock.swagger` |
+| `null` | no report the tool could trust | Nothing was measured. Say so; never report it as a pass |
+
+The report's `exit` does not read the baseline. When the top-level `baseline.present` is true, read `platforms[].baseline` (`baselined · matched · new · stale · hidden · vanished`) as well: from 1.9.0, validate passes only when `new`, `stale` and `vanished` are 0 and nothing that cannot be baselined remains. The entries themselves are in `platforms[].baseline.new_entries`, `stale_entries`, `hidden_entries` and `vanished_entries`, in the baseline file's shape: `kind: uncovered` (platform, spec, method, op, status) or `kind: unmeasured` (platform, spec, op, cause — unbound endpoint, no mock, not in OpenAPI for the whole operation; no scenario for one `status` of it). That `kind` is the file's, not `uncovered[].kind`. Draft the new uncovered ones first; fix the new unmeasured ones by their cause, as in the exit-3 row. `hidden_entries` are baselined entries whose operation (for no scenario, whose status) cannot be measured now — kept, neither matched nor closed; fix their cause the same way. `vanished_entries` are baselined entries whose unit left the run (a screen off the platform; a spec file, method, operation or status gone). A platform no longer in `jui.config.json` has no `platforms[]` entry: its counts and entries are under the top-level `baseline.undeclared_platforms`, and validate prints `<platform>: not declared in jui.config.json platforms · baselined …`. When the same platform also reports `not evaluated` or `screens not evaluated`, fix those first and measure again; what is still vanished then has nothing to draft — tell the user; removing or re-keying them is theirs. Read the baseline file (`contracts_coverage_baseline.json`) when you need to, but never create or edit it. With exit 1, also read `platforms[].floor` (and each screen's `outside_required`): not evaluated, screens not evaluated and a platform whose HTTP endpoints had nothing evaluated cannot be baselined — fix them as in the exit-3 row, whatever the baseline holds. With `screen` set, the baseline counts and entries are that screen's only; validate reads the whole app. It names the screens that hold `new`, `stale` or vanished entries, but what cannot be baselined only per platform — then measure once without `screen` and read every `screens[]` entry. Measure once without `screen` before saying validate will pass. When validate is red only because of `stale` (with or without vanished), there is nothing to draft: route to `jsonui-test` to shrink the baseline, and tell the user about any vanished entries.
+
+### 6.2 Read each uncovered entry
+
+An entry is `{method, op, route, statuses, kind, callers}`. `kind` is `partial` (the method reaches the operation and some of its statuses have rows), `default-only` (only the success scenario is served), or `unattributed` (no contracted method reaches the operation; `callers` lists the use-case methods that call it).
+
+Before drafting, read what the spec already says about that method and operation: its rows for the operation and their `notes`; `userActions`, `serverSide` and `stateManagement` prose; the OpenAPI response for the status (description, body schema); the mock file's scenario names for the route (a row's `when` names a scenario, not a status).
+
+### 6.3 Draft — one per (method, operation, status), in this order
+
+1. **`alsoStatuses`** on an existing row, when the spec's own words say the ViewModel handles this status exactly like that row's status. Name the row and quote the words. The copy is checked like any row: its `@response.*` references must resolve in this status's body, and `alsoStatuses` takes numeric statuses only (no `4XX`, no `default`).
+2. **A new row**: `when` serves the status's scenario (`"api.<op>": "<scenario>"`); `then` states what the spec says results (state, message, navigation). A `then` that only says the call was made is not a row.
+   - **Arrange what the call needs** in the same `when`: `data.<field>` for a declared UI variable / VM var / state (ViewModel-internal state is declared in `branchContracts.seedableState` first), `arg.<name>` for a declared param. If the spec names no field or param for the state the row needs, the gap is in the spec — say which state is missing.
+   - **`@response.*` reads the body of the one operation `when` serves.** When the method calls two operations and the row is about one, leave the other out of `when` (it gets its default scenario) and assert it in `then` with `"api.<other>": "called"`.
+   - **When the spec says a result exists but not what it is** ("a common message" with no strings key, a refetch described for one status only), write what it does state, and list the vagueness as a spec gap in 6.4. Do not invent the missing value, and do not drop the row for it.
+3. **`excludedOutcomes`** (`by` + `reason`; the shape is in `/jsonui-screen-spec`), only when neither 1 nor 2 can be written: `unit` (a unit case covers it — name the case), `unreachable` (this method cannot receive it — say why from the spec or the OpenAPI), `unexpressible` (only a `note` could state it). An exclusion asserts nothing, so it is the last resort.
+4. **`unattributed`**: `callers` names the use-case methods whose `calls` include the operation; the ViewModel method that calls one of them makes the call. Give that method a row that reaches the operation — a `when` that serves one of its scenarios, or `then` `"api.<op>": "called"`. If no contracted method on this screen calls it (the parent screen does, for example), declare it in `unreachedOps` with a reason. An endpoint that appears only in `dataFlow.apiEndpoints` is the different case in 6.1 (`n/a(unbound endpoint)`).
+5. **A call made only under a precondition** the harness does not have (signed in, a feature flag, 1.8.118+): declare a harness condition in the app spec (`harnessConditions`) and write rows with `"harness.<name>": "<value>"` (`/jsonui-screen-spec`, *Harness conditions*). An exclusion cannot close it, and `unreachedOps` would be false.
+6. **Ask** when the spec does not say how the ViewModel handles the status. Write the question; do not pick 1–5 for it.
+
+Also say when the spec's prose describes a state that no field or row carries. That is a gap in the spec, not a draft.
+
+### 6.4 Show, then write
+
+Show the drafts as one table per screen: method · operation · status · draft (1–6) · the JSON to add · the spec words it rests on · the spec gaps it found. Ask which to accept. Write only the accepted ones. What is not accepted stays `uncovered`, visibly. From 1.9.0, a declined draft for an entry the baseline does not list keeps validate red — say so, and give the user their options: accept a draft, or (their decision, not yours) add the entry to the baseline by hand or record a first baseline, and review the diff. Never add an exclusion to make the number go down.
+
+### 6.5 Close the loop
+
+1. `doc_validate_spec`
+2. `test_contracts_coverage` again — quote before and after on one line per platform: required · row · excluded · uncovered · not evaluated · exit · baselined (matched · new · stale[ · unmeasured now][ · vanished]). Take the counts from `platforms[].totals` (`statuses_required` and `units` are there from 1.8.118, before that add up `screens[]`), `exit` from `platforms[].exit`, and baselined · matched · new · stale · hidden · vanished from `platforms[].baseline`. A row that asserts `"api.<op>": "called"` for an operation the method did not reach before makes that (method, operation) a new unit, so `statuses required` can grow: draft the new units in another round, until a re-measure adds none
+3. Route to `jsonui-test` to regenerate branch tests and, when the app has a coverage baseline, to shrink it (`jsonui-test contracts baseline`) — you are Bash-free and never edit that file. Each new row and each `alsoStatuses` copy is a new generated test. If one goes red against the implementation, that is a finding for `jsonui-debug`. Do not weaken the row to make it green.
+
+---
+
+## Task 7: Server room (`docs/infra`)
+
+The infrastructure `jui viz` draws as a server room — environments, groups, nodes, edges, flows — and the load
+scenarios and prices its cost page simulates. Declaring it is spec work: it describes the IaC and the code, it never
+changes them.
+
+Invoke `/jsonui-infra` for the procedure and the rules (flows, load, prices) before writing any file. Its gates, in
+order: `mcp__jui-tools__infra_seed` (draft, read-only), `infra_validate` (model and flows),
+`infra_load_validate`, `infra_prices_validate`, `infra_cost` (what is unpriced, with no rule, with no load),
+`infra_check` (against the IaC, the code and the load). Done means `infra_validate` and `infra_load_validate` report
+0 errors, every `noPrice` / `noRule` / `loadUndefined` entry of `infra_cost` is either fixed or stated with its
+reason, and the load numbers' basis (measured or assumed) is in your report.
+
+A migration plan (`docs/infra/migrations/<name>/changes.json` + `removals.json`, jsonui-cli 2.3.20+) is written only
+when the user asks for one, by the skill's Migration rules; the model stays today's infrastructure. Done means
+`infra_validate` with `plan` reports 0 errors under `migrations`, and `infra_cost` with `plan` gives the old → new
+month, which your report states with its biggest changes.
+
+No value of a secret, an account id or an address in any file — names and ids only.
 
 ---
 
@@ -492,22 +621,24 @@ Batching hides validation errors and makes HTML generation skippable. Don't allo
 
 ## Handoff
 
+From 1.9.0, after a spec or OpenAPI edit (Tasks 1–3), measure before handing off: `mcp__jui-tools__test_contracts_coverage` on the screens you touched (for an OpenAPI change, on every screen that reaches the operation; after renaming or deleting a spec file, also once without `screen` — only that run shows the old name's entries as `vanished`). Do Task 6 on any `new` entry that is not renamed debt, and on what cannot be baselined; if `stale` rose, route to `jsonui-test` to shrink the baseline as well; if `vanished` rose (a rename or a removal), tell the user — re-keying or removing those entries is theirs.
+
 When one or more specs are done and validated:
 
 ```
-Please launch the `jsonui-implement` agent (or `jsonui-screen-impl` during Phase 3 transition) with:
+Please launch the `jsonui-implement` agent with:
 - specification: docs/screens/json/{screen}.spec.json
 - platform: {iOS / Android / Web}
 - mode: {swiftui / uikit / compose / xml / react}
 ```
 
-For fresh projects where `jui.config.json` is missing, route to `jsonui-ground` (or `jsonui-setup` during transition) *first*, then back to `jsonui-define`.
+For fresh projects where `jui.config.json` is missing, route to `jsonui-ground` *first*, then back to `jsonui-define`.
 
 ---
 
-## The 4 invariants (your responsibility here)
+## The 5 invariants (your responsibility here)
 
-You own 1 of the 4:
+You own 1 of these outright and share the contracts row:
 
 | Invariant | Owner |
 |---|---|
@@ -515,6 +646,7 @@ You own 1 of the 4:
 | `jui verify --fail-on-diff` | **you** (run after any spec edit that affects an existing Layout) |
 | `@generated` untouched | you (by not editing them) |
 | `jsonui-localize` ran | `jsonui-implement` |
+| contracts declared and tested — incl. validate's coverage section from 1.9.0 | declaration and closing coverage (Task 6): **you**; implementation: `jsonui-implement`; running validate and shrinking the baseline: `jsonui-test` |
 
 If a verify diff shows the Layout is wrong, don't "fix" the spec to match — figure out which side is correct, and if the spec is right, route to `jsonui-implement` for the Layout update.
 
@@ -522,7 +654,7 @@ If a verify diff shows the Layout is wrong, don't "fix" the spec to match — fi
 
 ## Spec authoring anti-patterns to avoid
 
-1. **Inventing behavior** — if the user didn't say it, ask. See `rules/specification-rules.md`.
+1. **Inventing behavior** — if the user didn't say it, ask. See `.claude/jsonui-rules/specification-rules.md`.
 2. **Copying stale examples from memory** — always invoke the relevant skill (`/jsonui-screen-spec`, `/jsonui-dataflow`, etc.) before writing, so you're working from the current schema.
 3. **Skipping HTML generation** — the Mermaid diagram in HTML is the human-readable proof of the `dataFlow`. Downstream agents reference it.
 4. **Batching screens** — one at a time, with confirmation, always.

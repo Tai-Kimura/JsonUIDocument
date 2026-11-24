@@ -28,6 +28,39 @@ Implement **screen test** JSON files that can be run by `jsonui-test-runner` to 
 
 **IMPORTANT**: This skill is for **screen tests only**. For multi-screen flow tests, use the `jsonui-flow-test` skill.
 
+### Screen tests are not the only kind — check which one the user needs
+
+A screen test drives the built app through the runner and asserts what is on
+screen. It is the wrong tool for "make sure the 402 response shows the
+server's message and does not navigate": that is a **branch test**, generated
+rather than authored.
+
+| The user wants to pin… | Use |
+|---|---|
+| what the screen looks like and how it responds to taps | this skill |
+| a journey across screens | `jsonui-flow-test` |
+| **what a ViewModel method does per branch — which API was called, what state resulted, whether it navigated** | **branch tests**, below |
+
+**Branch tests** come from a spec's `branchContracts` section, via
+`test_generate_branch_tests` (`platform: web | android | ios`). One
+declaration produces vitest, Kotlin JUnit4 + Robolectric, and Swift XCTest,
+and **only the HTTP boundary is mocked** — the ViewModel, UseCase, Repository
+and response decoding all run for real, so they catch the class of defect
+where a 2xx arrives but its body is mapped wrong.
+
+- The spec must already declare `branchContracts` — a screen without it is an
+  **error**, not a no-op. Authoring the declaration is `jsonui-screen-spec`'s job;
+  send the user there first.
+- The generated test file and its runtime are `@generated`. The **harness** is
+  written once as a skeleton and then belongs to the project: it is where
+  reading and writing VM state, invoking the method, and resolving `@key`
+  strings are wired up. Edit that, never the generated file.
+- Android needs `package`, iOS needs `module` (the `@testable import` target).
+- A generated test is only worth its green: **break the line it claims to pin
+  and confirm that branch — and only that branch — goes red.** If it stays
+  green, the probe missed the observation surface the contract actually reads;
+  vary the depth of the mutation rather than assuming the test is fine.
+
 ## Test Runner Repository
 
 - **GitHub**: https://github.com/Tai-Kimura/jsonui-test-runner
@@ -78,56 +111,75 @@ When the screen-under-test is hosted inside a parent screen via `Embed`, declare
 
 Rules:
 - `embeddedIn` value is `{ParentScreenName}.{regionId}` — PascalCase parent + camelCase `regionId` (matches the parent spec's `structure.embeds[].regionId`).
-- In v1 `navigationMode: "delegate"`, navigation assertions for the embedded screen target the **parent's** NavController/Router. Assertions like `wait_for screen == "..."` resolve against the parent stack.
+- With `navigationMode: "delegate"` (the default), navigation assertions for the embedded screen target the **parent's** NavController/Router. Assertions like `wait_for screen == "..."` resolve against the parent stack.
 - `pop` / `dismiss` / `navigateBack` from inside the embedded screen are bounded — they do not close the embed. Assert state on the embed instead.
 - Write a separate standalone test (without `embeddedIn`) when the same screen is also used standalone (phone). One assertion set per context.
 
 ## Available Actions & Assertions
 
-**For the complete and up-to-date list of actions and assertions, always check schema.py in the jsonui-cli repository (the `jsonui-test` CLI lives there):**
+**The canonical step inventory is `schemas/actions.schema.json` in the
+jsonui-test-runner repository** — every runner-supported action and assertion
+is defined (and documented via `x-doc`) there, and the tables below are
+**generated from it** at the pin recorded in each table's stamp line
+(regenerate: `node scripts/gen-skill-action-tables.mjs --fix`). For
+validator-side parameter details, `test_tools/jsonui_test_cli/schema.py` in
+jsonui-cli remains the `jsonui-test validate` reference.
 
-```bash
-# Find the schema.py file (installed at ~/.jsonui-cli/test_tools, or in a jsonui-cli checkout)
-find . "$HOME/.jsonui-cli" -path "*/test_tools/jsonui_test_cli/schema.py" 2>/dev/null | head -1 | xargs cat
-```
+### Actions
 
-Or view directly on GitHub: https://github.com/Tai-Kimura/jsonui-cli/blob/main/test_tools/jsonui_test_cli/schema.py
+<!-- generated:actions -->
+_Generated from [`schemas/actions.schema.json`](https://github.com/Tai-Kimura/jsonui-test-runner/blob/v1.14.0/schemas/actions.schema.json) @ jsonui-test-runner `v1.14.0` (28 actions). Do not edit by hand — `node scripts/gen-skill-action-tables.mjs --fix` regenerates; the pin lives in that script._
 
-This is the authoritative source for:
-- All supported actions and their required/optional parameters
-- All supported assertions and their parameters
-- Valid parameter values
+| Action | 説明 | Required | Optional | Platform notes |
+|---|---|---|---|---|
+| `tap` | 要素をタップ | `id` | `text`, `retryTapIfNoChange=false` | `retryTapIfNoChange`（ゴーストタップ緩和）は Web では受理のみ・no-op |
+| `doubleTap` | 要素をダブルタップ | `id` | - | - |
+| `longPress` | 要素を長押し | `id` | `duration=500` | - |
+| `input` | 指定要素にテキスト入力 | `id`, `value` | - | - |
+| `typeText` | フォーカス中の欄へキーボード入力（要素 id 不要。不可視のコード入力欄など向け） | `value` | `timeout` | - |
+| `clear` | 入力内容をクリア | `id` | - | - |
+| `scroll` | 指定方向へスクロール | `id`, `direction` | `amount` | - |
+| `scrollUntilVisible` | 要素が見えるまでスクロール（終端到達で即失敗） | `id` | `container`, `direction=down`, `timeout=20000` | - |
+| `swipe` | 要素をスワイプ | `id`, `direction` | - | - |
+| `waitFor` | 要素の出現を待機 | `id` | `timeout=5000` | - |
+| `waitForAny` | いずれかの要素の出現を待機 | `ids` | `timeout=5000` | - |
+| `wait` | 指定時間待機 | `ms` | - | - |
+| `back` | 戻る操作 | - | - | - |
+| `hideKeyboard` | ソフトキーボードを閉じる（未表示なら no-op） | - | - | - |
+| `screenshot` | スクリーンショットを保存 | `name` | - | - |
+| `alertTap` | アラート／ダイアログのボタンをタップ | `button` | `timeout=5000` | - |
+| `selectOption` | ドロップダウン／ピッカーから選択 | `id` | `value`, `index`, `timeout=5000` | - |
+| `tapItem` | コレクション内のアイテムをタップ | `id`, `index` | `timeout=5000` | - |
+| `selectTab` | タブを選択 | `id`, `index` | `timeout=5000` | - |
+| `readText` | 要素のテキストを実行時変数に読む（`@{変数名}` で後続参照） | `id`, `variable` | `timeout=5000` | - |
+| `repeat` | ステップ群を繰り返す（`times`／`while` 併用可、安全上限 100 回） | `steps` | `times`, `while` | - |
+| `retry` | 失敗時にブロック全体を再実行 | `steps` | `maxRetries=1` | - |
+| `setLocation` | モック位置情報を設定 | `latitude`, `longitude` | - | iOS: SDK 依存 ／ Android: best effort ／ Web: setGeolocation |
+| `addMedia` | メディアフィクスチャを端末に追加（png/jpg/jpeg/gif/mp4。蓄積するため件数でなく存在を検証） | `paths` | `id`, `timeout` | Android: ギャラリー（MediaStore）／ iOS: PhotoKit〈シミュレータ限定・photos-add 許可は CLI が自動付与〉／ Web: file input |
+| `setMocks` | エンドポイント（operationId）ごとのモックシナリオを切り替え | `mocks` | - | - |
+| `setViewport` | ビューポートをリサイズ（レスポンシブ検証） | `width`, `height` | - | Web のみ。iOS/Android は警告付き no-op（`when.responsive` でゲート） |
+| `setOrientation` | 画面の向きを変更 | `orientation` | - | iOS: XCUIDevice ／ Android: UiDevice ／ Web: モバイルエミュレーション時のみ（他は警告付き no-op） |
+| `emitHook` | アプリが登録したテストフックを呼び出す（`window.__jsonuiTestHooks`） | `name` | `hookArgs` | Web のみ。iOS/Android は警告付き no-op（`when.platform` でゲート） |
+<!-- /generated:actions -->
 
-### Common Actions (Quick Reference)
+Scroll notes:
+- **`scrollUntilVisible` guarantees that its target is visible, not where it stops.** The stop offset depends on where the target first arrives (Android lifts a target stuck at the trailing edge; one that is not stuck stays where the search swipe ended), so the same step can leave the screen at two different offsets.
+- **Without `container`, each platform scrolls a different surface**: web scrolls the target's nearest scrolling ancestor (a JsonUI page scrolls in its ScrollView's element, not the window), falling back to the window; iOS scrolls the first scroll view on screen; Android swipes across the middle of the app window, so it moves whichever scroll view lies under that line. On a screen-sized ScrollView all three reach the target; for a smaller scroll area (a list inside a card, a horizontal row), name it with `container`.
+- **Before asserting `visible` on a different element, scroll to that element too** (`scrollUntilVisible` on it), even if it sat on screen in the run you watched. A validation message at the bottom of a form, below a fixed footer, is the typical case: after `tap` Save, `scrollUntilVisible` the error label, then assert it.
 
-| Action | Required | Optional |
-|--------|----------|----------|
-| `tap` | `id` | `text`, `retryTapIfNoChange`, `timeout` |
-| `doubleTap` | `id` | `timeout` |
-| `longPress` | `id` | `duration`, `timeout` |
-| `input` | `id`, `value` | `timeout` |
-| `typeText` | `value` | `timeout` |
-| `hideKeyboard` | — | |
-| `clear` | `id` | `timeout` |
-| `scroll` | `id`, `direction` | `amount` |
-| `scrollUntilVisible` | `id` | `container`, `direction` (default `down`), `timeout` (default 20000) |
-| `swipe` | `id`, `direction` | |
-| `tapItem` | `id`, `index` | `timeout` |
-| `selectTab` | `id`, `index` | `timeout` |
-| `selectOption` | `id` | `value`, `label`, `index`, `timeout` |
-| `waitFor` | `id` | `timeout` |
-| `waitForAny` | `ids` | `timeout` |
-| `alertTap` | `button` | `timeout` |
-| `readText` | `id`, `variable` | `timeout` |
-| `repeat` | `steps` + (`times` and/or `while`) | |
-| `retry` | `steps` | `maxRetries` (0–3, default 1) |
-| `setLocation` | `latitude`, `longitude` | |
-| `addMedia` | `paths` | `id`, `timeout` (Android: device gallery, paths resolve against the on-device media fixtures dir; iOS: seeds the **simulator** photo library via PhotoKit — real devices fail with a clear error; Web: sets files on a file input — `id` targets the input or an element containing one, else the first `input[type=file]`, paths resolve relative to the test file. **Use basenames** — the iOS bundle is flat. See "addMedia notes" below) |
-| `emitHook` | `name` | `hookArgs` (array). Calls a hook the app registered on `window.__jsonuiTestHooks` (e.g. an RTDB mock emitter). **Web only** — iOS/Android no-op with a warning; gate with `"when": {"platform": "web"}` |
+Visibility notes (`visible` / `notVisible` / `hidden` and their `when` forms, one predicate each on all three platforms; Android is the baseline):
+- **`visible` means in the viewport**: at least 1pt/px each way of the element inside the screen and inside every scroll container above it. A part showing is enough — its centre may be outside. An element laid out below a ScrollView's fold is **not** `visible`, although it exists: `scrollUntilVisible` it first.
+- **`notVisible` is exactly the negation**: absent, hidden (`visibility: invisible` / `gone`), or outside the viewport. It does not mean "covered" or "not tappable": an element at `opacity: 0`, or `enabled: false`, is `visible`.
+- **To check that something is not shown, assert `hidden`, not `notVisible`** (jsonui-cli 1.9.31+; iOS needs SwiftJsonUI 10.29.16+, Android KotlinJsonUI 2.43.14+). `notVisible` is the viewport's question, so it passes for an element that is drawn but scrolled out or below the fold — a "must not appear" check that cannot fail there. `hidden` (and `when: { hidden: id }`) holds only when the element is not drawn at all: no element has the id, or it or an ancestor is `visibility: "gone"` / `"invisible"` / `hidden: true`. Off screen, scrolled out, under a modal or an overlay, `opacity: 0` and `enabled: false` are all drawn, so `hidden` fails on them. `count` with `equals: 0` is not the same check: on web a `gone` element stays in the page (`display: none`) and is counted. With an older SwiftJsonUI / KotlinJsonUI a bound `visibility` / `hidden` (and on iOS a static `hidden: true`) can read as shown.
+- **`hidden` on a cell of a lazy Collection** (`lazy: "lazy"`, the default): iOS and Android create only the cells near the screen, so a cell far off screen has no element yet and `hidden` passes for it there, while web draws every cell and `hidden` fails. With `lazy: "none"` or `"eager"` every cell exists on all three. Assert `hidden` on a cell only after scrolling to where it would be, or on something outside the list.
+- **Under a native modal the screen beneath is not visible** — iOS `.sheet` (any detent) / `.fullScreenCover` / `.alert` / `.confirmationDialog`, Android `ModalBottomSheet` / `Dialog`. Assert on the modal's own elements while it is up.
+- **An overlay drawn in the same layout is not a modal** (a backdrop View with a panel, the usual web dialog): what it covers is still `visible` on iOS and web, while Android hides an element covered by a Button (and not one covered only by a plain colored View). Do not assert `visible` / `notVisible` on what an overlay covers — assert the overlay itself (`visible` on its panel, `notVisible` on it after closing).
 
 Keyboard notes:
 - **`typeText`** types on the software keyboard into the **currently-focused** field — it takes no `id`. Use it for focused-but-untargetable fields (e.g. an invisible code-entry input behind a custom 2FA/PIN UI). Focus must already be established (a prior `tap`, or the app focusing programmatically).
-- **`hideKeyboard`** dismisses the soft keyboard; it is a no-op when no keyboard is shown. Use it when the keyboard covers the next tap target and the field type has no return key (e.g. `number-pad`). On iOS the last-resort strategy is a drag-to-dismiss gesture, which only works when the enclosing ScrollView opts in via `"keyboardDismissMode": "interactive"` (or `"onDrag"`) in the layout JSON — coordinate with the layout when a screen needs this.
+- **`hideKeyboard`** dismisses the soft keyboard; it is a no-op when no keyboard is shown. Use it when the keyboard covers the next tap target. On iOS it tries, in order: a dismiss key (iPad), an accessory-toolbar Done, a drag-to-dismiss gesture (works only when the enclosing ScrollView opts in via `"keyboardDismissMode": "interactive"` or `"onDrag"` in the layout JSON), and — from jsonui-test-runner-ios 1.14.0 (jsonui-cli 1.9.31) — **the Return key of the focused field**. Return is pressed only on a single-line field (never a multi-line one, where it inserts a newline) and only when the key reads return / Done / 改行 / 完了; a key that names an action (Go, Send, Search, Next, 送信, 検索 …) is refused and named in the failure, and the step fails if the field's value changed. ⚠️ **Return also runs the field's `onSubmit` when the screen binds one** — the driver cannot see whether it does, and the run prints `hideKeyboard: dismissed via Return on '<id>' — Return also fires the field's onSubmit if the screen binds one`. If the screen submits on Return, put `hideKeyboard` where submitting is acceptable, or keep the keyboard out of the way another way (scroll the target clear).
+- **After typing, iOS waits for the keyboard to settle** (from 1.14.0): the keyboard can leave and come back about a second after `input` / `typeText` / `clear`. `hideKeyboard` and `tap` read it only once it is still, so a `hideKeyboard` straight after typing no longer passes as "not visible" in that gap. When no keyboard comes back, the wait costs up to 2s.
+- **`tap` on a target under the iOS keyboard** (from 1.14.0) no longer taps the frame center — that point is a key, and the tap typed a character into the focused field while pressing nothing. The driver puts the keyboard away first with the dismiss key / accessory Done / drag, **never Return** (the target is usually the submit button the Return would already have fired), and fails with `keyboard covers '<id>' — hideKeyboard (which may press Return) or scroll it clear first` when it cannot. On an iPhone text keyboard (no dismiss key) over a form without interactive scroll-dismiss, write `{ "action": "hideKeyboard" }` between the last `input` and the `tap`.
 
 addMedia notes (gallery/photo-library seeding):
 - **Fixture placement**: put media files in `tests/media/` (override with `test.mediaDir` in the config). `jsonui-test validate` installs them automatically to the iOS UITest target (`<target_dir>/media/`); reference them by **basename** in `paths` (`"paths": ["icon.png"]`) — subdirectory paths work on Android but resolve by basename on iOS (the validator warns).
@@ -135,24 +187,30 @@ addMedia notes (gallery/photo-library seeding):
 - **Recommended flow**: `addMedia` first, **then** open the picker (tap your app's button). Picker contents live in a separate process and reflect with a small delay — give in-picker waits a generous `timeout`. The most robust assert is: tap a thumbnail → assert your app's post-pick state (selected-image view, count label, upload preview).
 - **iOS specifics**: simulator only (real devices error out — seeded assets would stay in the user's real library). The runner needs a `photos-add` pre-grant; `jsonui-test pregrant` does it automatically before `xcodebuild` (scans tests for addMedia, needs `test.install.ios.uitestBundleId` in config or `--bundle-id`). Without the pre-grant the driver falls back to auto-tapping the permission alert (en/ja labels only). **Your app's own photo-read permission alert is a different dialog** and stays the test author's job — handle it with `alertTap` after opening the picker, exactly like any other permission prompt.
 
-### Common Assertions (Quick Reference)
+### Assertions
 
 **All assertions auto-wait**: they poll every 100ms until the condition holds or the
 timeout (default 5000ms, override with `timeout`) elapses. **Do NOT precede an assertion
 with `waitFor`** — the assertion already waits. Use `waitFor` only when the next step is
 an *action* (not an assertion) that needs the element present first.
 
-| Assertion | Required | Optional |
-|-----------|----------|----------|
-| `visible` | `id` | `timeout` |
-| `notVisible` | `id` | `timeout` |
-| `enabled` | `id` | `timeout` |
-| `disabled` | `id` | `timeout` |
-| `text` | `id` | `equals`, `contains`, `timeout` |
-| `count` | `id`, `equals` | `timeout` |
-| `state` | `path`, `equals` | `timeout` |
-| `screenshot` | `name` | `cropId`, `threshold` (default 98.0) |
-| `openedUrl` | `equals` or `contains` | `timeout`. Asserts the most recent `window.open` call (the runner spies it automatically). **Web only** — gate with `"when": {"platform": "web"}` |
+<!-- generated:assertions -->
+_Generated from [`schemas/actions.schema.json`](https://github.com/Tai-Kimura/jsonui-test-runner/blob/v1.14.0/schemas/actions.schema.json) @ jsonui-test-runner `v1.14.0` (11 assertions). Do not edit by hand — `node scripts/gen-skill-action-tables.mjs --fix` regenerates; the pin lives in that script._
+
+| Assertion | 説明 | Required | Optional | Platform notes |
+|---|---|---|---|---|
+| `visible` | 要素がビューポート内に見えている（画面とすべてのスクロール容器の内側に縦横 1pt/px 以上。中心でなく一部で可。レイアウト上存在するだけでは不可） | `id` | `timeout` | - |
+| `notVisible` | `visible` の否定（不存在、非表示、またはビューポートの外） | `id` | `timeout` | - |
+| `hidden` | 要素が描画されていない（不存在、gone、または自身か祖先が invisible / hidden）。位置に依らない: 画面外・スクロール外・モーダルの下・重なりの下・opacity 0・enabled:false は描画されている扱い | `id` | `timeout` | - |
+| `enabled` | 要素が有効 | `id` | `timeout` | - |
+| `disabled` | 要素が無効 | `id` | `timeout` | - |
+| `text` | テキストを検証（`equals`／`contains`） | `id` | `equals`, `contains`, `timeout` | - |
+| `count` | 要素数を検証（`equals: 0` は不存在で成立） | `id`, `equals` | `timeout` | - |
+| `state` | ViewModel の data を検証（`path` はドット記法。ハーネスの provider は不要 — JsonUI ライブラリ ≥ SwiftJsonUI 10.30.0 / KotlinJsonUI 2.44.0 の state ブリッジを読む） | `path`, `equals` | `timeout` | - |
+| `screenshot` | ベースライン画像とのビジュアル比較（ベースライン無しは新規作成＋警告） | `name` | `cropId`, `threshold=98` | - |
+| `openedUrl` | 直近の `window.open` 呼び出しの URL を検証 | - | `equals`, `contains`, `timeout` | Web のみ（`when.platform: web` でゲート） |
+| `screen` | 指定画面の表示を検証（排他は主張しない — 埋め込み／タブ等で複数同時あり得る） | `name` | `timeout` | - |
+<!-- /generated:assertions -->
 
 ### Common Step Attributes (any action or assertion)
 
@@ -160,7 +218,7 @@ an *action* (not an assertion) that needs the element present first.
 |-----------|---------|
 | `label` | Human-readable step name for logs/reports. **Exception**: on `selectOption`, `label` is the option text, not a step name. |
 | `optional` | `true` → a failure of this step becomes a warning and execution continues. |
-| `when` | Pre-condition; the step is skipped when not satisfied. Object with `visible` / `notVisible` (element id), `platform`, and/or `state` (`{path, equals}`), ANDed. |
+| `when` | Pre-condition; the step is skipped when not satisfied. Object with `visible` / `notVisible` / `hidden` (element id), `platform`, and/or `state` (`{path, equals}`, read from the state bridge like the `state` assertion; instant — an absent bridge or an unresolved path is not met, a truncated iOS bridge fails the step), ANDed. |
 
 ```json
 { "action": "tap", "id": "tutorial_close", "when": { "visible": "tutorial_overlay" }, "optional": true }
@@ -204,11 +262,79 @@ A screen/flow test may declare a root-level `launch` object applied before the a
 `permissions` values are `allow` / `deny` / `unset`; names: camera, microphone, location,
 notifications, photos, contacts, calendar, bluetooth.
 
+The runner applies `launch` on all three platforms — on web too from jsonui-test-runner web
+1.15.0 (before it, the harness had to call `applyLaunchConfig`, which is removed). Per
+platform:
+
+- **iOS**: launch environment `JSONUI_TEST_CLEAR_STATE` / `JSONUI_TEST_PERMISSIONS` /
+  `JSONUI_TEST_ARGS`. The runner resets its keys before every launch (from 1.15.0), so one
+  file's `launch` never reaches the next file.
+- **Android**: `clearState` wipes the app's persisted files, prefs, databases and caches in
+  process (not `pm clear`); `allow` is granted, `deny` is *asserted* (a granted permission
+  declared `deny` fails the file), `unset` leaves it as it is; `arguments` → the
+  `JSONUI_TEST_ARGS` intent extra.
+- **Web**: `clearState` clears cookies and the origin's local / session storage (not
+  IndexedDB); a `deny` or `unset` clears the context's permissions first, then the `allow`s
+  are granted again; `arguments` → `sessionStorage["JSONUI_TEST_ARGS"]`, removed at the end
+  of the file. Then the runner calls the harness's `afterLaunch(page)` hook, writes the
+  initialState, switches the mocks and reloads the page once (`goto` on a reopen). The page
+  must already be on the app (not `about:blank`) when a file with a launch starts.
+
+**Web harness: seed cookies in `afterLaunch`.** `clearState` removes cookies and storage, so
+whatever the harness set up before `runner.run()` and needs to survive a launch — an auth
+cookie, a storage flag — goes in the runner config hook `afterLaunch: (page) => void |
+Promise<void>`. It is awaited after clearState / permissions / arguments and before the
+initialState write, the mocks and the reload; it runs on every launch (per case under
+`caseIsolation: "reopen"`) and not at all for a file with nothing to launch with; a throw fails
+the launch like the other launch steps (setup).
+
+```typescript
+const runner = new JsonUITestRunner(page, {
+  afterLaunch: async (page) => {
+    await page.context().addCookies([{ name: 'session', value: token, url: baseUrl }]);
+  },
+});
+// or createRunner().afterLaunch(async (page) => { … }).build(page)
+```
+
+On web the initialState payload also carries `writtenAt`; the generated hook takes it only in
+a document opened after it was written (the one the reload / `goto` opens), so a page still
+hydrating from before the launch cannot consume it first. Nothing to write in the test or
+harness — regenerate the app with `jui build` from the jsonui-cli of this train.
+
+`clearState` (iOS) and `arguments` are delivered and no further: reading them is the app's
+own code, not the libraries'. A file with a `launch`, `mocks` or a non-empty `initialState`
+launches the app (reloads, on web) once before the first case — before each case under
+`caseIsolation: "reopen"`; with none of them it does not.
+
 ### `state` Assertion vs. Visual State
 
-Prefer the `state` assertion (`{ "assert": "state", "path": "isLoading", "equals": true }`)
-to verify ViewModel state directly — it works on all three platforms and is more precise than
-inferring state from what is on screen. It requires the harness to expose a state provider.
+Prefer the `state` assertion to verify the screen's ViewModel Data directly — it works on all
+three platforms and is more precise than inferring state from what is on screen:
+
+```json
+{ "assert": "state", "path": "isLoading", "equals": true },
+{ "assert": "state", "path": "user.name", "equals": "Taro" },
+{ "assert": "state", "path": "tags.0", "equals": "new" },
+{ "assert": "state", "path": "nickname", "equals": null }
+```
+
+- **The harness needs nothing.** The app publishes its Data on a state bridge and the driver
+  reads it (iOS leaf `__state_<screenId>`, Android `JsonUIState` on the screen marker, web
+  `window.__JSONUI_STATE__[screenId]`). This needs SwiftJsonUI ≥ 10.30.0 / KotlinJsonUI ≥
+  2.44.0, code generated by the jsonui-cli of the same train (rjui's from that jsonui-cli on
+  web), a development build (the screen-marker gate), and drivers iOS 1.15.0 / Android 1.17.0
+  / web 1.15.0. A provider the harness still passes wins over the bridge. Older libraries
+  publish no bridge, and `state` then times out saying the bridge is absent.
+- **What it reads**: the Data of the screen under test (the screen id of `source.layout`);
+  in a flow, the step's `screen`, else the last `screen` an earlier step named. Only Data
+  whose class `initialState` accepts is published (below) — not closures, not
+  `CollectionDataSource`, not ViewModel properties outside `data`.
+- **`path`**: dot notation; a decimal segment indexes an array from 0 (`tags.0`, not `tags.01`).
+- **`equals: null`** asserts the value is `null`. A path that does not resolve is not `null`:
+  it keeps the assertion waiting and fails at the timeout.
+- `state` auto-waits like the other assertions. On iOS the bridge holds up to 32 KB; a
+  larger Data fails `state` at once.
 
 ## Element Identification (CRITICAL)
 
@@ -228,7 +354,7 @@ Tests identify elements by `id` attribute in the layout JSON:
 
 ### Include Prefix Handling
 
-When layouts use `include` with `id`, child element IDs are prefixed:
+When layouts use `include` with `id`, child element IDs are prefixed: the include's `id` in camelCase, then the child's `id` in camelCase with its first letter capitalized.
 
 ```json
 // Parent layout
@@ -238,13 +364,17 @@ When layouts use `include` with `id`, child element IDs are prefixed:
 }
 
 // login_form.json has id="submit_btn"
-// Actual ID becomes: "main_form_submit_btn"
+// Actual ID becomes: "mainFormSubmitBtn"
 ```
 
 **Test must use the full prefixed ID:**
 ```json
-{ "action": "tap", "id": "main_form_submit_btn" }
+{ "action": "tap", "id": "mainFormSubmitBtn" }
 ```
+
+A nested include is expanded as well, and joins its id to the prefix above it (include `row` → include `chip_a` → `chip_label` is `rowChipAChipLabel`); an include without an `id` adds no prefix.
+
+Generated SwiftUI and Compose code spell it this way. Web does once its code is generated by `jui build` from jsonui-cli 1.9.0 with the project's rjui_tools synced (`jui sync_tool`); before that, or from a standalone `rjui build`, web keeps the child's own id (`submit_btn`). The dynamic mode spells it this way from SwiftJsonUI 10.28.0 and KotlinJsonUI 2.41.1; before them it keeps the include's id as written (`main_formSubmitBtn`; an include id without `_` is unaffected). UIKit and XML layouts are outside this and spell it their own way (UIKit: `mainForm_submit_btn`). While the platforms a test runs on still differ, limit the case with `platform`.
 
 ## Naming Conventions
 
@@ -284,7 +414,7 @@ Use **Title Case** for `metadata.name` - this is displayed in documentation and 
    - KotlinJsonUI: Look for `*ViewModel.kt` files
    - ReactJsonUI: Look for `*ViewModel.ts` or hooks files
 3. **DO NOT guess ViewModel properties** - Only use properties that actually exist
-4. **Check if properties are settable** - Computed properties cannot be set via `initialState`
+4. **Read the layout's `data` section** - `initialState` can set only the Data names declared there (see *initialState Restrictions*)
 
 ### Creating Tests from Layout
 
@@ -298,6 +428,10 @@ Use **Title Case** for `metadata.name` - this is displayed in documentation and 
    - Validation scenarios
    - Error states
    - Edge cases
+
+**Element ids are checked against the layouts** (1.8.119+). `jsonui-test validate` looks up every id a step names (`id`, `ids`, `container`, `cropId`, `visible` / `notVisible` under `when` and `while`, nested `steps` too) in every layout of the project, on every platform with includes expanded. An id on none of them is INFO, and a WARNING from 1.9.0; it never fails the run by itself. Fix the step to the layout's spelling — when the message names layout ids, they are candidates: pick the node the step means. `test.appOwnedIds` in `jui.config.json` is only for elements the app draws outside every layout (a native navigation-bar item, a toast; an entry ending in `*` is a prefix): never add an id there to clear the message, and ask the user when you cannot tell. Ids the generated code derives (a Collection's `<id>_item_<n>`), a component's parts and web's `A #B` form are counted as cannot check.
+
+**A `notVisible` on a decorative image is no longer named (from jsonui-cli 1.9.30).** An image with no `alt` that operates nothing is decorative (jsonui-layout skill, *Images: `alt`*); iOS hides it from VoiceOver. Until 1.9.29 the iOS driver read an element it could not hit as not visible, so a `notVisible` on such an image passed even while it was on screen, and `jsonui-test validate` named the step with an INFO (`… cannot fail on iOS …`). From the driver that ships with jsonui-cli 1.9.30, `notVisible` is the exact negation of `visible` (in the viewport) on every platform: a decorative image on screen is visible and its `notVisible` fails, as on Android. The INFO is gone; a step it used to name now checks what it says, so it may turn red where the image really stays on screen.
 
 ### Example Workflow
 
@@ -316,33 +450,29 @@ tests/login.test.json
 
 ### initialState Restrictions
 
-**IMPORTANT**: `initialState` can only set properties that are:
-- Mutable (`var` in Swift, `var` in Kotlin, not `readonly` in TypeScript)
-- Not computed properties
-- Directly settable (not derived from other sources like UserDefaults, API, etc.)
+**IMPORTANT**: `initialState.viewModel` keys are the **Data names the layout declares** — the
+`data` section of the screen under test's layout (includes expanded, their names prefixed by
+the include's id in camelCase: include `header` + `title_text` → `headerTitleText`). Top level
+only, case-sensitive, no dot notation (`user.name` is one key and not a Data name).
 
-If a property is computed or depends on external state, **DO NOT use initialState**.
-Instead, create UI-only tests that don't depend on specific ViewModel state.
+Not settable, even though they exist on the generated Data or the ViewModel:
+
+- fields a generator adds by itself — `<id>IsFocused`, a Radio group's selection, TabView members
+- a `data` written as an object (the style shorthand) — it declares nothing
+- ViewModel properties outside `data` (computed properties, repositories, private state)
+- values an API provides — they are the ViewModel's to load (its `init` / `onAppear` may
+  already have run with default values when initialState is applied); make them with `mocks`
 
 ```json
-// BAD - computed properties cannot be set
-{
-  "initialState": {
-    "viewModel": {
-      "isLoading": true  // Won't work if this is a computed property
-    }
-  }
-}
+// BAD - not Data names: a computed VM property, a generator-added field, dot notation
+{ "initialState": { "viewModel": { "isFormValid": true, "emailIsFocused": true, "user.name": "Taro" } } }
 
-// GOOD - Test only UI elements without state assumptions
-{
-  "name": "initial_display",
-  "description": "Initial display shows logo",
-  "steps": [
-    { "assert": "visible", "id": "logo" }
-  ]
-}
+// GOOD - Data names from the layout's data section, values of their class
+{ "initialState": { "viewModel": { "email": "test@example.com", "agreed": false } } }
 ```
+
+If what the case needs is not Data, do not use `initialState`: reach it with steps, or with
+`mocks`. The full rules (types, timing, receipt) are in *Initial State* below.
 
 ## Platform-Specific Tests
 
@@ -400,23 +530,99 @@ variant tree:
 
 ## Initial State
 
-Set ViewModel state before tests:
+Put values into the Data of the screen under test before the first case:
 
 ```json
 {
+  "type": "screen",
+  "source": { "layout": "layouts/login.json" },
   "initialState": {
     "viewModel": {
-      "isLoggedIn": false,
-      "email": ""
+      "email": "test@example.com",
+      "rememberMe": true
     }
   },
   "cases": [...]
 }
 ```
 
+How it reaches the app (jsonui-test-runner iOS 1.15.0 / Android 1.17.0 / web 1.15.0, with
+SwiftJsonUI ≥ 10.30.0 / KotlinJsonUI ≥ 2.44.0 and code generated by the jsonui-cli of the
+same train):
+
+- The driver launches the app once (web: reloads) with the values in the
+  `JSONUI_TEST_INITIAL_STATE` payload, addressed to the screen id of `source.layout` (the
+  child screen also when `embeddedIn` is set).
+- The app applies them **once per launch, the first time that screen appears**. Navigating
+  away and back, or the screen being rebuilt, in the same launch does not apply them again —
+  a case that returns to the screen finds whatever the previous steps left.
+- The app reports what it applied and rejected, and the driver checks that report before
+  `setup` runs. Only a development build receives it (the same gate as the screen marker:
+  DEBUG / `FLAG_DEBUGGABLE` / `NODE_ENV !== 'production'`, or the marker's opt-in key).
+- An empty `viewModel` (`{}`) is the same as none: no payload, no launch.
+
+**Values must fit the Data's class** (the class as the layout writes it; `Integer` is `Int`,
+`Number` is `Double`, `Boolean` is `Bool`; optional is a trailing `?`). Each key is judged on
+its own; the others are still applied.
+
+| Data class | Accepts | Rejected (examples) |
+|---|---|---|
+| `String` | string | `1`, `true` |
+| `Int` | integral number within 32 bits (−2147483648 … 2147483647); `2.0` is accepted | `1.5`, `true`, `"1"`, `2147483648` |
+| `Double` / `Float` / `CGFloat` / `Number` | any number | `"1.5"` |
+| `Bool` | `true` / `false` only | `0`, `1`, `"true"` |
+| `Color` | string (colour token or hex) | `1` |
+| `Array(X)` / `[X]` / `List<X>` (X above) | array, every element checked as X; elements are not optional | `["a", null]` for `Array(String)` |
+| `Array` | array of strings / numbers / booleans | a nested array or object |
+| `Object` / `Hash` | object of strings / numbers / booleans | a nested array or object |
+| any of the above with `?` | the same, plus `null` | `null` without `?` |
+| closures / event handlers, `CollectionDataSource`, `Visibility`, `Image`, `EdgeInsets`, `Dp`, `Alignment`, `Void`, an array of a custom type (`[OrderItem]`), any other class | nothing — not settable | anything, `null` included |
+
+`Visibility` is not settable because its value differs per platform; set the Data it is
+computed from, or reach the state with steps.
+
+**Case-level `initialState`** is merged over the file's key by key (a case's value — `null`
+too — replaces the file's value for that key whole). It needs `caseIsolation: "reopen"`: under
+`"shared"` the screen opens once, before the first case, so a case's values cannot be
+delivered — `jsonui-test validate` errors (`case-initial-state-needs-reopen`) and the driver
+fails that case at setup.
+
+```json
+{
+  "caseIsolation": "reopen",
+  "initialState": { "viewModel": { "email": "" } },
+  "cases": [
+    { "name": "empty email shows the hint", "steps": [ { "assert": "visible", "id": "email_hint" } ] },
+    { "name": "prefilled email enables submit",
+      "initialState": { "viewModel": { "email": "test@example.com" } },
+      "steps": [ { "assert": "enabled", "id": "submit_button" } ] }
+  ]
+}
+```
+
+**Setup failures** (`failureReason: "setup"`; all the cases of a shared file, that case on a
+reopen):
+
+- *rejected* — `initialState for '<screen>' was rejected by the app: …` lists each key with
+  its reason: `not a data field`, `type mismatch: expected <class>`, `null for non-optional
+  <class>`, `unsupported type <class>`, and on Android `viewModel has no updateData` (the
+  ViewModel lacks the generated update block; `jui build` warns about it). Fix the key or the
+  value — validate reports the same before the run.
+- *not confirmed* — no report within `screenReadyTimeout` (15000 ms by default): `initialState
+  for '<screen>' was not confirmed by the app within …` (web: `… no receipt from the app
+  within …`). The message lists the causes: a library or generated code older than the
+  versions above (rebuild with `jui build`), a build with the screen-marker gate closed, on
+  web a page that does not go through the generated ViewModel hook, a screen id that does not
+  match the layout. Fix the build, not the test.
+
+`jsonui-test validate` checks the keys and values against the layout's Data on every platform
+the file runs on (errors), and says once, as INFO, when it cannot check them — an app-owned
+screen with no layout, a layout it cannot read, or a data item that gives that platform no
+class. INFO is not "checked and clean".
+
 ## Setup and Teardown
 
-Run steps before/after each test case:
+`setup` runs **once per file, before the first case**, and `teardown` runs **once, after the last case** — not around each case. This is how all three drivers run a screen test file:
 
 ```json
 {
@@ -429,6 +635,35 @@ Run steps before/after each test case:
   "cases": [...]
 }
 ```
+
+**The cases share one screen state, in order.** The screen is opened once and every case starts where the previous case left it: its scroll position, the screen it navigated to, what it typed. So:
+
+- A case that scrolls (`scroll`, `scrollUntilVisible`) leaves the next case scrolled: an element near the top may then be outside the viewport, and its `visible` fails.
+- A case that navigates away (tap a link, submit a form) leaves the next case on the other screen, where the ids it expects are not there.
+- Putting the initialisation in `setup` does not reset the screen between cases — `setup` runs only before the first one.
+- A setup failure fails every case; teardown still runs.
+
+Either order the cases so each starts where the previous one ends, or declare `caseIsolation: "reopen"`:
+
+```json
+{
+  "caseIsolation": "reopen",
+  "setup": [ { "action": "waitFor", "id": "list_header" } ],
+  "cases": [
+    { "name": "scrolls to the footer", "steps": [ { "action": "scrollUntilVisible", "id": "list_footer" } ] },
+    { "name": "header is shown", "steps": [ { "assert": "visible", "id": "list_header" } ] }
+  ]
+}
+```
+
+| `caseIsolation` | Screen | `setup` / `teardown` |
+|---|---|---|
+| `"shared"` (default; same as omitting it) | opened once; cases share its state | once per file |
+| `"reopen"` | opened afresh before **each** case | before / after **each** case |
+
+With `"reopen"` the web driver goes back to the URL the page was on when the file started (the file's `mocks` re-applied, the `screenReady` gate awaited); iOS and Android relaunch the app with the file's `launch` and `mocks`. Every reopen also delivers the `initialState` again (the file's, merged with the case's) and checks its receipt. A case skipped by `skip` / `platform` / `responsive` opens nothing. A setup failure fails only that case, and its teardown still runs. It costs one page load (web) or one app launch (iOS / Android) per case, so use it when the cases really need a fresh screen, not by default.
+
+`caseIsolation` is read from jsonui-test-runner web 1.14.0, iOS 1.14.0 and Android 1.16.0. An older driver ignores it and runs the file as `"shared"`. `jsonui-test validate` rejects any other value. It applies to screen test files run on their own; a flow that references a case runs it inside the flow and ignores it — and ignores the file's and the case's `initialState` too (validate and the driver warn `referenced-initial-state-ignored`; the flow's own `initialState.viewModels` is the place for them).
 
 ## Test Case Arguments (args)
 
@@ -663,7 +898,21 @@ Use `tapItem` to tap an item at a specific index in a CollectionView or List:
 }
 ```
 
-The element ID is constructed as `{collectionId}_item_{index}` internally.
+The element ID is constructed as `{collectionId}_item_{index}` internally. In a Collection with more than one section, `index` is the item's place in its own section — two sections each have an `_item_0`, so `index` alone does not tell them apart — except in a paging horizontal Collection, where from jsonui-cli 1.9.0 it is the page's place among all the pages (before 1.9.0, the web and iOS pagers counted from 0 again in each section as well).
+
+### One cell's child: `within`
+A cell's child carries the same id in every cell, so `{ "assert": "text", "id": "itemTitle" }` reads the first one on screen. To name the n-th cell's child, look the id up inside that cell with `within` (drivers web 1.18.0 / iOS 2.2.0 / Android 1.20.0):
+
+```json
+{ "assert": "text", "id": "itemTitle", "within": "product_list_item_1", "equals": "B" },
+{ "assert": "hidden", "id": "saleBadge", "within": "product_list_item_1" },
+{ "action": "tap", "id": "favoriteButton", "within": "product_list_item_2" },
+{ "assert": "visible", "id": "itemTitle", "when": { "visible": "saleBadge", "within": "product_list_item_0" } }
+```
+
+- Every step that targets an element by id takes `within`, and so does a `when` / `while` condition beside its `visible` / `notVisible` / `hidden`.
+- With no `within` element on screen the step fails, whatever it asserts — `visible`, `notVisible`, `hidden` and `count` alike — and a condition with `within` is not met. To check that a cell itself is not shown, write `hidden` on the cell's id (`product_list_item_3`) without `within`.
+- `index` is **not** "the n-th match": it is `tapItem`'s, `selectTab`'s and `selectOption`'s only, and `validate` reports it on any other step as an error.
 
 ### Handling Native Alert Dialogs
 When the app shows a native alert dialog (confirm, permission request, etc.), use `alertTap` to tap a button:
@@ -681,6 +930,8 @@ When the app shows a native alert dialog (confirm, permission request, etc.), us
 ```
 
 The `button` parameter specifies the button text to tap (e.g., "OK", "Cancel", "Delete").
+
+From jsonui-test-runner-ios 1.14.0 (jsonui-cli 1.9.31), iOS `alertTap` taps only once the button is hittable and then checks that it went away, tapping again while `timeout` lasts. A tap made while an alert or sheet is still appearing can be lost: the iOS "Save Password?" sheet after a sign-in stayed up after one tap and the next step failed on the screen under it. A run that needed more than one tap says so (`alertTap '<button>': the first N tap(s) did not dismiss it`), and a button that never goes now fails the step (`was tapped N time(s) and is still there`) instead of passing it.
 
 ### Selecting Tabs in TabView/TabBar
 Use `selectTab` to select a tab by index:
@@ -800,6 +1051,8 @@ curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/test_too
 
 ### Step 3: Validate the Test File
 
+From 1.8.119, `jsonui-test validate` also prints the project's contracts-coverage section, and from 1.9.0 it can fail on it whatever file you pass (the project's coverage, not this test file — see `rules/invariants.md`, invariant 5).
+
 ```bash
 jsonui-test validate path/to/your_test.test.json
 ```
@@ -808,27 +1061,14 @@ jsonui-test validate path/to/your_test.test.json
 
 **Success:**
 ```
-path/to/your_test.test.json is valid
+==================================================
+Result: PASSED
+Files: 1, Errors: 0, Warnings: 0
 ```
 
-**With Warnings:**
-```
-path/to/your_test.test.json has warnings:
+**With warnings or errors:** the file path, then one line per warning or error, then the same two summary lines (`Result: FAILED` when there is any error — and from 1.9.0 also when coverage fails: `Errors: 0` with `Coverage: FAILED`).
 
-  Warning: Case 'test_case_1' has no assertions (step 3)
-
-path/to/your_test.test.json is valid (with warnings)
-```
-
-**With Errors:**
-```
-path/to/your_test.test.json has errors:
-
-  Error: Missing 'id' in step 2 of case 'test_case_1' (action: tap)
-  Error: Unknown action 'click' in step 3 of case 'test_case_1'
-
-Found 2 error(s) and 0 warning(s)
-```
+From 1.8.119 the coverage section follows the summary (`coverage: <platform> units … → exit X (…) · baselined N (matched · new · stale[ · unmeasured now][ · vanished])`, then the notice or the gate line). From 1.9.0 the summary line also carries `Coverage: passed|FAILED (exit X; …)`.
 
 ### Fix and Re-validate
 

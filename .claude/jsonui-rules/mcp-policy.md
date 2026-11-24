@@ -24,11 +24,38 @@ JsonUI agents call the `jsonui-mcp-server` (the `jui-tools` MCP) to interact wit
 | Validate spec | `mcp__jui-tools__doc_validate_spec`, `doc_validate_component` | — |
 | Generate docs | `mcp__jui-tools__doc_generate_spec`, `doc_generate_html` | — |
 | Lint @generated markers | — | `jui lint-generated` (CI only) |
+| Localize gate — raw layout literals vs strings.json | — | `jui lint-strings` (also `jui build --lint-strings`) |
 | List swagger / OpenAPI files | `mcp__jui-tools__list_api_specs` | `jui ls api-specs --json` |
 | List generated DTO + Domain files (with orphan detection) | `mcp__jui-tools__list_api_models` | `jui ls api-models --json` |
 | Preview swagger filter + emit plan without writing | `mcp__jui-tools__preview_api_model_sync` | `jui g api --dry-run --json` |
+| Pull run artifacts (screenshots / recordings) | `mcp__jui-tools__test_artifacts_pull` | `jsonui-test artifacts pull` |
+| Show artifacts config + already-pulled files | `mcp__jui-tools__test_artifacts_status` | `jsonui-test artifacts status` |
+| Regenerate API mocks from swagger | `mcp__jui-tools__test_mock_generate` | `jsonui-test mock generate` |
+| Validate test files (always `no_install: true`; from 1.8.119 the result also carries the project's contracts-coverage section — a gate from 1.9.0) | `mcp__jui-tools__test_validate` | `jsonui-test validate --no-install` |
+| Generate branch tests from a spec's branchContracts | `mcp__jui-tools__test_generate_branch_tests` | `jsonui-test generate branch-tests` |
+| Contract-gap coverage (declared API outcomes no branch row answers; read-only. Its `exit` does not read the baseline: `jsonui-test validate` compares these entries with the app's baseline, and gates on that from 1.9.0) | `mcp__jui-tools__test_contracts_coverage` | `jsonui-test contracts coverage` |
+| Server room (`docs/infra`): validate the model and its flows, and its migration plans (`plan`: one) | `mcp__jui-tools__infra_validate` | `jsonui-doc validate infra --json [--migration <name>]` |
+| Server room: validate the load scenarios | `mcp__jui-tools__infra_load_validate` | `jsonui-doc validate infra-load --json` |
+| Server room: validate the room's own prices | `mcp__jui-tools__infra_prices_validate` | `jsonui-doc validate infra-prices --json` |
+| Server room: draft the model from IaC, config files and code (read-only unless `write: true`) | `mcp__jui-tools__infra_seed` | `jsonui-doc seed infra` |
+| Server room: the declared infra checks (model ⇔ IaC, code, load) | `mcp__jui-tools__infra_check` | `jsonui-doc check infra --json` |
+| Server room: the month's (or a day's) cost; with `plan`, a migration plan's old / new / difference | `mcp__jui-tools__infra_cost` | `jsonui-doc cost infra --json [--migration <name> [--account]]` |
+| jui viz (local viewer of Claude Code sessions only): server running, hooks installed, relay registered | `mcp__jui-tools__viz_status` | `jui viz status --json --with-relay` |
+| jui viz: check the environment | `mcp__jui-tools__viz_doctor` | `jui viz doctor --json` |
+| jui viz: start the server in the background, get its URL | `mcp__jui-tools__viz_start` | `jui viz start --json` |
+| jui viz: stop the server | `mcp__jui-tools__viz_stop` | `jui viz stop` |
+| jui viz: open the page in the browser | `mcp__jui-tools__viz_open` | `jui viz open` |
 
-Only **one** CLI command has no MCP equivalent today: `jui lint-generated`. Everything else goes through MCP.
+These commands have no MCP equivalent today and are Bash-invoked:
+`jui lint-generated`, `jui lint-strings` (lint gates), the two invariant-5 checks —
+`jsonui-test generate unit-stubs [--check]` (no MCP tool exists for unit stubs at all) and
+`jsonui-test generate branch-tests --check` (the generator has `test_generate_branch_tests`; **the `--check` mode does not**) —
+and `jsonui-test contracts baseline` (1.8.119+; `test` runs it only to shrink an existing baseline — the first recording is the user's decision).
+Everything else goes through MCP — including every other `jsonui-test` operation an agent performs.
+
+Fetching cloud prices (`jui viz cloud-prices fetch`) goes to the network and writes the viz home, so it has no MCP tool and is the user's to run.
+
+The `viz_*` tools are for the main session when the user asks about jui viz; no agent declares them. Installing the hooks or the relay (`jui viz hooks install`, `jui viz relay install`) writes `~/.claude/settings.json` and the user's MCP config, so it has no MCP tool and is left to the user.
 
 ---
 
@@ -59,7 +86,7 @@ tools: >
 ---
 ```
 
-**Avoid:** wildcard `mcp__jui-tools__*`. It loads all 30 tool schemas into the prompt, wasting tokens and increasing agent confusion.
+**Avoid:** wildcard `mcp__jui-tools__*`. It loads every tool schema the server exposes into the prompt, wasting tokens and increasing agent confusion.
 
 **Avoid:** `tools: "*"`. Only use for read-only debug agents during development.
 
@@ -67,30 +94,54 @@ tools: >
 
 ## Per-agent MCP tool inventory
 
+Generated from the `tools:` frontmatter of `.claude/agents/*.md` — the frontmatter is canonical. After changing an agent's tools, run `scripts/contract_check.sh --fix` to refresh this table (CI fails on drift). Tool names are sorted; non-MCP tools (Read, Bash, ...) are governed by the sections below, and `debug` is READ-ONLY by contract regardless of this table.
+
+<!-- inventory:begin — generated from agent frontmatter; edit frontmatter, then run scripts/contract_check.sh --fix -->
 | Agent | MCP tools |
 |---|---|
-| `conductor` | `get_project_config`, `list_screen_specs`, `list_layouts`, `list_component_specs` |
-| `implement` (screen marker) | `get_screen_identity` — before hand-writing anything that looks like a screen beacon |
-| `define` | `doc_init_spec`, `doc_init_component`, `doc_validate_spec`, `doc_validate_component`, `doc_generate_spec`, `read_spec_file`, `lookup_component`, `lookup_attribute`, `search_components`, `jui_verify` |
-| `ground` | `jui_init`, `jui_sync_tool`, `get_project_config` |
-| `implement` | `jui_generate_project`, `jui_build`, `jui_verify`, `read_spec_file`, `read_layout_file`, `list_layouts`, `lookup_component`, `lookup_attribute`, `get_binding_rules`, `get_modifier_order`, `get_platform_mapping` |
-| `navigation-ios` / `navigation-android` / `navigation-web` | `read_spec_file`, `read_layout_file`, `list_screen_specs`, `get_platform_mapping`, `get_screen_identity` |
-| `test` | `list_screen_specs`, `read_spec_file`, `doc_generate_html`, `list_layouts`, `get_screen_identity` |
-| `debug` (READ-ONLY) | `get_project_config`, `list_screen_specs`, `list_layouts`, `read_spec_file`, `read_layout_file`, `jui_verify`, `jui_build`, `doc_validate_spec`, `lookup_component`, `lookup_attribute`, `search_components` (+ `Read, Bash, Glob, Grep` for impl grep) |
+| `conductor` | `get_project_config`, `list_api_models`, `list_api_specs`, `list_component_specs`, `list_layouts`, `list_screen_specs` |
+| `debug` | `doc_validate_spec`, `get_platform_mapping`, `get_platform_rules`, `get_project_config`, `infra_cost`, `infra_load_validate`, `infra_validate`, `jui_build`, `jui_verify`, `list_api_models`, `list_api_specs`, `list_component_specs`, `list_layouts`, `list_screen_specs`, `lookup_attribute`, `lookup_component`, `preview_api_model_sync`, `read_layout_file`, `read_spec_file`, `search_components`, `search_specs` |
+| `define` | `doc_generate_component`, `doc_generate_spec`, `doc_init_component`, `doc_init_spec`, `doc_rules_init`, `doc_rules_show`, `doc_validate_component`, `doc_validate_spec`, `get_platform_rules`, `get_project_config`, `infra_check`, `infra_cost`, `infra_load_validate`, `infra_prices_validate`, `infra_seed`, `infra_validate`, `jui_verify`, `list_api_specs`, `list_component_specs`, `list_screen_specs`, `lookup_attribute`, `lookup_component`, `preview_api_model_sync`, `read_spec_file`, `search_components`, `search_specs`, `test_contracts_coverage` |
+| `ground` | `get_project_config`, `jui_build`, `jui_init` |
+| `implement` | `get_binding_rules`, `get_modifier_order`, `get_platform_mapping`, `get_platform_rules`, `get_project_config`, `jui_build`, `jui_generate_project`, `jui_verify`, `list_api_models`, `list_api_specs`, `list_layouts`, `list_screen_specs`, `lookup_attribute`, `lookup_component`, `read_layout_file`, `read_spec_file`, `search_components`, `search_specs` |
+| `navigation-android` | `get_platform_mapping`, `get_project_config`, `get_screen_identity`, `jui_build`, `list_screen_specs`, `read_layout_file`, `read_spec_file` |
+| `navigation-ios` | `get_platform_mapping`, `get_project_config`, `get_screen_identity`, `jui_build`, `list_screen_specs`, `read_layout_file`, `read_spec_file` |
+| `navigation-web` | `get_platform_mapping`, `get_project_config`, `get_screen_identity`, `jui_build`, `list_screen_specs`, `read_layout_file`, `read_spec_file` |
+| `test` | `doc_generate_html`, `get_project_config`, `get_screen_identity`, `list_layouts`, `list_screen_specs`, `read_layout_file`, `read_spec_file`, `search_specs`, `test_artifacts_pull`, `test_artifacts_status`, `test_generate_branch_tests`, `test_mock_generate`, `test_validate` |
+<!-- inventory:end -->
 
-Agents that do not appear in this table should still follow the "explicit enumeration" pattern.
+---
+
+## Test tooling: agent use of the test_* MCP tools
+
+Every `test_*` tool the MCP server exposes is in one of the two groups below. Agent consumption is deliberate, not implied — a tool not listed as agent-consumed stays unused by agents until this policy changes:
+
+**Agent-consumed** (declared by `test` unless noted):
+
+- `test_artifacts_pull` / `test_artifacts_status` — collect and inspect run artifacts
+- `test_mock_generate` — regenerate `generated/` mocks from the swagger
+- `test_generate_branch_tests` — generate branch tests from a spec's `branchContracts` (generated output, never authored)
+- `test_contracts_coverage` — declared by `define`: the contract-gap coverage report, read-only. Closing what it reports is spec work, and `define` is Bash-free. Its `exit` is the CLI's verdict (0 / 1 / 2 / 3); `exit: null` means no report came back that the tool could trust
+- `test_validate` — validate test files, **always with `no_install: true`**. The wrapper's default (like the CLI's) installs tests as a side effect, and authoring-time validation must not consume the files. Servers built before 2026-08-01 do not know the parameter and **silently drop it** (the SDK's zod validation strips unknown keys), so the install runs anyway — if validation appears to install despite `no_install: true`, update `~/.jsonui-mcp-server` (`bash ~/.jsonui-mcp-server/install.sh`) and restart before trusting this path.
+
+**Deliberately not agent-consumed:**
+
+- `test_generate_screen` / `test_generate_flow` / `test_generate_description` — template scaffolders for humans working without the pack. Agents author complete files via the `jsonui-screen-test` / `jsonui-flow-test` / `jsonui-test-doc` skills; a skeleton adds nothing. `test_generate_branch_tests` is **not** in this group: branch tests are generated output, never authored, so the agent that needs them calls the tool.
+- `test_report` — converts run results to JUnit / HTML. That is a runner / CI stage after execution, outside agent authoring scope.
 
 ---
 
 ## Bash tool policy
 
-Include `Bash` in the `tools:` frontmatter when the agent needs the one remaining uncovered CLI command (`jui lint-generated`, typically CI-only), or needs to run platform-specific native commands (e.g. `xcodebuild`, `./gradlew`, `npm run dev`, `git`, `rbenv` diagnostics). Every other `jui` / `jsonui-doc` operation is an MCP call — prefer that.
+Include `Bash` in the `tools:` frontmatter when the agent needs one of the Bash-invoked commands listed above (`jui lint-generated`, typically CI-only; `jui lint-strings`, the localize gate; `jsonui-test contracts baseline`, to shrink a coverage baseline), or needs to run platform-specific native commands (e.g. `xcodebuild`, `./gradlew`, `npm run dev`, `git`, `rbenv` diagnostics). Every other `jui` / `jsonui-doc` operation is an MCP call — prefer that.
 
 - `ground`: needs Bash for initial platform scaffolding
 - `debug`: needs Bash for impl-side grep and CI-style checks
 - `navigation-*`: may need Bash for platform-native build verification
+- `implement`: may need Bash for platform-native runs alongside the MCP build gate
+- `test`: needs Bash for running platform test suites and `jsonui-test contracts baseline` (`jsonui-test validate --no-install` stays available as the human/CI fallback, but agent validation goes through `test_validate`)
 
-All other agents should not declare Bash.
+`conductor` and `define` stay Bash-free.
 
 ---
 

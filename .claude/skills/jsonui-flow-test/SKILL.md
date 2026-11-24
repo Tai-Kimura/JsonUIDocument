@@ -10,7 +10,7 @@ You are an expert in implementing **flow test** JSON files for JsonUI applicatio
 
 Implement **flow test** JSON files that orchestrate multi-screen user journeys by referencing existing screen tests. Flow tests are designed to test complete user flows across multiple screens, reusing test cases defined in screen test files.
 
-**IMPORTANT**: This agent is for **flow tests only**. For single-screen tests, use the `jsonui-test-implement` agent.
+**IMPORTANT**: This agent is for **flow tests only**. For single-screen tests, use the `jsonui-screen-test` skill.
 
 ## Test Runner Repository
 
@@ -153,15 +153,66 @@ When no `case` or `cases` is specified, all cases from the referenced screen tes
 #### Conditional Flow Steps (`when`)
 Any flow step (file reference, block, or inline) may carry a `when` pre-condition and is
 skipped when it is not satisfied. Same condition object as screen tests
-(`visible` / `notVisible` / `platform` / `state`, ANDed):
+(`visible` / `notVisible` / `hidden` / `platform` / `state`, ANDed):
 ```json
 { "file": "product-detail", "case": "詳細表示", "when": { "platform": ["ios", "android"] } }
 ```
 
 #### Launch Configuration (flow root)
 A flow test may declare a root-level `launch` object (`clearState` / `permissions` /
-`arguments`) applied before the flow starts — same shape as screen tests. See the
+`arguments`) applied before the flow starts — same shape as screen tests, and applied by the
+runner on all three platforms (web from jsonui-test-runner web 1.15.0). See the
 jsonui-screen-test skill for details.
+
+#### Initial State (flow root)
+`initialState.viewModels` puts values into the Data of the screens the flow visits. Its keys
+are **screen ids** — the same values the steps write in `screen` (layout basename without
+`.json`, see *`screen` values are canonical screen ids*). Each inner object follows the screen
+test rules (*Initial State* in the jsonui-screen-test skill): Data names the layout declares,
+values fitting the Data's class, `null` only for a class ending in `?`.
+
+```json
+{
+  "type": "flow",
+  "initialState": {
+    "viewModels": {
+      "login": { "email": "test@example.com" },
+      "checkout": { "couponCode": "WELCOME10" }
+    }
+  },
+  "steps": [
+    { "screen": "login", "action": "tap", "id": "login_button" },
+    { "file": "home", "case": "open_cart" },
+    { "screen": "checkout", "assert": "visible", "id": "coupon_applied" }
+  ]
+}
+```
+
+- All entries travel with the flow's one launch. Each screen applies its entry **once, the
+  first time the flow reaches it**; coming back to it later in the same flow does not apply it
+  again.
+- The driver checks the app's receipt where the flow reaches the screen — the first time an
+  inline step's `screen` changes to it (after the implicit screen check passes; with
+  `verifyScreenTransitions` off, still at that step). A screen stays pending until its receipt
+  passed, so a retried body (`retry`) checks it again. A rejected key or no receipt fails the
+  flow there (see *Setup failures* in the jsonui-screen-test skill for the
+  messages and causes). Drivers iOS 1.15.0 / Android 1.17.0 / web 1.15.0 with SwiftJsonUI ≥
+  10.30.0 / KotlinJsonUI ≥ 2.44.0 and code from the jsonui-cli of the same train.
+- **Name each screen in an inline step's `screen`.** A screen in `viewModels` that no step in
+  `setup` / `steps` names never has its receipt checked — `jsonui-test validate` warns. The
+  driver warns about every screen still pending when the flow ends — also one an earlier
+  attempt reached but did not confirm, when the attempt that passed never went there. A file reference carries no `screen`, so a
+  screen visited only inside a referenced case is not "reached"; add an inline step on it
+  (an `assert: "screen"` is enough).
+- **`initialState.screen` is removed.** A flow starts where the app starts. validate errors
+  (`flow-initial-state-screen-removed`); delete the key.
+- **A referenced file's or case's own `initialState` is ignored inside the flow** —
+  validate and the driver warn (`referenced-initial-state-ignored`). Move the values into
+  `viewModels` under that screen's id.
+- An empty `viewModels` (`{}`) is the same as none.
+
+`state` / `when.state` in a flow read the Data of the step's `screen` (else the last `screen`
+an earlier step named); a case a flow references reads its own file's screen.
 
 #### Step-level Features
 Inline flow steps and block steps support the same step attributes as screen tests —
@@ -232,6 +283,7 @@ When screen tests define `args` with default values, flow tests can override the
 ### Inline Steps (For Flow-Specific Actions)
 
 You can also include inline steps for flow-specific actions that don't belong to any screen test.
+Their element ids are checked against the layouts the same way as a screen test's (1.8.119+; see the jsonui-screen-test skill, *Element ids are checked against the layouts*). (A `notVisible` on a decorative image was named with an INFO from 1.9.0 to 1.9.29; from 1.9.30 it is not — the jsonui-screen-test skill, *A `notVisible` on a decorative image is no longer named*.) The steps of a `block` have no screen and are not judged.
 
 **Every top-level inline step (action or assert) MUST carry a non-empty `screen`** — the
 alias (from `sources`) of the screen the step runs on. This applies to `steps`, `setup`,
@@ -489,33 +541,77 @@ The loader tries these locations in order:
 
 ## Available Actions & Assertions
 
-**For the complete and up-to-date list of actions and assertions, always check schema.py in the jsonui-cli repository (the `jsonui-test` CLI lives there):**
+**The canonical step inventory is `schemas/actions.schema.json` in the
+jsonui-test-runner repository** — the tables below are **generated from it**
+at the pin recorded in each table's stamp line (regenerate:
+`node scripts/gen-skill-action-tables.mjs --fix`). For validator-side
+parameter details, `test_tools/jsonui_test_cli/schema.py` in jsonui-cli
+remains the `jsonui-test validate` reference.
 
-```bash
-find . "$HOME/.jsonui-cli" -path "*/test_tools/jsonui_test_cli/schema.py" 2>/dev/null | head -1 | xargs cat
-```
+### Actions
 
-### Common Actions for Flow Tests
+<!-- generated:actions -->
+_Generated from [`schemas/actions.schema.json`](https://github.com/Tai-Kimura/jsonui-test-runner/blob/v1.14.0/schemas/actions.schema.json) @ jsonui-test-runner `v1.14.0` (28 actions). Do not edit by hand — `node scripts/gen-skill-action-tables.mjs --fix` regenerates; the pin lives in that script._
 
-| Action | Required | Optional | Use Case |
-|--------|----------|----------|----------|
-| `waitFor` | `id` | `timeout` | Wait for screen transition |
-| `wait` | `ms` | - | Wait for animations/loading |
-| `tap` | `id` | `text`, `timeout` | Navigate between screens |
-| `back` | - | - | Navigate back |
-| `typeText` | `value` | `timeout` | Type into the currently-focused field (no `id`) |
-| `hideKeyboard` | - | - | Dismiss soft keyboard before tapping a covered target |
-| `screenshot` | `name` | - | Document flow state |
+| Action | 説明 | Required | Optional | Platform notes |
+|---|---|---|---|---|
+| `tap` | 要素をタップ | `id` | `text`, `retryTapIfNoChange=false` | `retryTapIfNoChange`（ゴーストタップ緩和）は Web では受理のみ・no-op |
+| `doubleTap` | 要素をダブルタップ | `id` | - | - |
+| `longPress` | 要素を長押し | `id` | `duration=500` | - |
+| `input` | 指定要素にテキスト入力 | `id`, `value` | - | - |
+| `typeText` | フォーカス中の欄へキーボード入力（要素 id 不要。不可視のコード入力欄など向け） | `value` | `timeout` | - |
+| `clear` | 入力内容をクリア | `id` | - | - |
+| `scroll` | 指定方向へスクロール | `id`, `direction` | `amount` | - |
+| `scrollUntilVisible` | 要素が見えるまでスクロール（終端到達で即失敗） | `id` | `container`, `direction=down`, `timeout=20000` | - |
+| `swipe` | 要素をスワイプ | `id`, `direction` | - | - |
+| `waitFor` | 要素の出現を待機 | `id` | `timeout=5000` | - |
+| `waitForAny` | いずれかの要素の出現を待機 | `ids` | `timeout=5000` | - |
+| `wait` | 指定時間待機 | `ms` | - | - |
+| `back` | 戻る操作 | - | - | - |
+| `hideKeyboard` | ソフトキーボードを閉じる（未表示なら no-op） | - | - | - |
+| `screenshot` | スクリーンショットを保存 | `name` | - | - |
+| `alertTap` | アラート／ダイアログのボタンをタップ | `button` | `timeout=5000` | - |
+| `selectOption` | ドロップダウン／ピッカーから選択 | `id` | `value`, `index`, `timeout=5000` | - |
+| `tapItem` | コレクション内のアイテムをタップ | `id`, `index` | `timeout=5000` | - |
+| `selectTab` | タブを選択 | `id`, `index` | `timeout=5000` | - |
+| `readText` | 要素のテキストを実行時変数に読む（`@{変数名}` で後続参照） | `id`, `variable` | `timeout=5000` | - |
+| `repeat` | ステップ群を繰り返す（`times`／`while` 併用可、安全上限 100 回） | `steps` | `times`, `while` | - |
+| `retry` | 失敗時にブロック全体を再実行 | `steps` | `maxRetries=1` | - |
+| `setLocation` | モック位置情報を設定 | `latitude`, `longitude` | - | iOS: SDK 依存 ／ Android: best effort ／ Web: setGeolocation |
+| `addMedia` | メディアフィクスチャを端末に追加（png/jpg/jpeg/gif/mp4。蓄積するため件数でなく存在を検証） | `paths` | `id`, `timeout` | Android: ギャラリー（MediaStore）／ iOS: PhotoKit〈シミュレータ限定・photos-add 許可は CLI が自動付与〉／ Web: file input |
+| `setMocks` | エンドポイント（operationId）ごとのモックシナリオを切り替え | `mocks` | - | - |
+| `setViewport` | ビューポートをリサイズ（レスポンシブ検証） | `width`, `height` | - | Web のみ。iOS/Android は警告付き no-op（`when.responsive` でゲート） |
+| `setOrientation` | 画面の向きを変更 | `orientation` | - | iOS: XCUIDevice ／ Android: UiDevice ／ Web: モバイルエミュレーション時のみ（他は警告付き no-op） |
+| `emitHook` | アプリが登録したテストフックを呼び出す（`window.__jsonuiTestHooks`） | `name` | `hookArgs` | Web のみ。iOS/Android は警告付き no-op（`when.platform` でゲート） |
+<!-- /generated:actions -->
 
-(Inline usage of any action requires `screen`; see the schema.py reference above for the full action list.)
+(Inline usage of any action requires `screen` — see "Inline Steps" above.)
 
-### Common Assertions for Flow Tests
+Scroll note: `scrollUntilVisible` guarantees its target is visible, not where it stops — before asserting `visible` on a different element, `scrollUntilVisible` that element too (see the jsonui-screen-test skill's Scroll notes). Without `container`, web scrolls the target's nearest scrolling ancestor, iOS the first scroll view, Android the middle of the app window — name `container` for a scroll area smaller than the screen.
 
-| Assertion | Required | Optional | Use Case |
-|-----------|----------|----------|----------|
-| `visible` | `id` | `timeout` | Verify screen loaded |
-| `notVisible` | `id` | `timeout` | Verify screen dismissed |
-| `text` | `id` | `equals`, `contains`, `timeout` | Verify data persistence |
+Visibility note: `visible` means in the viewport (inside the screen and every scroll container — laid out below the fold is not visible), `notVisible` is its exact negation (`opacity: 0` and `enabled: false` are visible), and the screen under a native modal is not visible. To check that something is not shown, assert `hidden` (not drawn at all, wherever it is) — `notVisible` passes for an element scrolled out. An overlay drawn in the same layout covers differently per platform — assert the overlay, not what it covers (see the jsonui-screen-test skill's Visibility notes).
+
+**Keyboard (iOS, jsonui-test-runner-ios 1.14.0+)**: a `tap` whose target sits under the software keyboard fails with `keyboard covers '<id>'` unless the keyboard can be put away without Return; write `{ "action": "hideKeyboard" }` between the last `input` and that `tap`. `hideKeyboard` may press the focused single-line field's Return key (return / Done only), which also runs the field's `onSubmit` if the screen binds one. Details: `jsonui-screen-test` → Keyboard notes.
+
+### Assertions
+
+<!-- generated:assertions -->
+_Generated from [`schemas/actions.schema.json`](https://github.com/Tai-Kimura/jsonui-test-runner/blob/v1.14.0/schemas/actions.schema.json) @ jsonui-test-runner `v1.14.0` (11 assertions). Do not edit by hand — `node scripts/gen-skill-action-tables.mjs --fix` regenerates; the pin lives in that script._
+
+| Assertion | 説明 | Required | Optional | Platform notes |
+|---|---|---|---|---|
+| `visible` | 要素がビューポート内に見えている（画面とすべてのスクロール容器の内側に縦横 1pt/px 以上。中心でなく一部で可。レイアウト上存在するだけでは不可） | `id` | `timeout` | - |
+| `notVisible` | `visible` の否定（不存在、非表示、またはビューポートの外） | `id` | `timeout` | - |
+| `hidden` | 要素が描画されていない（不存在、gone、または自身か祖先が invisible / hidden）。位置に依らない: 画面外・スクロール外・モーダルの下・重なりの下・opacity 0・enabled:false は描画されている扱い | `id` | `timeout` | - |
+| `enabled` | 要素が有効 | `id` | `timeout` | - |
+| `disabled` | 要素が無効 | `id` | `timeout` | - |
+| `text` | テキストを検証（`equals`／`contains`） | `id` | `equals`, `contains`, `timeout` | - |
+| `count` | 要素数を検証（`equals: 0` は不存在で成立） | `id`, `equals` | `timeout` | - |
+| `state` | ViewModel の data を検証（`path` はドット記法。ハーネスの provider は不要 — JsonUI ライブラリ ≥ SwiftJsonUI 10.30.0 / KotlinJsonUI 2.44.0 の state ブリッジを読む） | `path`, `equals` | `timeout` | - |
+| `screenshot` | ベースライン画像とのビジュアル比較（ベースライン無しは新規作成＋警告） | `name` | `cropId`, `threshold=98` | - |
+| `openedUrl` | 直近の `window.open` 呼び出しの URL を検証 | - | `equals`, `contains`, `timeout` | Web のみ（`when.platform: web` でゲート） |
+| `screen` | 指定画面の表示を検証（排他は主張しない — 埋め込み／タブ等で複数同時あり得る） | `name` | `timeout` | - |
+<!-- /generated:assertions -->
 
 ## Workflow (CRITICAL)
 
@@ -524,7 +620,7 @@ find . "$HOME/.jsonui-cli" -path "*/test_tools/jsonui_test_cli/schema.py" 2>/dev
 1. **Identify the user journey** - Map out the screens involved
 2. **Check existing screen tests** - See what test cases are already defined
 3. **Identify gaps** - Note any missing screen tests or cases needed
-4. **Create missing screen tests first** - Use `jsonui-test-implement` agent
+4. **Create missing screen tests first** - Use the `jsonui-screen-test` skill
 5. **Then create the flow test** - Orchestrate the screen tests
 
 ### Creating Flow Tests
@@ -807,6 +903,8 @@ curl -fsSL https://raw.githubusercontent.com/Tai-Kimura/jsonui-cli/main/test_too
 
 ### Step 3: Validate the Test File
 
+From 1.8.119, `jsonui-test validate` also prints the project's contracts-coverage section, and from 1.9.0 it can fail on it whatever file you pass (the project's coverage, not this test file — see `rules/invariants.md`, invariant 5).
+
 ```bash
 jsonui-test validate path/to/your_flow.test.json
 ```
@@ -815,18 +913,14 @@ jsonui-test validate path/to/your_flow.test.json
 
 **Success:**
 ```
-path/to/your_flow.test.json is valid
+==================================================
+Result: PASSED
+Files: 1, Errors: 0, Warnings: 0
 ```
 
-**With Errors:**
-```
-path/to/your_flow.test.json has errors:
+**With warnings or errors:** the file path, then one line per warning or error, then the same two summary lines (`Result: FAILED` when there is any error — and from 1.9.0 also when coverage fails: `Errors: 0` with `Coverage: FAILED`).
 
-  Error: Referenced file not found: screens/missing_screen
-  Error: Case 'nonexistent_case' not found in screens/login
-
-Found 2 error(s) and 0 warning(s)
-```
+From 1.8.119 the coverage section follows the summary (`coverage: <platform> units … → exit X (…) · baselined N (matched · new · stale[ · unmeasured now][ · vanished])`, then the notice or the gate line). From 1.9.0 the summary line also carries `Coverage: passed|FAILED (exit X; …)`.
 
 ### Fix and Re-validate
 

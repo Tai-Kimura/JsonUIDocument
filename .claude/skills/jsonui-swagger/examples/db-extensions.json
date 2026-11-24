@@ -181,11 +181,11 @@
     "example": {
       "x-indexes": [
         {
-          "columns": ["owner_id", "status", "created_at"],
-          "name": "idx_owner_status_created"
+          "columns": ["room_id", "status", "start_at", "end_at"],
+          "name": "idx_booking_overlap"
         },
         {
-          "columns": ["workspace_id", "slug"],
+          "columns": ["venue_id", "kind"],
           "unique": true
         }
       ]
@@ -204,12 +204,12 @@
   },
 
   "x-external-ref": {
-    "_description": "Cross-DATABASE reference note (at property level) — NOT a foreign key. Format is exactly 3 dot-separated parts: {db}.{table}.{column} (no dots allowed inside each part). Used when a document in one database stores an ID from another database (e.g. a Firestore doc holding an RDB item id). Rendered as an EXT badge; reserved for future cross-ERD links.",
+    "_description": "Cross-DATABASE reference note (at property level) — NOT a foreign key. Format is exactly 3 dot-separated parts: {db}.{table}.{column} (no dots allowed inside each part). Used when a document in one database stores an ID from another database (e.g. a Firestore doc holding an RDB reservation id). Rendered as an EXT badge; reserved for future cross-ERD links.",
     "example": {
-      "item_id": {
+      "reservation_id": {
         "type": "integer",
-        "description": "RDB item this document belongs to",
-        "x-external-ref": "main.items.id"
+        "description": "RDB reservation this document belongs to",
+        "x-external-ref": "main.reservations.id"
       }
     }
   }

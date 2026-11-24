@@ -50,7 +50,7 @@ Layout JSON supports two attribute override mechanisms — do not confuse them:
 | Key | Resolution | Purpose |
 |-----|-----------|---------|
 | `platform` (dict) | `jui build` time (static) | iOS/Android/Web differences (e.g. height, maxWidth) |
-| `responsive` | App runtime (dynamic) | Screen size class switching (compact / regular / landscape) |
+| `responsive` | App runtime (dynamic) | Screen size class switching (compact / regular / landscape), or window-width conditions (`minWidth:N` / `maxWidth:N`, jsonui-cli 1.9.26+) |
 
 Both can coexist on the same node. `platform` is stripped at build time; `responsive` is left for the framework to resolve at runtime.
 
@@ -70,7 +70,7 @@ Unlike `include` (static inline expansion, parent owns the VM) and `TabView` (ta
 - **Parent → child data**: only what is explicitly listed in `params` crosses the boundary. No implicit `data` sharing.
 - **Child → parent events**: only what is explicitly declared in `events` (mapped to a parent VM method or eventHandler) crosses back. Embedded VMs emit via the lib `emit(name, payload)` helper.
 - **Same screen embedded twice**: each instance gets its own VM, keyed by the Layout JSON `Embed.id`. On Android, `EmbedContainer` `remember(id)` a per-slot `ViewModelStoreOwner` to guarantee this — do not bypass.
-- **Navigation**: v1 uses `navigationMode: "delegate"` — the embedded screen's `navigate()` drives the parent's NavController/Router. `pop` / `dismiss` / `navigateBack` are bounded at the embed and do not close it.
+- **Navigation**: with `navigationMode: "delegate"` (the default) the embedded screen's `navigate()` drives the parent's NavController/Router; with `"isolated"` the embed owns a private stack and a push stays inside it (a spec declares it from jsonui-cli 1.9.0). `pop` / `dismiss` / `navigateBack` are bounded at the embed and do not close it.
 
 The embedded screen requires **no spec changes** to be embeddable. VMs that implement `applyInitParams(_:)` consume the params; others ignore them. This is the inverse of `include`'s ID-prefix scoping trick — instead of injecting parent identity into the child, `Embed` walls the child off and forces explicit channels.
 
@@ -98,7 +98,7 @@ let dto = try JSONDecoder().decode(UserDto.self, from: data)
 return User(dto: dto)
 ```
 
-This pattern is mirrored on Android (Moshi/kotlinx) and Web (factory function `userFromDto`). See `invariants.md` (rules 5-8) for the editing contract and `file-locations.md` for the per-platform path layout.
+This pattern is mirrored on Android (Moshi/kotlinx) and Web (factory function `userFromDto`). See `invariants.md` (rules 6-9) for the editing contract and `file-locations.md` for the per-platform path layout.
 
 ## When in doubt
 

@@ -7,6 +7,8 @@ tools: >
   mcp__jui-tools__list_screen_specs,
   mcp__jui-tools__list_layouts,
   mcp__jui-tools__read_spec_file,
+  mcp__jui-tools__search_specs,
+  mcp__jui-tools__get_platform_rules,
   mcp__jui-tools__read_layout_file,
   mcp__jui-tools__jui_generate_project,
   mcp__jui-tools__jui_build,
@@ -23,7 +25,7 @@ tools: >
 
 # Implement Agent
 
-Takes a validated spec and produces a working screen: Layout JSON + Styles + VM method bodies + strings.json + passing gates. Owns three of the four project invariants (build warnings, verify drift, localize).
+Takes a validated spec and produces a working screen: Layout JSON + Styles + VM method bodies + strings.json + passing gates. Owns four of the five project invariants (build warnings, verify drift, localize, contracts tested — the implementation half; validate's coverage section is closed by `jsonui-define` and run by `jsonui-test`).
 
 ## You do NOT
 
@@ -67,12 +69,12 @@ Parallel MCP calls:
 
 From the spec, note:
 
-- `metadata.layoutFile` — **required on every screen spec**. UI structure lives in `docs/screens/layouts/{layoutFile}.json`. Spec `structure.components` / `structure.layout` should be empty (`[]` / `{}`). If they're not, treat that as a spec bug — route back to `jsonui-define` before touching the Layout JSON. See `rules/specification-rules.md` "HARD RULE".
+- `metadata.layoutFile` — **required on every screen spec**. UI structure lives in `docs/screens/layouts/{layoutFile}.json`. Spec `structure.components` / `structure.layout` should be empty (`[]` / `{}`). If they're not, treat that as a spec bug — route back to `jsonui-define` before touching the Layout JSON. See `.claude/jsonui-rules/specification-rules.md` "HARD RULE".
 - `dataFlow.viewModel.methods` / `vars` — these become Protocol members (you do NOT declare them yourself; `jui build` generates the Protocol)
 - `dataFlow.repositories[]` / `useCases[]` — stub methods will be generated; you fill in the bodies
 - `stateManagement.uiVariables` — drive the `data` section in Layout JSON
 - `stateManagement.displayLogic` — drive `visibility` bindings
-- `structure.collection.cell.uiVariables` / `cell.eventHandlers` (when present) — drive the cell Layout JSON's own `data` section. See `rules/specification-rules.md` "Collection Cell: declaring typed data".
+- `structure.collection.cell.uiVariables` / `cell.eventHandlers` (when present) — drive the cell Layout JSON's own `data` section. See `.claude/jsonui-rules/specification-rules.md` "Collection Cell: declaring typed data".
 - `userActions` / `transitions` — navigation targets for the navigation agents
 
 ### 2. Scaffold
@@ -83,10 +85,10 @@ mcp__jui-tools__jui_generate_project with spec_file: "{spec_basename}"
 
 This creates / updates:
 
-- Layout JSON skeleton in `docs/screens/layouts/{name}.json`
+- Layout JSON skeleton in `docs/screens/layouts/{name}.json` — only for a spec that has `structure.components`. With the shape this pack writes (`metadata.layoutFile` set, `structure.components` empty) it writes no Layout JSON, neither the screen's nor a cell's, header's or footer's, and prints `Skipped layout (authored externally): <file>.json`: you write those in step 3.
 - VM stub in each platform's ViewModel directory
 - Repository / UseCase stubs (if present in spec)
-- Does NOT overwrite existing hand-authored content except for `@generated` sections
+- Does NOT overwrite existing hand-authored content except for `@generated` sections. When it does write a Layout JSON (the screen's, a cell's, a header's or a footer's) and one already exists, the existing file is left alone when it is what the spec generates, and kept when it differs: from jsonui-cli 1.9.0 the run says so, as `Kept existing layout: <file> (it differs from what the spec generates; --force replaces it)` (`Kept existing cell layout: …` for a cell). What the spec added since does not reach a kept layout — add it by hand; the closing `jui_verify` names what still differs. `force: true` replaces it with what the spec generates and drops the hand edits, so pass it only when the user asks for that — except when its `data` section holds entries the spec does not declare: then the run names them in an ERROR and keeps the file (add them to the spec's uiVariables through `jsonui-define`, or delete them from the layout's `data`, first). Before 1.9.0 a run rewrites an existing layout (with the same `data` exception) and prints `Created:` for it, and an edit outside its `data` section (a style, a node) is lost — on those versions, do not re-run it over a layout that has been edited.
 
 If the spec is a `screen_parent_spec`, `jui_generate_project` merges sub-specs automatically.
 
@@ -97,9 +99,9 @@ Open `docs/screens/layouts/{name}.json` and refine:
 - Bindings (`@{propertyName}`) matching `stateManagement.uiVariables` and `dataFlow.viewModel.vars`
 - Styling (spec may only suggest styles in prose; you decide concrete values)
 - Platform overrides (`platform: { ios: {...}, android: {...}, web: {...} }`) for attributes that differ per platform
-- Responsive overrides (`responsive: { compact: {...} }`) for screen-size variants
+- Responsive overrides (`responsive: { compact: {...} }`, or window-width conditions `minWidth:N` / `maxWidth:N` from jsonui-cli 1.9.26 — not both in one block) for screen-size variants; one key wins alone (see the jsonui-layout skill)
 - Includes (`"include": "path/to/partial"`) for repeated sections
-- Collection `cellClasses` / `sections` for lists (use `lazy: false` only when the Collection is nested inside an already-scrollable parent — see `rules/specification-rules.md`)
+- Collection `cellClasses` / `sections` for lists (use `"lazy": "none"` only when the Collection is nested inside an already-scrollable parent — see `.claude/jsonui-rules/specification-rules.md`)
 - TabView `view` references for tab screens
 
 Use MCP for authoritative references instead of guessing:
@@ -109,26 +111,18 @@ Use MCP for authoritative references instead of guessing:
 - `get_binding_rules` — `@{...}` syntax rules (two-way vs read-only)
 - `get_modifier_order` — platform-specific modifier order (critical for rendering)
 - `get_platform_mapping` — cross-platform value conversion (e.g. `matchParent` → `"1fr"` on Web)
+- `get_platform_rules` — per-platform styling/visibility: the node-level `platform` directive (e.g. change `fontColor` on iOS only), root `platforms` whitelist, vs `responsive`
+- `search_specs` — keyword search across ALL spec files (including a split screen's sub-specs) to find which spec covers a topic
 
 #### Extracting styles
 
-If you use the same style block 3+ times, extract it to `{styles_directory}/{name}_style.json` (default: `docs/screens/styles/{name}_style.json` — **sibling to `layouts/`**, NOT under it) and reference by name. `jui build` distributes `Styles/` alongside Layouts on every platform. See `rules/file-locations.md`.
+If you use the same style block 3+ times, extract it to `{styles_directory}/{name}_style.json` (default: `docs/screens/styles/{name}_style.json` — **sibling to `layouts/`**, NOT under it) and reference by name. `jui build` distributes `Styles/` alongside Layouts on every platform. See `.claude/jsonui-rules/file-locations.md`.
 
 Invoke `/jsonui-layout` skill for authoring examples when needed; write the JSON yourself with `Edit`.
 
-#### Generating sub-files (collections, partials)
+#### Sub-files (collection cells, partials)
 
-These don't have MCP wrappers yet; use `Bash`:
-
-```bash
-# Create a collection cell layout
-jui g collection {screen}/{CellName}
-
-# Create a partial (includable)
-jui g partial {path/to/partial}
-```
-
-Then edit the generated JSON.
+jui has no command that makes them: `jui g collection` / `jui g partial` do not exist (`jui g` takes project, screen, converter, api and attr-bindings), and `jui_generate_project` writes no Layout JSON for a spec whose `metadata.layoutFile` is set with `structure.components` empty — neither the screen's nor a cell's, header's or footer's. Write a cell's or a partial's Layout JSON by hand in the shared layouts directory (`docs/screens/layouts/`), at the path the referencing `cellClasses` / `cell.layoutFile` / `include` names, as you write the screen's. A layout that no other layout references yet is read by `jui verify` as a screen with no spec: add the reference in the same change, or put `"partial": true` on its root. The platform tools' own `g collection` / `g partial` (`sjui`, `kjui`, `rjui`) write into that platform's directories, not the shared one. On iOS, from jsonui-cli 1.9.6 `jui build` writes the View and the ViewModel a hand-written cell layout needs when no Swift source defines them (`Scaffolded cell <name>: <path>`; never over a file), and warns for a cell it cannot (see step 7); before, such a cell built at warning 0 and the app did not compile.
 
 ### 3.5 Embed nodes in the Layout JSON (cross-screen embedding)
 
@@ -151,7 +145,7 @@ Before authoring:
 
 - Confirm the embedded screen exists via `mcp__jui-tools__list_layouts` (the embedded layout JSON must be on disk) and `mcp__jui-tools__list_screen_specs` (the embedded screen's spec). **You do not modify the embedded screen** — both spec and Layout JSON stay as-is.
 - Make sure every `@{varName}` in `params` is declared in the parent VM's `stateManagement.uiVariables` or `dataFlow.viewModel.vars` (otherwise spec validation rejected the spec earlier — recheck and route back to `jsonui-define` if missed).
-- `navigationMode` in v1 is `"delegate"` only. If the user asked for `"isolated"`, stop and tell them — that's deferred to v1.5.
+- `navigationMode` is `"delegate"` (the default) or `"isolated"`. A spec can declare `"isolated"` from jsonui-cli 1.9.0; an earlier spec validator rejects it — tell the user the version it needs. With `"isolated"`, `jui build` refuses when the embedded screen's spec declares a present-type transition (a sheet or modal): route that to `jsonui-define`. The platform navigation agents wire the private stack, each with the library version it needs.
 
 After `jui build`, the generated screen code includes an `EmbedContainer { ... }` block. **Do not hand-edit the generated EmbedContainer** — it is regenerated. If the embedding is wrong, fix the spec / Layout JSON.
 
@@ -189,7 +183,7 @@ When a Repository method's `returnType` is a swagger schema name (e.g. `User`):
   const dto: UserDto = await response.json();
   return userFromDto(dto);
   ```
-- **Computed properties / proxies live on the Domain** (`Model/{Name}.swift` etc.) — that file is created once by `jui build` and is **user-owned thereafter**. Add your `var displayPrice: String { String(format: "%.2f", dto.price) }` style accessors there.
+- **Computed properties / proxies live on the Domain** (`Model/{Name}.swift` etc.) — that file is created once by `jui build` and is **user-owned thereafter**. Add your `var displayRating: String { String(format: "%.1f", dto.rating) }` style accessors there.
 - **NEVER edit `Model/Generated/{Name}Dto.swift`** (and the Android/Web counterparts under `generated/`) — they regenerate on every `jui build` and your changes will be lost.
 
 Use `mcp__jui-tools__list_api_models` to see the current DTO + Domain inventory; use `mcp__jui-tools__list_api_specs` to confirm which schemas have been authored on the swagger side.
@@ -239,15 +233,43 @@ Read the output:
 
 - 0 warnings + exit 0 → proceed
 - Warnings → fix the root cause and re-run. Never silence warnings.
+- Exit 1 → not done, whatever the warning count. `[ERROR] exit 1: N stage(s) did not complete. Pass --allow-partial to accept a partial tree.` follows a list (`  - <stage>: <message>`) of what a platform build could not do; `ERROR: Build failed for: <platform>` means a platform tool stopped (its own ERROR lines above say why). Fix each at the file it names and re-run; never pass `--allow-partial`. From jsonui-cli 1.9.0 an ERROR a platform build prints and carries on past lands in that list, so a build that exited 0 before can exit 1 — a style a layout names that is not there (`styles: <path> was not found; the layouts using it were drawn without it`), a style file that does not parse (`styles: <file> could not be parsed (…); the layouts using it were drawn without it`; iOS and web used to print `Warning: Style file '<name>' not found` and exit 0), a platform config file that does not parse (`Error parsing config file: …`), an Android `colors.xml` with no root element, a layout refused for what an included file holds (an unparseable `colors.json` already failed the build before).
 
 Common warning sources:
 
 - Unknown attribute on a component → check `lookup_component` for the valid attribute list
+- `Unknown attribute 'child'` on a custom component (1.9.0+) → read its spec first: if `slots.items` is empty, the layout is wrong — remove the children. If the component is meant to take children and only `child` is unknown, an earlier `sjui` / `kjui` / `rjui` wrote its definition: `jui sync_tool`, then `jui g converter --all --skip-existing`. If its own props are unknown as well (the common `id`, `width`, `height` never are), that face has no definition for it: scaffold it (`jui g converter --from <spec>`). With no props set in the layout the two look the same, and `jui sync_tool`, then `jui g converter --all --skip-existing`, covers both. That run prints, for each platform whose scaffolds already exist, `<Name>: every scaffold file already existed and was kept (…); --force overwrites them` (a platform it had to scaffold prints `Scaffolded <Name>: N created, …` instead) — expected: what it fixes is the definition (`Rewrote attribute definition file: …`, or `Created attribute definition file: …` where there was none); do not add `--force`, which discards the scaffolds' hand edits
+- `… takes no children — it is declared a leaf …` (`[error] <file>: …`, 1.9.0+; `jui build` exits 1) → a leaf component is given children. The line is printed for the file that holds the node and, on iOS and Android, again for every layout that includes that file (a partial is listed as `(a partial, drawn by the layouts that include it)`), so edit the file that holds the node (a line for a layout that includes it names the id as that layout draws it — prefixed, through an include with an `id`; look for the unprefixed id in the included file): remove the children, or make the component a container (`slots.items` entries in its spec, then `jui g converter --from <spec> --force`). Never pass `--allow-partial` to get past it
 - Binding path not in `data` section → update Layout JSON `data` or spec `uiVariables`
-- Missing file referenced via `include` / `cellClasses` → generate it (`jui g partial` / `jui g collection`)
-- Platform override structure wrong → see `rules/design-philosophy.md` for `platform` vs `platforms` vs `responsive`
+- `[binding-mixed-text] '<Type>.<attr>' mixes literal text with a binding (…)` (1.9.6+) → compose the string in the ViewModel (a var the screen binds, its text from strings.json) and bind it as one value; do not keep the literal around the binding
+- `'<Type>.<attr>' is the bare name '<h>', but the attribute is declared binding-only: write '@{<h>}'. … (binding-bare-event)` (1.9.6+) → write `@{<h>}`: the generated code called nothing for the bare name
+- `WARNING: <layout>: data property '<name>' is declared as '<A>' and as '<B>'. The Data type keeps the first …` (1.9.6+, every platform) → one data name is declared twice with two types in the screen as its includes expand (an include without an `id` passes its names through as written). Declare it once, or with one type; the same type twice says nothing
+- `'<attr>' is not called on a <Type>: <reason>` (1.9.6+) → `onPan` on a TextField / TextView / Slider, or `onClick` / `onclick` on a Web, is never delivered: remove it (jsonui-layout skill)
+- `Collection cell <ref> is drawn as <View>, which no Swift source defines and the build cannot scaffold (…)` (iOS, 1.9.6+) → from jsonui-cli 1.9.6 sjui's build writes the View and ViewModel of a hand-written cell layout that no Swift source defines (`Scaffolded cell <name>: <path>`, never over a file); this line is a cell it could not (no layout or two layouts give the name, a partial, a refused layout). Fix the layout the line names — before 1.9.6 such a cell built at warning 0 and the app did not compile
+- `ERROR [api-model:<platform>]: [enum-case-names] Enum '<Name>' (<language>): … Name the cases with x-enum-varnames …` (1.9.6+) → the generated case names of an API enum would not compile (two values get one name, an empty name, a leading digit, a symbol): add `x-enum-varnames` to the schema, one name per value in order (jsonui-swagger skill). A negative integer value is named, not stopped: `valueMinus1` (Swift) / `VALUE_MINUS_1` (Kotlin; `VALUE__1` before 1.9.6)
+- Missing file referenced via `include` / `cellClasses` → write its Layout JSON in the shared layouts directory at the path the reference names (see "Sub-files" above — jui has no command that generates one)
+- `ERROR: sjui needs Ruby 3.2 or later (jsonui-cli 1.9.0), and this is Ruby <version> at <path>…` (or kjui / rjui; `jui build` then says `ERROR: Build failed for: <platform>`) → the environment, not the layout: the tool ran on a Ruby older than 3.2. `rbenv: version `<v>' is not installed (set by <platform directory>/.ruby-version)` is the same kind of stop, before the tool starts: `jui sync_tool` pins that exact Ruby there. Tell the user which Ruby the line names and ask them to install exactly that one — the pin names a patch level (3.2.2), and another 3.2 or a 3.3 does not satisfy it (see the Ruby paragraph of `jsonui-platform-setup`); do not work around it
+- `warning: [section-bounder] <file> <function>: depth N / M lines exceeds the bound and has no safe cut (…). The function is emitted oversized.` (iOS, `jui build`) → the SwiftUI generator could not split one generated function, and wrote it whole. It is not a layout defect: do not restructure the layout to silence it — tell the user, quoting the line, and change the layout only if they ask.
+- `[WARN] N file(s) the <language> output replaces were kept:`, `<file> is in the other language and was kept: …`, `N ViewModel(s) of this <language> project are in the other language; …` (web, 1.9.0+) → `rjui.config.json`'s `typescript` changed, and the build replaced the files it had written in the other language; the ones it names are the app's (edited, or not marked as generated), and a ViewModel in the other language keeps its bases and hooks in its own language. Do not delete them to clear the line: tell the user, quoting it — each line says what to move and delete by hand, or to keep.
+- `'<Type>' is drawn by the app in release but not registered for Dynamic — Debug draws …` (Android; iOS: `… but has no Dynamic adapter registered …`), `Dynamic component '<Type>' reads the node's <key> itself, and ModifierBuilder.buildModifier applies it too — … Pass handles = setOf("<key>") to buildModifier.`, `'<Type>''s adapter does not apply the standard modifiers — …` (jsonui-cli 1.9.0+) → Debug (KotlinJsonUI / SwiftJsonUI Dynamic) draws one of the app's own components differently from release. The fix is in the app's Debug code the line names — its Dynamic registry or adapter registration, or that component's Dynamic component or adapter — as the line says, never in the layout. `handles` needs KotlinJsonUI 2.42.0 or later.
+- `Warning: Style file '<name>' not found` → the layout names a style that `styles_directory` does not hold: fix the name or create the style. From jsonui-cli 1.9.0 it is also a stage the build did not complete (`styles: <path> was not found; the layouts using it were drawn without it`, and `jui build` exits 1), on every platform; before, it was a warning with exit 0, and Android drew the node without the style and said nothing. One use prints the warning more than once — one cause, not several
+- Platform override structure wrong → see `.claude/jsonui-rules/design-philosophy.md` for `platform` vs `platforms` vs `responsive`
 - Spec ↔ Impl drift on a method/var signature → spec wins; route to `jsonui-define` to fix spec, then regenerate. Or add `@jui:protocol` marker if the signature should override.
 - `@generated` file was hand-edited → revert it and edit the spec or Impl body instead
+
+An `[info] … operates a control and has no alt` line (1.9.0+)
+is not a warning and does not fail the build, but it names an image that screen
+readers read as an internal name, or as nothing: add an `alt` that says what
+the control does (jsonui-layout skill, *Images: `alt`*). Images that carry
+meaning without operating anything (a logo, a photo) get no message from the
+build — give them an `alt` too; with none they are skipped.
+
+An `[info] … 'contentMode' on Image is bound: …` line (iOS, 1.9.6+; also on
+NetworkImage) is not a warning either. From jsonui-cli 1.9.6 the iOS code
+crops an AspectFill image to its frame (SwiftJsonUI 10.29.2 in Dynamic mode;
+before, it was drawn past the frame), except a `contentMode` bound to a value
+that is AspectFill at run time on a frame whose width and height are not both
+numbers. Write the mode as a literal, or give such an image a numeric frame.
 
 Loop until zero warnings.
 
@@ -264,6 +286,83 @@ If drift is reported:
 
 Do not "fix" one side blindly to match the other. Decide which is correct based on user intent.
 
+**Initial values (1.9.0+).** `jui_verify` also compares each initial value the spec declares with the layout's `data` entry — an externally authored layout too — and prints `**WARNING: N initial value(s) a spec declares that its layout does not carry** (…)` with one line each. In jsonui-cli 1.9.0 the parenthesis says they are reported only and names the release from which `--fail-on-diff` counts them: the run exits 0 over them, but they are drift all the same. Make the two agree as above, and do not report "no drift" while the section is printed.
+
+**Initial values are counted (1.9.1+).** From jsonui-cli 1.9.1, `--fail-on-diff` counts each initial value a screen spec declares — in `stateManagement.uiVariables`, and in a Collection cell's (or header's / footer's) `uiVariables` against that cell's layout — that the layout's `data` does not carry (`… declares no data entry '<name>'`, `… gives it no defaultValue`) or carries with another value (`… has <value>`): the parenthesis says counted by `--fail-on-diff`, and `jui_verify` with `fail_on_diff` fails on them. In 1.9.0 the same WARNING lines were reported only.
+
+- An include's `data` counts under the include id's prefix, the way sjui / kjui name it in the screen's Data type: include id `card` + entry `title` → `cardTitle`; an include without an id passes the names through as written. Such a line ends `(in include '<path>')`. Before jsonui-cli 1.9.6 rjui did not expand an include (the partial's own Data had the unprefixed name, and the partial drew its own defaults), but the check followed the native naming; from 1.9.6 the web screen's Data type is built from the expanded tree too, so the included layout reads the screen's prefixed data on every platform (jsonui-layout skill, *Include Syntax*).
+- Two spellings are not one value. `"[]"` is not `CollectionDataSource()`: sjui emits `= []`, which is not a CollectionDataSource (`jui g project` writes a spec's `Array(X)` as class `[X]`, with `"[]"` when the spec says `"[]"`). A data entry without `defaultValue` starts as nil / null / undefined on all three tools, not as `[]`.
+- Fix a line by making the spec and the layout agree: if the screen draws the value, add the entry to the layout's `data` with the same default; a variable only the view model uses leaves `uiVariables` (it belongs in `dataFlow.viewModel.vars`); a cell's value moves to the cell's `uiVariables`.
+
+### 8.5 Contracts → declared logic is tested (MUST — invariant 5)
+
+Only for logic that has something to assert. A screen whose ViewModel methods
+have no branches, and which introduced no hand-written class, has nothing to
+do here — say that, rather than manufacturing an entry.
+
+**Branches.** For every method whose behaviour depends on a condition, the
+spec must carry the `branchContracts` entry. Missing → route to
+`jsonui-define`; it is spec work, not test work.
+
+Generation itself is `jsonui-test`'s Flow B2 — **delegate it**, the way
+navigation is delegated. It owns the harness wiring, and duplicating the
+generate step here would be a second copy of that flow to keep in step.
+
+**Hand-written classes.** For a mapper / formatter / calculator you wrote,
+the spec declares `unitContracts` and the stubs come from it:
+
+```bash
+jsonui-test generate unit-stubs                 # writes the stub; you write the body
+```
+
+**Then both checks, and read the number:**
+
+```bash
+jsonui-test generate branch-tests --check
+jsonui-test generate unit-stubs   --check
+# exit 0 required
+```
+
+- ⚠️ **`N = 0 case(s) declared` also exits 0.** The checks compare declared
+  against implemented; they do not measure coverage. Coverage of the declared
+  API outcomes is `jsonui-test validate`'s coverage section (a gate from
+  1.9.0): closing it is `jsonui-define` Task 6, running validate is
+  `jsonui-test`; never record or edit a coverage baseline, or pass `--initial`
+  or `--no-coverage-check`, to get a green. Quote the count — a green
+  check over an empty set is the thing this step exists to prevent
+- ⚠️ **From jsonui-cli 1.9.0, `unit-stubs --check` judges
+  (target, case) pairs.** A case name several targets declare needs a test
+  in each target's own place: its class (`<target>ContractTests` on iOS,
+  `<target>ContractTest` on Android), its outermost `describe('<target>')`
+  on web, or its file. Read the lines it prints:
+  - `MISSING` `… (declared for <target>, no test of <target> implements
+    it)` → write that target's test in its place — unless an `UNDECLARED`
+    line names the same case: then move that test there (over the stub
+    `generate` wrote for it, if it wrote one), which clears both;
+  - `MISSING` `… (declared for <targets> with no test of their own; …)` →
+    the tests that exist sit in no target's place: give each target its
+    own;
+  - `UNDECLARED` `… (implemented in <target>'s tests, which does not
+    declare it — another target does)` → if a `MISSING` line names the same
+    case, move the test there; if none does, the declaring target already
+    has its own — delete this copy;
+  - `UNATTRIBUTED` `… (… not checked …)` → it does not by itself fail the
+    check, but those pairs were not checked: move each target's test into
+    its place and run again. The ✅ line below needs no `unattributed` on
+    any platform line.
+  `generate unit-stubs` writes a stub only for the first kind, and only
+  into a new file or one that keeps its `// >>> GENERATED_STUBS_START` …
+  `// <<< GENERATED_STUBS_END` markers (into another file it prints
+  `unchanged … [wrote]` and writes nothing). For the second kind it prints
+  `no stub can be written for N missing case(s) …` and exits 1; for
+  `UNDECLARED` and `UNATTRIBUTED` it prints `no stubs to write — …` and
+  exits 0. So `--check`, not `generate`, is the verdict — write or move
+  those tests yourself.
+- ⚠️ Declared in the SUB-spec. A parent spec drops both blocks, and since
+  1.8.46 `--check` reports PROBLEM instead of losing them quietly
+- The tests must actually run, not merely generate. A stub whose body you did
+  not write is a declared case with no assertion behind it
+
 ### 9. Completion report
 
 ```
@@ -273,6 +372,10 @@ Do not "fix" one side blindly to match the other. Decide which is correct based 
 - ✅ jui build: 0 warnings
 - ✅ jui verify --fail-on-diff: no drift
 - ✅ jsonui-localize: N strings registered (or 0 if none)
+- ✅ VM literal sweep: M literals swept across {files}, all accounted for
+- ✅ branch-tests --check: exit 0, N case(s) declared across M spec file(s)  (or: no conditional method on this screen)
+- ✅ unit-stubs --check: exit 0, N case(s) declared, no `unattributed` on a platform line  (or: no hand-written class added)
+- contracts coverage (from 1.9.0 a gate): as `jsonui-test` last reported it — exit · baselined (matched · new · stale[ · unmeasured now][ · vanished]) — or "not measured yet — route to `jsonui-test` (Flow D) before calling invariant 5 met"
 
 ### Files touched
 - Layout: docs/screens/layouts/{screen}.json
@@ -295,7 +398,7 @@ Do not "fix" one side blindly to match the other. Decide which is correct based 
 
 ## Invariant ownership
 
-You own three of the four:
+You own four of the five:
 
 | Invariant | Responsibility | How |
 |---|---|---|
@@ -303,16 +406,37 @@ You own three of the four:
 | 2. `jui verify --fail-on-diff` | **you** | step 8, after every edit cycle |
 | 3. `@generated` untouched | **you** | never edit them; if drift appears, fix spec or body |
 | 4. `jsonui-localize` ran | **you** | step 6, before the final build |
+| 5. Contracts tested | **you** (implementation) / `jsonui-define` (declaration) | step 8.5 — generate, write the bodies, both `--check` exit 0 · validate's coverage section (from 1.9.0): closed by `jsonui-define` Task 6, run by `jsonui-test` — quote it as they last reported it, never as yours |
 
-Step 7 and step 8 are both mandatory. Do not report the screen done without both.
+Steps 7, 8 and 8.5 are all mandatory. Do not report the screen done without them.
+
+### ⛔ Invariant 4 has no machine backstop on the VM side
+
+Invariants 1–3 are checked by a command that fails. Invariant 4 is only half
+checked: `jui lint-strings` proves **layout** literals resolve, and `--usage`
+compares **key sets**. A display string written straight into VM source
+references no key, so **nothing sees it** — build is clean, verify reports no
+drift, lint is green, and the untranslated text ships.
+
+So for VM/Repository/UseCase source, **the sweep is the gate**. Do not accept
+"localize ran, 0 strings" as a result on its own: ask how many literals were
+swept and in which files. A 0 that came from reading the wrong file looks
+identical to a screen that was already clean, and the four green gates above
+look identical either way too.
+
+The classification rule and the sweep command live in the
+`jsonui-viewmodel-impl` and `jsonui-localize` skills. The short form: **every
+string literal in VM source is display text unless it is a key, a path, an
+identifier, log output, or a word-free format specifier — and when unsure, it
+is display text.**
 
 ---
 
 ## Edit etiquette
 
 - Edit Layout JSON in `docs/screens/layouts/` (the shared directory), never in platform directories (`my-app-ios/my-app/Layouts/` etc.) — `jui build` overwrites those.
-- When you edit a Layout JSON that references another file (include / cellClasses / sections / TabView.view), verify the target exists. If not, generate it (`jui g partial` / `jui g collection`) before committing to the reference.
-- When you add a new platform override, use `platform` (singular, dict) for attribute overrides or `platforms` (plural, array) at the root for file-level whitelisting. They are different mechanisms — see `rules/design-philosophy.md`.
+- When you edit a Layout JSON that references another file (include / cellClasses / sections / TabView.view), verify the target exists. If not, write its Layout JSON in the shared layouts directory (see "Sub-files" — jui has no command that generates one) before committing to the reference.
+- When you add a new platform override, use `platform` (singular, dict) for attribute overrides or `platforms` (plural, array) at the root for file-level whitelisting. They are different mechanisms — see `.claude/jsonui-rules/design-philosophy.md`.
 - When you edit VM method bodies, don't introduce new public methods without going through `jsonui-define` first.
 
 ---
@@ -320,7 +444,7 @@ Step 7 and step 8 are both mandatory. Do not report the screen done without both
 ## Common mistakes
 
 1. **Editing `@generated` files to fix a drift** — always fix the source (spec or body), never the generated output.
-2. **Skipping localize "just this once"** — breaks invariant 4.
+2. **Skipping localize "just this once"** — breaks invariant 4. And on the VM side there is nothing to catch it: no gate reads VM literals, so the screen ships with untranslated text and all five gates green.
 3. **Declaring done with warnings** — all warnings must be 0. Not "low", not "only deprecation warnings". Zero.
 4. **Running platform-specific builds directly** (`sjui build`, `./gradlew`) — use `jui build` via MCP. It distributes layouts + resolves platform overrides + runs the platform build in one step.
 5. **Editing Layout JSON in `my-app-ios/my-app/Layouts/`** — the platform copy gets overwritten. Always edit in shared `docs/screens/layouts/`.

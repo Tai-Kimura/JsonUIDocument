@@ -1,14 +1,21 @@
 ---
 name: jsonui-test
-description: Authors JsonUI test files (screen tests, flow tests) and test documentation. Reads specs + layouts via MCP to know what to assert. Validates test files via the jsonui-test CLI. Does not set up the test environment — that's `jsonui-ground`'s job.
+description: "Authors JsonUI test files (screen tests, flow tests), generates branch tests from a spec's branchContracts, and writes test documentation. Reads specs + layouts via MCP to know what to assert. Validates test files via the `test_validate` MCP tool (always `no_install: true`). Does not set up the test environment — that's `jsonui-ground`'s job."
 tools: >
   Read, Write, Edit, Glob, Grep, Bash,
   mcp__jui-tools__get_project_config,
   mcp__jui-tools__list_screen_specs,
   mcp__jui-tools__list_layouts,
   mcp__jui-tools__read_spec_file,
+  mcp__jui-tools__search_specs,
   mcp__jui-tools__read_layout_file,
-  mcp__jui-tools__doc_generate_html
+  mcp__jui-tools__doc_generate_html,
+  mcp__jui-tools__get_screen_identity,
+  mcp__jui-tools__test_artifacts_pull,
+  mcp__jui-tools__test_artifacts_status,
+  mcp__jui-tools__test_generate_branch_tests,
+  mcp__jui-tools__test_mock_generate,
+  mcp__jui-tools__test_validate
 ---
 
 # Test Agent
@@ -32,8 +39,11 @@ Call `mcp__jui-tools__get_screen_identity` for the canonical rules, and
 - Screens the app owns with no layout are declared in `jui.config.json` under
   `test.appOwnedScreens`. An entry is a bare id, or `{ "id", "group" }` when it
   also needs a transition-diagram group (it has no screen test to declare one in).
-- `jsonui-test validate` INSTALLS tests as a side effect. Pass `--no-install`
-  when you only want to check.
+- Validation goes through the `test_validate` MCP tool, **always with
+  `no_install: true`** — the underlying CLI installs tests as a side effect by
+  default, and authoring-time validation must not consume the files. The Bash
+  form `jsonui-test validate --no-install` is the human/CI fallback, not the
+  agent path.
 
 ## Responsibilities
 
@@ -72,11 +82,22 @@ Which kind of test?
 
 1. **Screen test** — one screen: functionality, rendering, interactions
 2. **Flow test** — multi-screen user journey (e.g. login → home → checkout)
-3. **Test documentation** — add description JSON + HTML docs to existing tests
-4. **Test validation** — check whether existing tests pass the CLI schema
+3. **Branch test** — what a ViewModel method does per branch (which API was
+   called, what state resulted, whether it navigated), generated from the
+   spec's branchContracts
+4. **Unit test stubs** — for the hand-written classes a spec declares in
+   `unitContracts` (mappers, formatters, calculators); the stub is generated,
+   the body is yours
+5. **Test documentation** — add description JSON + HTML docs to existing tests
+6. **Test validation** — check whether existing tests pass the CLI schema
 ```
 
 If the user says something like "write tests for screen X", skip the question.
+
+**Watch for requests that are really branch tests.** "Make sure the 402 shows
+the server's message and does not navigate", "prove the rollback happens when
+the save fails", "check the error branches" — those pin ViewModel behaviour,
+not what is on screen, and a screen test is the wrong instrument for them.
 
 ---
 
@@ -89,6 +110,11 @@ mcp__jui-tools__read_spec_file with file: "{screen}.spec.json"
 mcp__jui-tools__read_layout_file with file: "{screen}.json"
 ```
 
+A large screen may be SPLIT into sub-specs (the parent's `subSpecs` array;
+`list_screen_specs` lists them inline as `screen_sub_spec` rows). When you
+need the part that covers a topic, `mcp__jui-tools__search_specs` with a
+keyword returns the owning file + JSON path directly.
+
 Extract:
 
 - `stateManagement.eventHandlers` → interaction cases to test
@@ -100,7 +126,7 @@ Extract:
 #### Fixture construction for API-backed flows
 
 When the VM method consumes a Domain model derived from a swagger schema
-(e.g. `User`, `Bar`), build the test fixture by constructing the DTO first
+(e.g. `User`, `Product`), build the test fixture by constructing the DTO first
 and wrapping with the Domain factory — the same path the Repository takes
 in production:
 
@@ -151,6 +177,15 @@ For each eventHandler and each key displayLogic state, draft a test case:
 
 Invoke `/jsonui-screen-test` for the canonical schema, action/assertion reference, and examples.
 
+**One cell of a Collection — `within`.** A cell's child has the same id in every cell, so a step on it alone reads the first one on screen. To target the n-th cell's child, look it up inside the cell: `"within": "<collectionId>_item_<n>"` (0-based). Every step that targets an id takes it (tap, input, text, visible, hidden, count, readText, a screenshot's `cropId`, …), and so does a `when` / `while` condition beside its `visible` / `notVisible` / `hidden`:
+
+```jsonc
+{ "assert": "text", "id": "itemTitle", "within": "productList_item_1", "equals": "B" },
+{ "assert": "hidden", "id": "saleBadge", "within": "productList_item_1" }
+```
+
+Do **not** write `index` for "the n-th match": `index` belongs to `tapItem`, `selectTab` and `selectOption` only, and `test_validate` reports it on any other step as an error. Drivers: web 1.18.0 / iOS 2.2.0 / Android 1.20.0 or later.
+
 ### A3. Write the file
 
 ```
@@ -161,17 +196,48 @@ Use `Write` or `Edit` directly.
 
 ### A4. Validate
 
-```bash
-jsonui-test validate tests/screens/{screen}.test.json
+```
+mcp__jui-tools__test_validate with files: ["tests/screens/{screen}.test.json"], no_install: true
 ```
 
 Fix any errors. When the project config declares `mock.swagger` + `mock.mockDir`,
 this gate **also** regenerates `<mockDir>/generated/` if it is stale and fails on
 mock contract drift — so a failure here is not necessarily about the test file.
-Read the output before assuming the test is wrong; `--no-mock-check` isolates the
-test-file half. For the full list of available actions/assertions and their
+Read the output before assuming the test is wrong; `no_mock_check: true` isolates the
+test file from mock drift. From 1.8.119 the result also carries the
+project's contracts-coverage section — the whole project, whatever `files`
+holds; `no_mock_check` does not skip it. From 1.9.0 it can make the
+result FAILED (`Coverage: FAILED` on the summary line). That is not a test-file
+problem: entries not in the baseline, and what cannot be baselined, go to
+`jsonui-define` (Task 6) with the screens validate names; `baselined but closed`
+alone, or with only vanished beside it, means shrink the baseline as in B2.2;
+with any other cause in the same result, route to `jsonui-define` first and
+shrink after it routes back. `baselined but gone from the run` (vanished)
+means the unit left the run — a screen off the platform, or a spec file,
+method, operation or status gone. When the same platform also reports
+`not evaluated` or `screens not evaluated`, fix those first (define) and
+measure again; what is still vanished after that is the user's: tell them —
+removing or re-keying those entries by hand is theirs, and the shrink keeps
+them. `new` on one screen with `vanished` of the same count on another (a
+renamed spec file), or `new` and `vanished` after a rename of a method or an
+operation, is the same debt under a new name, not new debt: stop and tell
+the user before routing anything. `cannot start` — a config problem, or a baseline
+file that cannot be read — is the user's to fix: report it; never edit,
+regenerate or delete the file. The notice's "or record the current ones once"
+is the user's decision, not yours: tell them the command it names
+(`jsonui-test contracts baseline --initial`) and the app's root to run it
+from. Never run it when the file is missing, never pass `--initial`, and never
+skip the section to get a green. For the full list of available actions/assertions and their
 parameters, see the `/jsonui-screen-test` skill's reference or read
 `test_tools/jsonui_test_cli/schema.py` in the jsonui-cli repo.
+
+An `[INFO] … notVisible on '<id>' cannot fail on iOS` line comes only from
+jsonui-cli 1.9.0–1.9.29. From 1.9.30 validate no longer prints it: the iOS
+driver's `notVisible` is the exact negation of `visible`, so a step on a
+decorative image checks what it says on every platform (the
+`/jsonui-screen-test` skill, *A `notVisible` on a decorative image is no
+longer named*). If an older CLI still prints it, update the CLI rather than
+changing the step; do not pass `quiet: true`, which hides INFO lines.
 
 Note: assertions **auto-wait** (poll until the condition holds or `timeout`), so
 don't precede an assertion with `waitFor`. New capabilities available: `when`/`optional`
@@ -185,8 +251,9 @@ iOS xcresult, the Android device, and the web Playwright output into the
 returns absolute file paths — use it when the user asks to see failure evidence.
 Web recording/browser selection is Playwright-native: `use: { video: 'on' }` +
 `projects` in playwright.config, and pass `screenshotDir: testInfo.outputDir` to the
-runner so driver PNGs land next to the video. `jsonui-test artifacts status` shows
-the resolved config; `mock serve --artifacts` auto-pulls after each run target.
+runner so driver PNGs land next to the video. `jsonui-test artifacts status` (or
+the `test_artifacts_status` MCP tool) shows the resolved config and what has
+already been pulled; `mock serve --artifacts` auto-pulls after each run target.
 
 ### A4b. API mocks (only when the screen calls an API)
 
@@ -231,6 +298,14 @@ generated body puts `null` into non-nullable slots and manufactures real
 violations. Only `[BODY]` (required missing / wrong type / bad enum / a field
 the contract does not have) needs action. `strict: true` (or
 `mock.checkOptionalFields`) is the opt-in for teams that do want full coverage.
+
+**A `null` the schema admits is not a violation.** From jsonui-cli 1.9.6 the
+check reads the schema as written before following a `$ref`: `nullable: true`
+— beside a `$ref` too (`{"$ref": "…", "nullable": true}`, OpenAPI 3.0) — a
+`null` type or type member, or a `oneOf` / `anyOf` branch that admits null.
+Before, a null for `$ref` + `nullable` was a `[BODY]` violation. Keep the
+`null` in the mock when the server sends it; do not replace it to satisfy an
+older check.
 
 **`mock serve` also checks the requests the app sends** against the operation's
 `requestBody` and query parameters. Violations do not fail the request — they
@@ -298,8 +373,305 @@ Invoke `/jsonui-flow-test` for the flow schema.
 ```
 tests/flows/{flow}.test.json
 
-jsonui-test validate tests/flows/{flow}.test.json
+mcp__jui-tools__test_validate with files: ["tests/flows/{flow}.test.json"], no_install: true
 ```
+
+A coverage failure in the result is routed as in A4, not fixed in the flow file.
+
+---
+
+## Flow B2: Branch test (generated, not authored)
+
+Branch tests come out of the spec's `branchContracts` decision table. You do
+not write the assertions — you generate them, then make sure the harness the
+project owns is wired and that a green result means something.
+
+### B2.1 Confirm the declaration exists
+
+```
+mcp__jui-tools__read_spec_file with file: "{screen}.spec.json"
+```
+
+No `branchContracts` section → **stop and route to `jsonui-define`**. The
+generator errors on such a screen rather than producing an empty suite, and
+authoring the decision table is spec work. Do not invent one here.
+
+⚠️ **Absence is not an answer any more (invariant 5).** If the screen has
+ViewModel methods whose behaviour depends on a condition, the missing section
+is a gap to close in the spec, not a reason to skip branch tests. Route it
+and say which methods need declaring. The exception is a screen whose methods
+genuinely have no branches — there, no section is the correct state, and it
+is reported as that rather than as "tests skipped".
+
+### B2.2 Generate
+
+```
+mcp__jui-tools__test_generate_branch_tests with screen: "{screen}", platform: "web"
+mcp__jui-tools__test_generate_branch_tests with screen: "{screen}", platform: "android", package: "com.example.app"
+mcp__jui-tools__test_generate_branch_tests with screen: "{screen}", platform: "ios", module: "AppModule"
+```
+
+Generate for the platforms the project actually has. Only the HTTP boundary
+is mocked, so the ViewModel, UseCase, Repository and decoding all run for
+real — which is why these catch "the response arrived but was mapped wrong",
+a class screen tests cannot see.
+
+An error here is usually a declaration that cannot be bound, and the message
+names the fix: a scenario the mock file does not define, an `arg.<name>` the
+method does not declare as a param, a `@response.<path>` absent from the
+scenario body. Those belong back in the spec — route to `jsonui-define`.
+
+Since 1.8.116 a generated test also fails when the method, during its act,
+calls a declared endpoint that none of its rows reaches; the failure names
+the operation. That is a missing `"api.<op>": "called"` in the spec (usually
+a refetch after a save) — route it to `jsonui-define`. Never remove the
+endpoint from `dataFlow` to silence it. With it, name the rows of that method
+that stayed green: they do not make the call, and once `called` lands they
+will allow it — each one that must not make it needs `"api.<op>":
+"not-called"`.
+
+From jsonui-cli 1.9.0 both claims — this bound and a
+row's `"not-called"` — hold over a stated window, and their failures say
+so: `(within the act and until no request was in flight for 400 ms after
+it)`. A call made later than that — more than 400 ms after the last request, with nothing in flight (a longer timer, a pause) — is outside it, so a green says nothing about such a call: on web and iOS any such call, on Android one from a thread, a timer or an IO task (a `viewModelScope` delay runs in the row's virtual time, inside the window). An earlier runtime stopped after a fixed drain and could miss a call made just after the act, so after the upgrade a row that was green can go red: the window now sees a call — usually the method's; an earlier row's view model can make it too where the runtime cannot keep it out — a subscription on web, or any such call where web rows cannot be told apart (Node before 20.16 / 22.3, a browser); a process-wide base URL on Android; on iOS a view model kept alive, every earlier one below 26 and a leaked one (`outlived_its_test`) from 26 (B2.4, *An earlier row's view model*). Once B2.4 has ruled that out, a red on the bound is handled as above, and a red on a row's `"not-called"` is a call the row forbids: fix the ViewModel, or route to `jsonui-define` if the row is wrong. Neither is a timing flake, nor a reason to add waits or to remove the endpoint.
+
+API outcomes that `contracts coverage` reports uncovered are also spec work:
+route them to `jsonui-define` (Task 6: close contract coverage). When define
+routes back after closing, regenerate the branch tests and, if the app has a coverage baseline
+(1.8.119+ — Glob for `contracts_coverage_baseline.json` in the
+`spec_directory` that `mcp__jui-tools__get_project_config` reports; validate's
+`no baseline file` wording is not the check, because it is absent whenever
+the section did not run), run
+`jsonui-test contracts baseline` from the app's root (the directory with its
+`jui.config.json`) to remove the entries that are now closed. It only removes
+what the run measured as answered (for an unmeasured entry: its operation or
+status measured again). It keeps what is only unmeasured now
+(`H unmeasured now — not closed, kept`) and what vanished (`V vanished — not
+closed, kept; remove or re-key them by hand`: the user's to resolve — tell them).
+`new K not added (close them, or add by hand)` means route those K to
+`jsonui-define` Task 6 — adding by hand is the user's option, not yours —
+unless the same line reports `V vanished` of the same count after a rename
+(as in A4): that is the renamed debt; tell the user and route nothing.
+`nothing written` means one of two things. `nothing written — the gate fails
+on these …` names what cannot be baselined: route those to `jsonui-define`
+too, then run it again. `nothing written — recording the first baseline …`
+means there is no file: stop and tell the user — the first recording is
+their decision, and you never pass `--initial`. `cannot start` (for example a
+baseline file a merge conflict left unparsable) means stop and report it.
+Never create the file when it is missing, and never delete, regenerate or
+edit it.
+
+### B2.3 Wire the harness (once per screen)
+
+The generated test + runtime are `@generated`. The **harness** is written
+once as a skeleton and is then the project's: it wires reading and writing VM
+state, invoking the method, expecting transitions, and resolving `@key`
+strings. Fill in its typed switches — and keep them **closed**, failing loudly
+on an unknown name. A lenient default (`?? "open"`) turns a dropped value into
+a passing test of the wrong case.
+
+**Call the method as the spec declares it.** The generated test passes the
+row's `arg.*` values positionally, in the order of the method's declared
+params — the spec, the `jui generate` stub and the test agree on that. A
+ViewModel method that takes one object instead (`start(params: {…})`) has
+drifted from its spec. Report it and route it (the spec's params →
+`jsonui-define`, the ViewModel → `jsonui-implement`); do not absorb it in the
+harness (its `invoke` on Android and iOS, or a wrapper around the ViewModel in
+`createHarness` on web), which would hide the drift from every later reader.
+
+**Harness conditions (once per app, 1.8.118+).** When the app spec
+declares `harnessConditions`, the generator creates one file in the harness
+directory — `branch-conditions.ts` / `BranchConditions.kt` /
+`BranchConditions.swift` — whose `arrangeCondition(name, value)` fails every
+pair (web throws, Kotlin `error()`, Swift `XCTFail`). Replace each pair with
+code that makes the ViewModel observe the condition as production would, and
+keep it closed: an unknown name or value still fails. For a signed-in session on web, replace only the session check
+rather than setting the cookie (the first rule below); if you do set the
+cookie, declare the refresh route and its scenarios.
+
+Two environment rules, both measured on real apps:
+
+- **Web: do not stub the session cookie.** With a session cookie present the
+  app's ApiClient tries a refresh; the screen does not declare the refresh
+  route, the runtime answers it 599, and the ViewModel receives status 0
+  instead of 401. The test stays green because `then` does not look at the
+  error kind — it is now testing an outcome production never has. If a
+  harness must carry a session, declare the refresh route and its scenarios
+  in the spec's `dataFlow` and the mock.
+- **iOS: stop third-party SDKs that make HTTP calls on their own schedule in
+  the test host** (push-token delivery is the common one). Such a call can
+  land inside a test's act window or not, depending on what an earlier run
+  left in the simulator, so the result flips between runs and no row can
+  fix it. Clearing Keychain or UserDefaults is not enough — it only stops
+  the SDK until it delivers again. Under XCTest, do not set the messaging
+  delegate, turn auto-init off and skip APNs registration; turning auto-init
+  off alone still let the delegate fire. This is a change in the app's own
+  launch code, so say so to the implementer — the generator cannot make it.
+
+### B2.4 Prove the tests can fail
+
+Green on first run is not evidence. Break the implementation line the branch
+claims to pin and confirm **that branch, and only that branch, goes red**;
+then restore it. If it stays green, the mutation missed the surface the
+contract observes — mutate deeper (at the mapping stage rather than the
+surface value) rather than concluding the test is fine.
+
+Report which branches you verified this way. Running the tests themselves is
+the user's job (`npm run test:unit`, `./gradlew test`, `xcodebuild test`) —
+same boundary as the runner-based flows above.
+
+**How a generated row waits (1.9.0+).** A generated
+branch test waits for the work, not for a fixed time: once after the
+harness is built and once after the act, each time until no request is in
+flight and none has arrived or been answered for 400 ms. A row whose `when`
+serves an operation its `then` does not mention, or whose `then` says
+`"called"` or reads `.request`, also waits until each such operation has
+been called (not a `--condition-controls` control row, which reads the
+call's absence over the quiet window). So every row takes at least 2 × 400 ms (on web, earlier
+runtimes took tens of milliseconds a row). No spec or row setting tunes
+these waits; the only timing input on the spec side is still a scenario's
+`delayMs` (each applied as at most 30000: a larger value validates without a warning and waits 30000). On Android and iOS a harness that overrides
+`settle()` must call the base one, which holds the 400 ms quiet. Two reds
+come from the wait itself:
+
+- `settle: the row expects <op>, never called within EXPECT_MS (10000 ms)
+  after the act, …` — 10 s after the act: the act never sent that request,
+  the same finding as `route '<op>' declared in when was never hit` (on iOS
+  that line can follow it). A mutation that stops the call goes red this
+  way, 10 s later, not at once.
+- `settle: still busy after N ms — M request(s) in flight …` (Android:
+  `M response(s) still due`) — at 31 s, the budget of one wait (one
+  `delayMs` of at most 30000 and a margin): the work did not settle. Either
+  requests kept being made or answered less than 400 ms apart — after the
+  act, or from the harness's construction (a polling or retry loop) when it
+  is the wait before the act that fails (on web and Android the stack names
+  the row's own `settle` line; on iOS the failure points at the runtime's
+  `settle` for either wait, and a construction that stays busy fails the
+  wait after the act too) — or delayed calls made one after another ended
+  past the budget: the delays of the calls one wait sees add up, and two of
+  16000 already fail it. M is read at the instant the budget ran out and
+  does not tell these apart (the same chain reads 1 or 0 by that instant);
+  work out from the ViewModel which calls the row made and read their
+  scenarios' `delayMs` instead — the red does not list them. No row setting
+  lengthens this wait.
+
+On web, from jsonui-cli 1.9.1, the rows call `settleQuiet()` /
+`settleQuiet({ rec, expect })` — the wait described here, so a red's
+stack names that line — and every failure still starts `settle:`. A
+hand-written test that imports the runtime's `settle()` / `settle(n)`
+gets 1.8.120's wait again — n macrotask turns (10 without a number) and
+the delayed responses, no quiet window, and no loop under a frozen
+`Date` — and calls `settleQuiet` when it wants the rows' quiet wait.
+
+On web each generated row gives vitest its own timeout (`ROW_TIMEOUT_MS`,
+67000 ms), so `Test timed out in 5000ms` on a generated row means an
+earlier jsonui-cli wrote that file. Whoever runs the suite should give the
+command at least 0.8 s a row, plus each scenario's `delayMs`, 10 s for each
+row that fails on an expected operation and 31 s for each busy wait (on iOS
+a view model busy from its construction can fail both waits of a row).
+
+**An earlier row's view model (1.9.0+).** A view model
+can outlive its row — a timer, a task, a thread or an observer holds it —
+and call after its row ended, inside a later row's window. The runtime keeps
+such a call out of the later row where it can, and names it:
+
+- web: a request made from a timer or task that began in an earlier row —
+  usually that row's view model's, but a module-level loop, queue or
+  interval an earlier row started counts as that row's too, even when the
+  later row's own view model asked for the call — is answered 599, not
+  counted in the later row, and named in that row's output after its wait:
+  `earlier_row_call: <N> — <METHOD> <path> from "<earlier row>", …`. A
+  call an earlier view model makes from an event the later row posts (a
+  subscription) runs in the later row and is counted there. Where rows
+  cannot be told apart (Node before 20.16 / 22.3, or a browser) the runtime
+  says so once, `earlier_row_call: rows cannot be told apart here …`, and
+  such calls are counted.
+- Android: a call an earlier row's view model makes to its own ended row's
+  server while the next row runs is answered 599, not counted, and named
+  (by that row, or a later one if it lands after that row's notices)
+  (`earlier_row_call: <N> — …: made by an earlier row's view model after its
+  row ended …`); later than that the server is shut down and the call fails
+  unseen inside the view model. A view model that reads a process-wide base
+  URL sends it to the later row's server instead, where it is counted — have
+  the harness pass the view model the URL its factory is given.
+- iOS 26 and later: a view model still alive when the next test starts is
+  named — `outlived_its_test: the view model of "<earlier row>" is still
+  alive after its test ended — the app's view model leaks: …`. That is a
+  leak in the app (a Task, Timer or observer holding it strongly keeps it
+  past its screen there too) unless the harness itself stores the view model
+  somewhere that outlives the test: check the harness, then report it to the
+  implementer. Its calls are not told apart.
+- iOS below 26: the runtime keeps every earlier test's harness and view
+  model alive (releasing them crashes there), so such a call lands in a
+  later row. It says so once per process, `retained_harnesses: below iOS 26
+  this process keeps every earlier test's harness and view model alive (<N>
+  so far; …)`, and on the absence failures with the note `— below iOS 26
+  the harnesses of <N> earlier test(s) in this process are kept alive …`.
+
+On web and Android, a row that waits for a call an earlier view model made
+instead goes red on EXPECT_MS, and the red says so (`; not counted here,
+<N> call(s) an earlier row's view model …`). Where such a call is still
+counted — a subscription on web, and every such call where web rows cannot
+be told apart; a process-wide base URL on Android; on iOS every earlier view
+model below 26 and a leaked one (`outlived_its_test`) from 26 — it can fail
+a `"not-called"` or the bound, or satisfy a `"called"`, `.request` or `when`
+row the view model under test never made. Before acting on such a red or
+green, check whether an earlier row's view model makes the call (on web,
+also whether the call goes through a loop or queue an earlier row started;
+on iOS, confirm on 26 or later and read `outlived_its_test`); do not change
+the spec for it.
+
+**A green run can still print what you must act on — read it from a run
+that shows it.** A generated test that passes may print notices, never as a
+failure: `unmatched` (a request that `… reached no declared route and was
+answered 599`; follow the fix the line names — declaring the route and its
+scenarios is spec work, route it to `jsonui-define`) and the infos
+`unmatched_foreign`, `condition_without_effect` and, from
+1.9.0, `earlier_row_call` (web and Android),
+`outlived_its_test` (iOS 26 and later) and `retained_harnesses` (iOS below
+26). From jsonui-cli
+1.8.120 the generated runtime writes each as one line,
+`jsonui-test branch test [<screen>.<method> <row title>] <kind>: …`, to the
+test process's own stderr, outside the runner's console capture: on web it
+is on vitest's stderr, shown by the agent, default and json reporters (the
+ones measured); on Android it is on Gradle's stderr, shown on the console
+(the test results XML no longer holds it); on iOS it is on `xcodebuild`'s
+stdout, which carries everything a test process writes. Count them with
+`grep 'jsonui-test branch test \['` over the run's output with stderr
+included (`2>&1`). What still hides them: `xcodebuild -quiet`; on web and
+Android, a pipe that keeps only stdout; and vitest's browser mode, where the
+runtime falls back to the console (read it as an earlier runtime's). A
+runtime generated by an earlier jsonui-cli prints them through the runner's
+console capture, with no `[…]` after the prefix (`jsonui-test branch test:
+…`, `unmatched_foreign: …`, `condition_without_effect: …`), and the runner
+may hide them: on web, vitest's default reporter does when it detects that
+an agent is running it, so read them from
+`npx vitest run --reporter=default`; on Android, Gradle keeps them off its
+console, so read them in the test results XML
+(`build/test-results/<task>/TEST-*.xml`, under `<system-err>` and
+`<system-out>`); on iOS, `xcodebuild` shows them unless `-quiet`. A count
+of 0 from a run that did not show a passing test's output is not a
+measurement: report it as not measured, never as 0.
+
+**After an upgrade, regenerate every screen's branch tests** —
+`jsonui-test generate branch-tests` without a screen does them all, once
+per platform with the flags the project generates with (`-p android
+--package …`, `-p ios --module …`, `--condition-controls`; without `-p` it
+is web). The MCP generator takes one screen per call and cannot pass
+`--condition-controls`. The runtime is one file the screens share, but each
+screen's own test file carries its rows' part, and a screen not
+regenerated still compiles and runs against the new runtime with nothing in
+its output saying the file is stale: from 1.9.0 its rows
+do not wait for their operations and their reds lack the window, it prints
+none of the notices about an earlier row's view model (each screen's own
+file calls them), and a screen generated before 1.8.120
+prints its `unmatched` notices as `jsonui-test branch test [] …`, without
+its row. A screen's file from 1.9.0 names the window in
+every row (`until no request was in flight for`; on web every row also
+ends `}, ROW_TIMEOUT_MS);`). `jsonui-test generate branch-tests --check`,
+per platform with the same flags, is the verdict: it exits 1 and prints
+`[DRIFT]` for the runtime and for each screen's file an earlier jsonui-cli
+wrote.
 
 ---
 
@@ -315,7 +687,7 @@ mcp__jui-tools__doc_generate_html with input_dir: "tests/", output_dir: "tests/h
 
 ## Flow D: Validation only
 
-Run `jsonui-test validate` on the target directory via Bash. Report errors; do not fix them blindly — understand each one. For the schema reference of available actions / assertions, see the `/jsonui-screen-test` skill or `test_tools/jsonui_test_cli/schema.py` in the jsonui-cli repo.
+Call `test_validate` with the target directory in `files` and `no_install: true`. Report errors; do not fix them blindly — understand each one. A coverage failure in the result is routed as in A4, not fixed in the test files. For the schema reference of available actions / assertions, see the `/jsonui-screen-test` skill or `test_tools/jsonui_test_cli/schema.py` in the jsonui-cli repo.
 
 ---
 
@@ -383,7 +755,7 @@ When a screen is intended to run inside an `Embed` slot of a parent screen, the 
 
 Notes:
 - `embeddedIn` value is `{ParentScreen}.{regionId}` (PascalCase parent + camelCase regionId — matches the spec).
-- In v1 `navigationMode: "delegate"`, navigation assertions for the embedded screen target the **parent's** NavController/Router. `pop` / `dismiss` / `navigateBack` are bounded at the embed.
+- With `navigationMode: "delegate"` (the default), navigation assertions for the embedded screen target the **parent's** NavController/Router. `pop` / `dismiss` / `navigateBack` are bounded at the embed.
 - Flow tests do not yet support assertions that cross the embed boundary (v1 limitation). If the user needs an end-to-end flow that involves an embed, write two screen tests (parent + embedded) and assert their states independently, or wait for the flow test schema's `embeddedIn` support (deferred).
 
 ---
@@ -405,10 +777,11 @@ Same rule as `jsonui-define` and `jsonui-implement`: finish the full cycle (draf
 - tests/html/ — (if regenerated)
 
 ### Validation
-- ✅ jsonui-test validate: pass
+- test_validate (no_install: true): Result {PASSED|FAILED}
+- contracts coverage, per platform: exit {X} · baselined {N} (matched {M} · new {K} · stale {S}[ · unmeasured now {H}][ · vanished {V}])  (or the section's one line — not applicable / not run / cannot start / skipped — quoted; none of them is a coverage pass)
 - ⚠ (any warnings noted)
 
-### Coverage
+### Spec tie-in
 - Tied to spec sections: eventHandlers ({count}), displayLogic states ({count}), VM methods ({count})
 
 ### Next
@@ -422,6 +795,6 @@ Same rule as `jsonui-define` and `jsonui-implement`: finish the full cycle (draf
 
 1. **Asserting impl details not in spec** — all assertions must trace to a spec section.
 2. **Referring to a screen test that doesn't exist in a flow test** — verify with `list_screen_specs` + filesystem before writing the flow.
-3. **Skipping `jsonui-test validate`** — the CLI catches schema errors early.
+3. **Skipping `test_validate`** — the validator catches schema errors early.
 4. **Trying to run tests from this agent** — test execution is out of scope; point to platform docs.
 5. **Writing setup code here** — `jsonui-ground` owns test environment setup.

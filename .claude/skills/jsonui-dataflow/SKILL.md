@@ -32,6 +32,226 @@ Agents have been caught shipping specs with empty or missing `dataFlow` on scree
 
 **Pure-static display is the one exception.** Even then, write `viewModel: { methods: [], vars: [] }` explicitly — don't omit `dataFlow`.
 
+### `endpoint` is checked against the API document — spell it the canonical way
+
+`repositories[*].methods[*].endpoint` is `"<VERB> <path>"`, and `doc_validate_spec`
+compares it with the OpenAPI documents under `api_directory`. Copy the path from
+the API document rather than typing what the route "should" be: the check warns on
+a path that appears nowhere, on a verb the document does not declare for that path,
+and on **parameter names that differ** (`/api/venues/{venueId}` against a document
+that says `{venue_id}`). Warnings do not fail validation, but each one is a spec
+that has drifted from the API it claims to call — and the same declaration is what
+`test_generate_branch_tests` binds mock scenarios through, so a drifted spelling
+becomes a hard error the moment anyone generates branch tests.
+
+A non-HTTP verb (`WS`, a realtime-database read, a GraphQL operation) is legal here
+and simply not checked — the OpenAPI documents do not describe those transports.
+
+### `params: "@canonical"` — reference the API document instead of copying it
+
+Once `endpoint` names an operation, the operation already says what the method
+takes. Write the reference rather than the copy:
+
+```jsonc
+{ "name": "getBookmarks",
+  "endpoint": "GET /api/user/bookmarks",
+  "params": "@canonical",
+  "returnType": "BookmarkListResponse" }
+```
+
+`doc_validate_spec` and `jui build` both expand it, from one implementation, to
+the operation's `parameters` plus its JSON request-body properties. A parameter
+the document marks `required` is emitted without `?`.
+
+**Mix the mark with hand-written entries** when the method takes something the
+API never declares — a progress callback, a cancellation token. The mark expands
+where it sits, and a hand-written name wins over a canonical one of the same
+name (including one that differs only in case):
+
+```jsonc
+"params": ["@canonical", { "name": "onProgress", "type": "((Int) -> Void)?" }]
+```
+
+**Rules that matter when you use it:**
+
+- **Omitting `params` is not the mark.** An absent `params` means "no
+  parameters" and always has. Only the written mark asks for resolution.
+- **An unresolvable mark is an ERROR, not an empty list.** If the endpoint
+  names no operation, or names a non-HTTP transport, validation fails rather
+  than generating a method with no arguments.
+- **Naming follows `spec.canonical_param_case` in `jui.config.json`**
+  (`asIs` — the document's own spelling — by default, or `camelCase` /
+  `snake_case`). Set it before converting a project: without it, a canon
+  written in `snake_case` produces `venue_id` where the spec said `venueId`,
+  and those names are argument labels in generated code on three platforms.
+- **パス変数も引数として展開されます。** `in` で絞っていないので
+  `/api/venues/{venue_id}` の `venue_id` はシグネチャに入ります。**つまり正本側の
+  パス変数の改名は、参照している全 spec の生成シグネチャを動かします** —
+  route の照合は綴り差を正規化して吸収するので、**同じ改名が「解決には無影響・
+  展開には影響」**という分かれ方をします。
+- **`requestBody.required` が付いていないと、schema 側の `required: [...]` は
+  生成に効きません**(両者の AND)。body ごと省略できる以上、中身を無条件必須には
+  できないため正しい挙動ですが、理由が症状から遠いので**警告が出ます**。
+- **`returnType` takes `@canonical.wire`, never `@canonical`.** A spec's return
+  type is the domain type and the document's is the wire type, and they
+  legitimately differ (`[ItemSummary]` against `ItemSearchResponse`). Only
+  `@canonical.wire` — "the wire type is what I mean" — lifts it, and it fails
+  when the operation describes its response body inline, because there is then
+  no name to lift.
+
+**When NOT to use it.** Write the value directly when the method deliberately
+says something the document does not: an object argument standing in for a
+group of flat fields, a client-side callback, a domain return type. The mark is
+for the declarations that were copying the document, which is most of them but
+not all — do not force the ones that were saying something.
+
+### `canonicalDivergence` — 直書きが「どう違うか」を宣言する
+
+直書きの `params` は「正本と意図的に違う」の表明そのものなので、**差を一律に警告すると
+意図の表明手段が消えます**(直書きの宣言が全部赤になり、常時赤の検査は読まれなくなる)。要るのは「差があるか」ではなく **「宣言された差と実際の差が一致しているか」**。
+
+```jsonc
+{ "name": "getVenue",
+  "endpoint": "GET /api/venues/{venue_id}",
+  "params": [{ "name": "venueUuid", "type": "String" }],
+  "canonicalDivergence": {
+    "renamed": { "venue_id": "venueUuid" },
+    "reason": "正本は略記。spec・実装とも読みやすさのため揃えている(spec と実装は一致)"
+  } }
+```
+
+- **宣言が検査のスイッチです。**書かなければ従来どおり何も起きません — プロジェクトは
+  1 メソッドずつ採用できます
+- **`reason` 必須。**説明できない差は、たいてい誰も直していない差です
+- **stale 宣言はエラー**(これが本命)。正本が `venueUuid` に改名されたら差が消えるので、
+  それを説明する注記は**「もう対処済み」が対象より長生きする**形になります
+- **差し引きであって免除ではない。**`renamed` で説明しきれない差が残っていればエラー。
+  事故の混入は「もともと違うと分かっているメソッド」に一番よく隠れます
+- **`@canonical` を使うメソッドには書けません**(参照は定義上ずれない)
+
+`contractViolations`(mock)と同型です。
+
+### 語彙 — `renamed` 以外の 3 つ
+
+`renamed` は「同じ引数が別名になっている」しか言えません。手書きの宣言の多くは**この形ではなく**
+(正本の数十のフィールドを 1 オブジェクトにまとめたものなど)、`renamed` だけでは**宣言できません**。
+
+| 句 | 何を言うか |
+|---|---|
+| `omitted` | **呼び手が決めない引数**。プラットフォーム文字列を Repository が定数で送る、など。検査を通すために引数にするのは検査より悪い |
+| `wrapped` | **1 引数が複数をまとめている**。30 引数のメソッドは DTO より悪い契約で、しかも DTO は同じ正本から生成されるので**別経路で追随している** |
+| `added` | **正本が宣言していない引数**。multipart は JSON 展開が空になるので全部これ |
+
+```jsonc
+"canonicalDivergence": {
+  "wrapped": { "request": ["item_uuid", "note"] },
+  "omitted": ["platform"],
+  "added":   ["onProgress"],
+  "reason":  "…"
+}
+```
+
+**⚠️ `omitted` と `wrapped` は、要求する証拠が違います。**
+
+どちらも「差の説明」ですが、**主張の向きが逆**です:
+
+| 句 | 何を主張しているか | 必要な証拠 |
+|---|---|---|
+| `omitted` | **送っていない**(不在) | **呼び出し元を網羅**すれば足りる — ただし下記 |
+| `wrapped` | **この引数が運んでいる**(存在) | **マップ/DTO の構築箇所を読む**必要がある |
+
+**`omitted` の「呼び出し元」は Repository メソッドの呼び出し元だけでは足りません。**
+**同じ endpoint への直叩き(Repository を迂回して ApiService/HTTP client を直接呼ぶ箇所)も
+掃いてください。** spec がフィールドを落とした後も、実装が意図的な bypass で
+そのフィールドを送り続けていることがあります(コメント付きの意図的迂回)。迂回は
+**宣言が拾えない場所にこそ生える**ので、Repository 単位の網羅は「アプリとして
+送っていない」の証拠にならない — grep の対象はメソッド名でなく **endpoint のパス**に。
+
+**`wrapped` を「正本にあって spec に無いフィールド全部」で機械的に埋めてはいけません。**
+「欠けている」と「そのラッパが運ぶ」は違います。運んでいないフィールドを `wrapped` に
+入れると、**実在の欠陥が「意図的な差」として台帳に載り、以後見つけられなくなります**。
+
+よくある誤りです。**「構築箇所を読んで書いたものは正しく、読まずに埋めたものが外れる」**のが典型です。
+運んでいないと分かったフィールドは `omitted` へ移してください。
+
+**「構築箇所」は holder の実体によって違います。**
+
+| holder の実体 | 読むべきもの |
+|---|---|
+| **正本から生成された DTO** | **その型定義**(`*Dto.ts` 等)。生成元が同じなので網羅的で読み違いが起きない |
+| 手書きの型 / 素のマップ | **組み立てているコード**(`buildRequest()` 等) |
+| プリミティブ 1 本(検索文字列など) | **メソッド本体**(内容で送り先を決めている場合がある) |
+
+**grep で確かめないでください。**メソッド本体の grep は**ほとんどが偽陽性**になります
+(DTO をそのまま渡す実装なのでフィールド名が本体に現れない)。逆に、条件付きスプレッドや
+エントリ間のコメント行があると、**「運んでいない」方向に外します**。**どちらの誤りも「それらしい」出力になります。**
+
+**間違える向きは両方あります**:
+
+- 運んでいないものを `wrapped` に載せる → **実在の欠陥が「意図的な差」として台帳に載る**
+- 運んでいるものを外して `omitted` に移す → **実在しない「不在」を台帳に書く**
+
+**どちらもツールでは捕まえられません。**唯一機械化できているのは
+**`wrapped` が body 以外(パス変数・クエリ)を名指ししていないこと**だけです
+(それはエラーになります)。
+
+**台帳を書く前に実装のシグネチャと突き合わせてください。**ツールは「宣言した差が本物か」は
+検査しますが、**「その差が意図なのか欠陥なのか」は検査できません** —— 台帳を書く行為そのものが
+drift を「既知の差」に変換し得ます。
+
+**どの句も `renamed` と同じく正本に照合されます** — 正本がもう宣言していないものを名指し
+していればエラーなので、**注記が対象より長生きしません**。**差し引きであって免除ではない**
+のも同じで、どの句でも説明されない差は報告されます。
+
+### split tree では `extends` でスタブが正本 config を指す
+
+spec と build config が別サブツリーにある構成では、**どの config が答えるかが実行ディレクトリ
+依存**でした(`jui build` はアプリから、`jsonui-doc` はリポ直下から走る)。
+
+**spec の系譜が face を決める**ようになり、系譜上のスタブ config が `extends` で所有者を
+指します:
+
+```jsonc
+// docs/<face>/jui.config.json
+{ "extends": "../../<face>/jui.config.json",
+  "layouts_directory": "screens/layouts" }
+```
+
+**これが無いと、系譜上で最も近い config(たいていリポ直下)が答えます。**
+
+**`jsonui-test` does not follow `extends`.** `jsonui-test generate
+branch-tests`, `contracts coverage` and `generate unit-stubs --check` read
+only the config of the directory they run in (`jui.config.json`, else
+`jsonui-test.config.json`), so run them from the app's config directory (the one that declares `spec_directory`), not
+from the stub. From a stub, `generate branch-tests --spec …` can succeed
+without the rules' side routes (it prints `apiOutcomeRules: none (…)`);
+from 1.9.0, when a row names a side call the screen does
+not declare, it stops with `…; apiOutcomeRules could not be read from here
+(<reason>) — run from the app's config directory, or declare the
+operation` — run it from there, and do not declare the operation.
+
+**Declare `params` on a method whose arguments a contract will pin.** `arg.<name>`
+in `branchContracts` binds to `methods[].params`, and nowhere else:
+`stateManagement.eventHandlers` is View-layer by design and carries no signature,
+so a handler-only method cannot take contracted arguments.
+
+### 共有コンポーネントが呼ぶものは、使っている spec すべてに宣言する
+
+共有ヘッダやパーシャルから呼ぶ Repository / UseCase メソッドは、**そのコンポーネントを
+使っている画面 spec すべてに宣言**します。1 箇所にまとめたり「app レベルだから spec の外」
+にしたりしません。**理由は生成ではなく追跡可能性で、spec を読んで「どこから呼ばれているか」
+が分からない状態を作らないため**です。
+
+コンポーネント spec には `dataFlow` がないので(`props` / `slots` / `structure` /
+`stateManagement` / `usage` のみ)、**コンポーネント自身がメソッドを宣言する手段はありません**。
+使う側が言うしかない、というのがこの規則の構造的な理由でもあります。
+
+**同じメソッドが複数 spec に出ることは正常です。**異常なのは**宣言が食い違うこと**で、
+実装は 1 つなのでどれか 1 つとしか一致し得ません。`jsonui-doc validate spec <dir>`
+(ディレクトリ指定のバッチ実行)が突き合わせて ERROR にします —— **1 ファイルの検証では
+原理的に見えない**ので、ディレクトリで回してください。`platforms` が違う宣言は
+別物として扱われます(`UIImage` / `Bitmap` のような正当な差)。
+
 **Do not guess method / var / repo names from the screen description alone.** They become part of the generated Protocol that every platform must implement, and renaming is a breaking change. If the user didn't volunteer the detail, ASK with the template in `rules/specification-rules.md` → "How to ask the user when they didn't volunteer this info".
 
 ---
@@ -91,7 +311,7 @@ The public contract. Every method and var declared here becomes a Protocol/Inter
 "vars": [
   { "name": "isLoading", "type": "Bool" },
   { "name": "items", "type": "Array(Product)" },
-  { "name": "onDismiss", "type": "() -> Void", "optional": true },
+  { "name": "onDismiss", "type": "() -> Void", "optional": true, "observable": false },
   { "name": "staticLabel", "type": "String", "readOnly": true, "observable": false }
 ]
 ```
@@ -119,12 +339,14 @@ spec: { "name": "fetch", "params": [{"name":"id","type":"String"}], "returnType"
 Var example:
 
 ```
-spec: { "name": "onDismiss", "type": "() -> Void", "optional": true }
+spec: { "name": "onDismiss", "type": "() -> Void", "optional": true, "observable": false }
   iOS Protocol:     var onDismiss: (() -> Void)? { get set }
-  iOS Impl:         @Published var onDismiss: (() -> Void)? = nil
+  iOS Impl:         var onDismiss: (() -> Void)? = nil
   Android Protocol: var onDismiss: (() -> Unit)?
-  Web Base:         public onDismiss?: () => void;   (only when observable: false)
+  Web Base:         public onDismiss?: () => void;   (the Base carries a var only when observable: false)
 ```
+
+A callback is not UI state, so declare it `observable: false`. `observable` defaults to `true` for every type: left at the default, the same var is `@Published var onDismiss` on iOS and `val onDismiss: StateFlow<(() -> Unit)?>` on Android.
 
 ### `// @jui:protocol` marker (escape hatch)
 
@@ -181,6 +403,8 @@ Multi-line signatures use consecutive marker lines:
 |---|---|
 | `endpoint` | single API endpoint the method calls; format `"METHOD /path"` |
 | `endpoints` | array of endpoints (if one method calls multiple); same format |
+| `params` | list of `{name, type}`, or `"@canonical"` / `["@canonical", …]` to take them from the operation `endpoint` names |
+| `returnType` | the domain type, or `"@canonical.wire"` for the schema the operation's success response names |
 
 Both are optional, but declaring them lets the auto-Mermaid diagram draw explicit edges instead of fan-out guesses. See `get_dataflow_linkage_rules` (MCP, Phase 4 future) for rules, or `jui_tools_README.md`.
 

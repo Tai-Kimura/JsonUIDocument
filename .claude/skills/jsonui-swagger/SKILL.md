@@ -117,11 +117,11 @@ FOREIGN KEY constraint is expected in the database.
 
 ## DTO + Domain codegen consequences
 
-API specification files (`docs/api/*.json`) are not just documentation — `jui build` reads them and generates per-platform DTO + Domain Data Model files (see `rules/file-locations.md` § API Specifications + Data Model, `rules/invariants.md` rules 5-8). Author with that in mind:
+API specification files (`docs/api/*.json`) are not just documentation — `jui build` reads them and generates per-platform DTO + Domain Data Model files (see `rules/file-locations.md` § API Specifications + Data Model, `rules/invariants.md` rules 6-9). Author with that in mind:
 
 - **v1 halt constructs** — these will halt `jui build` with an ERROR (not warning). Avoid them or factor them out before `jui build` is invoked:
-  - `anyOf` anywhere (untagged unions — v2 feature)
-  - Schema-level `oneOf` (top-level discriminated envelopes — v2 feature)
+  - `anyOf` anywhere (untagged unions) — **except a null union**: `anyOf` / `oneOf` of exactly one non-null member plus `{"type": "null"}` (either order, e.g. Pydantic's `Optional[X]`) and the 3.1 type array `type: [T, "null"]` are read as that member / `T` with `nullable: true`, on a field, an array `items`, a map's `additionalProperties` or a top-level schema. Prefer the 3.0 spelling (`nullable: true`, or `$ref` + `nullable: true`) when authoring; the null-union forms build the same DTOs
+  - Schema-level `oneOf` (a top-level union envelope) **unless** it has a `discriminator` with a `propertyName`, no `properties` of its own, and only `$ref` variants pointing at top-level schemas that are not themselves unions. With those, it is **supported**: an explicit `discriminator.mapping` is validated (and must agree with a variant's own `const` / `enum` tag), and without one the mapping is inferred from each variant's tag property — every variant must declare it as a `const` string or a single-value string `enum`, with no duplicates; the inferred mapping is printed as a WARNING, so pin it with `mapping`. Android needs `serializer: "kotlinx"` for it (Moshi / none halt)
   - Field-level `oneOf` **without** a sibling `discriminator` + explicit `mapping`
   - `discriminator` block without an accompanying `oneOf` list
   - `$ref` pointing outside the same file (`./other.yaml#/Foo`, URL refs — v2)
@@ -130,10 +130,35 @@ API specification files (`docs/api/*.json`) are not just documentation — `jui 
 - **Field-level `oneOf` with discriminator is supported.** When a property has `oneOf: [...]` + a `discriminator` block with `propertyName` matching a sibling property and explicit `mapping` listing every variant, codegen emits a Swift `enum` / Kotlin `sealed class` / TS discriminated union with `init(from:)` / custom `KSerializer` / `parse{Name}Dto` helpers that dispatch on the sibling tag. Variants must be `$ref` to top-level schemas (inline variants are not supported in v1). Android requires `serializer: "kotlinx"` for this path — Moshi / none modes still halt on oneOf.
 - **Domain wrapper opt-out** — when a schema is "pure transport" with no value in wrapping (e.g. `LoginRequest`), add `x-jui-skip-domain: true` to the schema. Codegen still emits the DTO but skips the Domain scaffold.
 - **Inline enums get auto-derived names** — `{ type: string, enum: [...] }` at the property level is OK; codegen synthesizes a top-level enum named `{ParentSchema}{FieldPascal}` (or set `x-jui-name: CustomName` to override).
+- **Enum case names must compile.** Codegen names each enum value as a Swift / Kotlin case; from jsonui-cli 1.9.6 a negative integer is spelled `minus` (`-1` → Swift `valueMinus1`, Kotlin `VALUE_MINUS_1`; before, Swift named `-1` and `1` alike and the enum did not compile), and an enum whose names would not compile — two values that get one name (`foo_bar` / `fooBar`, `active` / `ACTIVE` in Kotlin), an empty name, a leading digit (`1st`), a symbol (`+`, `a.b`) — stops `jui build` with `ERROR [api-model:<platform>]: [enum-case-names] Enum '<Name>' …`. Give such an enum `x-enum-varnames`: one case name per value, in the order of `enum`.
 - **`description` carries into doc comments** — every `description` you write becomes a Swift `///`, Kotlin `/** */`, or TS JSDoc on the generated DTO field. Lean into that — it's developer documentation, not just HTML doc filler.
 - **`deprecated: true`** — emits `@available(*, deprecated)` / `@Deprecated` / JSDoc `@deprecated` so IDE strikethroughs surface in app code automatically.
 
 After authoring or editing a swagger file, the user can verify the codegen impact with `mcp__jui-tools__preview_api_model_sync` (dry-run, no writes) before running `jui build`.
+
+## Screen specs read these operations directly
+
+A screen spec method that declares `endpoint` may write `"params": "@canonical"`
+instead of restating the operation's arguments, and `"returnType":
+"@canonical.wire"` for the schema its success response names. Both expand from
+the documents you author here, so editing an operation changes every spec that
+references it — which is the point, and which makes two things load-bearing that
+were previously only documentation:
+
+- **`required` on a parameter or a request-body property** decides whether the
+  generated signature is `String` or `String?`. Marking everything optional
+  produces optional arguments in three platforms' generated code.
+- **`nullable: true` is not the same as optional.** `nullable` says the value
+  can be `null`; leaving a property out of `required` says the key can be
+  absent. Declare each only when the API does it: a response field that is
+  always present but may be `null` is both `required` and `nullable`.
+- **A named success-response schema** (`$ref`) is what `@canonical.wire` lifts.
+  An operation whose 200 body is described inline has no name to lift, and a
+  spec asking for it fails validation with that reason.
+
+Renaming a parameter is therefore a change to every spec that references the
+operation. That is visible — `doc_validate_spec` re-expands on the next run —
+but it is not silent-safe: run it after renames rather than assuming.
 
 ## Contract checks (`jsonui-doc check`)
 
@@ -149,6 +174,10 @@ Projects can declare contract checks in `jui.config.json` (top-level
   schema (connection via `JSONUI_CHECK_DB_URL_{NAME}` env var, never in
   config). Type comparison is family-lenient by default; add `x-db-type`
   to a column for exact-match.
+- `builtin:infra-iac`, `builtin:infra-code`, `builtin:infra-load` — the
+  server room's model (`docs/infra`) against the IaC, the code, and its load
+  definitions. Findings are warnings unless the check sets `"gate": true`.
+  These belong to `/jsonui-infra` (run them with `mcp__jui-tools__infra_check`).
 
 `check` is an explicit command that may execute project-declared code —
 it never runs as part of `generate html`. Results are saved as

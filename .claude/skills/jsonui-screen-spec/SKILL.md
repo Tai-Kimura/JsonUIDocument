@@ -161,11 +161,13 @@ Ask: "Are there visibility rules? (e.g., show loading indicator when loading)"
 {
   "condition": "loading",
   "effects": [
-    {"element": "loading_indicator", "state": "visible", "variableName": "loadingVisibility"}
+    {"element": "loadingIndicator", "state": "visible", "variableName": "loadingVisibility"}
   ]
 }
 ```
 If `variableName` is omitted, it auto-generates as `{elementId}Visibility`.
+
+`element` (and `states[].values[].visibleElements`) names the **Layout JSON `id` exactly as the layout writes it** — not a snake_case copy of it. If the layout says `loadingIndicatorView`, write `loadingIndicatorView`. For a node inside an include that has an id, write the resolved id (`hero` + `type_badge` → `heroTypeBadge`), not the included layout's own `type_badge`. `doc_validate_spec` checks it against the resolved layout (1.8.119+ as info, a WARNING from 1.9.0). When the message names layout ids (`the layout has '…'`), they are candidates, not matches: confirm which node the rule means — the one that carries the visibility binding — before changing the spec, and ask the user when there is no candidate. Never delete an effect or a `visibleElements` entry to clear the message.
 
 **⛔ CRITICAL: No Business Logic in UI Variables**
 
@@ -274,7 +276,7 @@ Does this screen host another screen as a region of its layout? If yes:
 - screen to embed (snake_case layout JSON filename, no extension, e.g. 'order_detail'):
 - params to pass (key → parent VM var name or literal value):
 - events to receive from the embedded screen (on[A-Z]... → parent VM method or eventHandler):
-- navigationMode: 'delegate' is v1 default; 'isolated' is deferred to v1.5.
+- navigationMode: 'delegate' (default) or 'isolated' (jsonui-cli 1.9.0+; the embedded screen then declares no present-type transition).
 ```
 
 Then write `structure.embeds[]`. Example shape:
@@ -338,6 +340,256 @@ Files created:
 - {project_directory}/docs/screens/json/{screen_name}.spec.json
 - {project_directory}/docs/screens/html/{screen_name}.html
 ```
+
+## `branchContracts` — declare the branches, get the tests
+
+A spec carries a `branchContracts` section: a decision table per ViewModel
+method, from which `test_generate_branch_tests` generates real unit tests for
+web, Android and iOS **from the one declaration**.
+
+**Required for every method whose behaviour depends on a condition** —
+error handling, validation, optimistic updates, state transitions, a
+`switch`/`when` over a state (invariant 5). Write only branches that can be
+stated as fact.
+
+⛔ **Not required, and not wanted, elsewhere.** A pass-through getter, a
+one-line setter, a method with no branches and nothing to assert gets no
+entry. A `note` saying "no branches" is not a contract: it raises the declared
+count and asserts nothing. If the entry would not make a real test exist,
+leave it out.
+
+```jsonc
+"branchContracts": {
+  "conditions": {                       // named predicates, optional
+    "needsPayment": {
+      "meaning": "an amount is due now",
+      "witness_true":  { "amountDue": 1000 },   // state that makes it hold
+      "witness_false": { "amountDue": 0 }
+    }
+  },
+  "methods": {
+    "onConfirmTap": {
+      "baseline": { "isAgreed": true },  // arranged before every branch
+      "branches": [
+        { "when": { "data.isAgreed": false }, "then": { "api": "none" } },
+        { "when": { "api.createOrder": "declined" },
+          "then": { "data.errorMessage": "@response.error.message" } },
+        { "when": { "cond": "needsPayment" },
+          "then": { "transition": "payment" } },
+        { "note": "3DS polling is out of scope" }   // escape hatch
+      ]
+    }
+  }
+}
+```
+
+**`when`** — `data.<field>` (a declared UI variable / VM var / state),
+`arg.<name>` (**must be a declared param of that method** —
+`stateManagement.eventHandlers` carries no signature), `api.<op>` (the name of
+a mock scenario), `cond` (a named condition, `!` to negate), or
+`harness.<name>` (a precondition outside the ViewModel that the harness sets
+up — see *Harness conditions* below; `cond` is different: its witness sets
+ViewModel state).
+
+**`then`** — a literal, `transition`, `api: "none"` (no declared route was
+called), `api.<op>: "called" | "not-called"`, `api.<op>.request` (partial match
+of what was sent), or one of three `@` references:
+
+| Reference | Means | Resolved by |
+|---|---|---|
+| `@some_strings_key` | text the project's strings table owns | the test harness |
+| `@data.<field>` | the field's value **before** the call | captured at arrange time |
+| `@response.<path>` | the value the server sent in this branch's scenario | read out of the mock at generation time |
+
+**`note`** is the honest escape hatch for a branch that cannot be stated —
+it stays visible and counted in the generated decision table. Prefer a note
+over a contract you are guessing at.
+
+### Answering every declared API outcome (1.8.116+)
+
+`jsonui-test contracts coverage` (MCP: `test_contracts_coverage`) compares the
+statuses each operation declares in the OpenAPI with the rows that serve them, per method × operation ×
+platform. Four declarations close what it reports:
+
+```jsonc
+"branchContracts": {
+  "unreachedOps": {                      // no contracted method calls it
+    "api.prefetchBanner": { "reason": "the parent screen calls it; this VM only reads the result" }
+  },
+  "methods": {
+    "onCancelTap": {
+      "branches": [
+        { "when": { "api.cancelSubscription": "error_500" },
+          "alsoStatuses": { "api.cancelSubscription": ["429", "503"] },   // same then, copied and tested
+          "then": { "data.errorBannerVisibility": "visible" } }
+      ],
+      "excludedOutcomes": {              // last resort — asserts nothing
+        "api.detail": { "403": { "by": "unreachable", "reason": "the PUT just before answers 403 first" } }
+      }
+    }
+  }
+}
+```
+
+- **Write a row first.** A status the ViewModel folds into another outcome
+  (a 404 shown as the empty list) is still a row: `when` serves it, `then`
+  states the folded result.
+- **`alsoStatuses`** says "this row's `then` also holds for these statuses".
+  The generator copies the row once per status and runs it, so it is a
+  tested claim. Keys are the row's own `api.<op>` with a string scenario;
+  values are numeric statuses as strings (no `4XX`, no `default`). If
+  `@response.*` in the `then` cannot be read out of that status's body,
+  generation stops and names the row — the status needs its own row.
+- **`excludedOutcomes`** — `by` is `unit` (a unit case covers it),
+  `unreachable` (this method cannot receive it) or `unexpressible` (only a
+  `note` could state it); `reason` is required. There is no
+  `distinguish: false`: an outcome the VM does not distinguish is a row.
+- **`unreachedOps`** — an operation `dataFlow` declares that no contracted
+  method calls. The generated tests check it: a method that does call it
+  goes red.
+- **`metadata.platforms`** on the spec (`["ios", "android"]`) is the set of
+  platforms the screen exists on; coverage and the generator skip the rest.
+- **Every endpoint a method calls belongs on that method.** An endpoint that
+  appears only in `dataFlow.apiEndpoints` is invisible to the generated
+  tests; coverage reports it `n/a(unbound endpoint)` and exits 3. Put it in
+  the `endpoint` of the repository or use-case method that calls it.
+- **App-wide network effects are not a screen's rows.** Sign-out on a
+  terminal 401, the 426 overlay, refresh — declare them as `unitContracts` in
+  the `app_contracts_spec`. When the network layer itself makes an HTTP call
+  that shows up in a screen's generated test (a logout POST after a terminal
+  401), permit it there with `apiOutcomeRules`:
+  `{ "id", "statuses": ["401"], "sideCalls": ["<operationId>"], "verifiedBy": ["<unit case in this file>"], "reason" }`.
+  `sideCalls` takes operationIds, never `VERB /path`.
+- **A call made with an opt-out flag** (e.g. a request that must not end the
+  session on 401) should state it in its 401 row: `"api.<op>": "not-called"`,
+  where `<op>` is the operationId the `apiOutcomeRules` rule names in
+  `sideCalls` — or, when the screen declares that endpoint itself, the
+  screen's own name for it. Without the row, the rule's permission lets the
+  flag regress silently. From jsonui-cli 1.8.120 the
+  row may name a side call the screen does not declare, but only as
+  `"not-called"`: `"called"`, a `when` scenario and `.request` stop
+  generation, because checking that the call is made is the rule's
+  `verifiedBy` unit case's job. A regressed flag then fails its row as
+  `api.<op>: this row says not-called (within the act and until no request
+  was in flight for 400 ms after it) — called N time(s)` (the parenthesis
+  from jsonui-cli 1.9.0). With a jsonui-cli
+  before 1.8.120 the row is accepted only when the screen declares the operation
+  in `dataFlow` (otherwise validate warns and generation stops); do not
+  declare an endpoint the screen does not call just to write it. There, a
+  regressed flag fails with the bound's message, whose advice to write
+  `"called"` is wrong for this row: keep `"not-called"` and fix the
+  ViewModel.
+  With jsonui-cli 1.8.120, when the spec's nearest `jui.config.json` is a
+  doc-tree stub (`extends` and `layouts_directory`), `jsonui-doc validate
+  spec` does not reach the rules: it warns on each such `"not-called"` row
+  that the operation is not declared, in the same words whether or not a
+  rule names it. Look the op up in the app contracts spec's
+  `apiOutcomeRules[].sideCalls`: if it is there, the warning is false —
+  keep the row. From 1.9.0 validate follows `extends`
+  to the config that owns the spec; when it still cannot read the rules,
+  the warning ends `(the app contracts spec could not be read from here:
+  <reason>, so sideCalls was not checked)` — the row was not checked, not
+  rejected: fix the reason (a config on the chain from the spec, or the app
+  contracts spec itself), not the row, and validate again — if the warning
+  stays without the parenthesis, no rule names the op: the row, or the
+  rule's `sideCalls`, is wrong.
+- **`"api.<op>": "called"` in one row permits that operation in every row
+  of the method** — the generated tests bound a method's calls per method,
+  not per branch. A row where the method must not make that call says
+  `"api.<op>": "not-called"`; a note saying so asserts nothing.
+
+### Harness conditions (1.8.118+)
+
+Some ViewModels call an endpoint only under a precondition the branch harness
+does not have — a signed-in session, a feature flag, the clock. Such an
+operation is `unattributed` in coverage, and neither a row nor an exclusion
+can close it. Declare the precondition once, in the `app_contracts_spec`, and
+name it in the rows that need it:
+
+```jsonc
+// app_contracts_spec
+"harnessConditions": {
+  "session": { "values": ["absent", "present"], "default": "absent",
+               "reason": "the profile is fetched only with a session" }
+}
+// a screen's row
+{ "when": { "harness.session": "present", "api.fetchMe": "error_429" },
+  "then": { "data.profileErrorVisibility": "visible" } }
+```
+
+- Every declared condition is arranged in every generated test of the app,
+  before the harness is built: with the row's value, or `default` when the
+  row does not name it. An app that declares none gets no calls and no file.
+- The app implements the hook once, in its harness directory:
+  `branch-conditions.ts` (`export function arrangeCondition(name, value)`),
+  `BranchConditions.kt`, `BranchConditions.swift`. The generator writes a
+  stub once, when the file is missing, and the stub fails every pair you have
+  not implemented; `generate branch-tests --check` warns while the file is
+  missing.
+- The hook must make the ViewModel observe the condition as production
+  would. Nothing checks this for you. For a session, see the jsonui-test
+  agent's harness rules.
+- An undeclared name, a value outside `values`, or `harness.*` in an app with
+  no `harnessConditions` is a declaration error.
+
+**Scope the claim to what is invariant.** A branch that only holds because
+some unrelated axis (a plan tier, a locale, a clock) happens to have one
+value pins that axis too, and goes red later for a reason that is not a
+regression. If you cannot say "this holds however that other thing changes",
+declare the weaker fact that does.
+
+`doc_validate_spec` lints the whole vocabulary — unknown keys, ghost
+conditions, unbindable arguments, and witnesses nothing gates on are errors
+or warnings there, before anyone generates a test.
+
+## `unitContracts` — the hand-written logic no generator produces
+
+Where `branchContracts` covers ViewModel methods, `unitContracts` declares the
+classes a human wrote: mappers, formatters, calculators, handlers.
+
+```jsonc
+"unitContracts": {
+  "target": "PriceCalculator",              // the class under test
+  "cases": [
+    { "name": "appliesMemberDiscount",      // the test's NAME — detection is by name
+      "intent": "a member price is 10% under list",
+      "platforms": ["ios", "android", "web"] }   // omit = every platform
+  ]
+}
+```
+
+An object, or an array of them. `doc_validate_spec` lints the shape.
+
+An `intent` longer than a line or two — the rule, the platforms, the state
+before the fix — goes in the spec's texts file as Markdown (jsonui-cli
+1.9.3+): `"intent": { "md": "cases.price_calculator.applies_member_discount" }`
+with the text under that key in `<name>.texts.yaml`. See "Long prose: texts
+files" in `rules/specification-rules.md`.
+
+- **`name` is the contract.** Implementation is detected by matching it:
+  iOS `func test_<name>(` inside an `XCTestCase`, Android `@Test fun
+  <name>(`, web `it("<name>")` / `test("<name>")`. Renaming a test
+  un-implements the case. From
+  jsonui-cli 1.9.0 a name several `target`s declare is one case per
+  target: each needs its own test, in the class, describe or file
+  `generate unit-stubs` writes for that target
+- `jsonui-test generate unit-stubs` writes the stub in each platform's
+  convention; the body is the implementer's. It needs
+  `platforms.<p>.unitTestsDir` in `jui.config.json`
+- `--check` compares the declared set against implemented names (from
+  1.9.0, (target, case) pairs) and exits non-zero on a
+  mismatch; tests of a name several targets declare that no target's
+  class, describe or file places are reported `unattributed` — not
+  checked, and they do not by themselves fail it
+
+⛔ **Same restraint as `branchContracts`.** Declare a case because a real test
+should exist, not to raise a count. `--check` measures declared-vs-implemented
+agreement — **nothing computes a coverage percentage** — so a project
+declaring nothing exits 0 exactly like one declaring everything.
+
+⚠️ **Declare in the sub-spec, never a parent spec.** `screen_parent_spec`
+merging discards both contract blocks; since 1.8.46 `--check` reports PROBLEM
+and exits non-zero rather than losing them silently.
 
 ## Important Rules
 

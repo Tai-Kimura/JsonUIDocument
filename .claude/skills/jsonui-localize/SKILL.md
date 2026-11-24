@@ -86,11 +86,23 @@ Rules (enforced by build validation — violations fail the build):
 2. Identify all user-visible text strings:
    - `"text"` attributes with literal values (not bindings `@{...}`)
    - `"hint"` / `"placeholder"` attributes
-   - `"alt"` attributes on Image/NetworkImage (web; screen-reader text — resolves
-     strings.json keys like text/hint; decorative images should use `"alt": ""`).
+   - `"alt"` attributes on Image/NetworkImage (screen-reader text — in SwiftUI,
+     Compose and web layouts from jsonui-cli 1.9.0, web only
+     before; resolves
+     strings.json keys like text/hint, and from that version a literal alt is
+     reported by `jui lint-strings` and extracted like text; `"alt": ""` marks
+     a decorative image, which is also what an image with no alt is, unless it
+     operates something).
      Never register Image `"src"` / `"srcName"` values — image sources are not
      user-visible text, and a src that collides with a strings key breaks the image
    - `"title"` attributes
+   - On a custom component, a literal String prop named `text`, `hint`,
+     `placeholder`, `label`, `prompt`, `alt` or `accessibilityLabel`: from
+     jsonui-cli 1.9.6 these names are `jui lint-strings`' vocabulary
+     (`accessibilityLabel` added), and a converter scaffolded by 1.9.6 looks
+     such a literal up as a key on iOS and Android. Any other prop (`variant`)
+     stays a literal — do not register it (jsonui-layout skill, *Custom
+     Components*, for a converter scaffolded earlier)
    - Segment `"items"` arrays
    - ConfirmationDialog `"title"` values
    - Any other hardcoded user-facing strings
@@ -100,19 +112,54 @@ Rules (enforced by build validation — violations fail the build):
    - Color names, font names
    - Numeric values
 
-### Phase 2: Scan ViewModel
+### Phase 2: Scan ViewModel (the part no gate can do for you)
 
-1. Read the ViewModel file for the screen
-2. Identify hardcoded strings that should be localized:
-   - Error messages
-   - Alert titles/messages
-   - Status labels set in code
-   - Format strings
-   - Any user-visible string literal
-3. Skip:
-   - API endpoints, parameter keys
-   - Log messages
-   - Internal state values
+**This phase is the only check that exists for VM-side literals.** The layout
+surface is machine-checked by `jui lint-strings`; `--usage` compares key sets.
+A display string written directly into VM source references no key, so it is
+invisible to both — every gate goes green and the untranslated text ships.
+Skipping or skimming this phase is not "a lighter run", it is the whole check.
+
+1. Read every VM/Repository/UseCase file the screen touches — **not just the
+   file named after the screen**. Text is routinely assigned in a repository's
+   error mapping.
+2. Sweep mechanically rather than by eye:
+
+   ```bash
+   grep -nE '"[^"]*[^\x00-\x7F][^"]*"|"[A-Za-z][^"]{3,}"' <file>
+   ```
+
+3. Classify **every** hit. A literal is display text unless it is one of the
+   closed list below; **when unsure, it is display text.** (A wrongly-localized
+   internal string costs one redundant key; a wrongly-inlined display string
+   ships untranslated with nothing reporting it.)
+
+   **Allowed non-display literals** — dictionary/JSON keys and param names;
+   API paths and URLs; enum raw values, state identifiers, screen ids; log and
+   debug output that is never rendered; format specifiers and word-free
+   separators (`"%.2f"`, `", "`); and key strings being passed *to* the
+   resolver.
+
+   **And one exception in the other direction:** text that is displayed but
+   must NOT follow the active language — a language switcher whose options
+   each render in their own language (`["日本語", "English"]`), proper nouns,
+   brand names. **Localizing these is the bug.** Leave them, and add a comment
+   saying why: "deliberately not localized" and "nobody noticed" look identical
+   in source, and the next sweep has to tell them apart.
+
+4. These are display text and are the ones actually missed, because they get
+   written while thinking about something else:
+   - **Error and validation messages**
+   - **Empty-state and placeholder text**
+   - **Alert/dialog titles, bodies, and button labels** — including `"OK"` / `"キャンセル"`
+   - **Status and result labels assigned in code**
+   - **Units and suffixes concatenated onto numbers** (`"\(count)件"`, `"円"`)
+   - **Accessibility labels and hints**
+   - **Words produced by a `switch`/`when` over a state**
+
+5. Report the count of literals you swept and the count you localized. "0
+   found" is a measurement — say how many you looked at, so a scan that read
+   the wrong file is distinguishable from a screen that was already clean.
 
 ### Phase 3: Register in strings.json
 
@@ -165,6 +212,36 @@ viewModel.updateData(mapOf("errorMessage" to context.getString(R.string.screen_n
 1. Run build: `{tools_directory}/bin/{cli} build`
 2. Verify no warnings about missing strings
 3. Verify all string references resolve correctly
+4. **The completion gate is `jui lint-strings` — exit 0 required.** It
+   machine-checks the layout surface (raw literals that don't resolve via
+   `strings.json`); this skill is the repair tool for its findings.
+   Intentional non-localized literals go in `.jui-strings-allowlist.json`
+   with a reason (see `rules/invariants.md` invariant 4).
+5. **`jui lint-strings --usage` additionally checks the VM surface**, and is
+   worth running on any screen this skill touched. It reads references on
+   every declared platform — web `StringManager` props, iOS
+   `StringManager` accessors / `"key".localized()` / `NSLocalizedString` /
+   `String(localized:)`, Android `R.string` — plus a spec's
+   `branchContracts` `@key` expectations, and reports three directions:
+
+   | Finding | Meaning |
+   |---|---|
+   | `missing-key` | a reference resolving in neither `strings.json` nor the platform's own catalogs (`Localizable.strings` / `.xcstrings` / `.stringsdict`) — **the raw key reaches the screen** |
+   | `unused-key` | a table entry no face's app code references — from 1.8.119, a key that only test code reads is unused too (a test may still read it: removing the key makes that test's reference a `missing-key`, so update the test with it) |
+   | `dynamic-ref` | a lookup whose key is not a literal and whose statement names no `*_STRING_KEYS` map — the closure that makes the other two trustworthy |
+
+   From 1.8.119, test code is scanned but does not count as usage:
+   iOS test targets (from `project.pbxproj`), Android test source sets
+   (`src/test*`, `src/androidTest*`, `src/testFixtures*`) and web
+   `*.test.*` / `*.spec.*` / `__tests__/`. Generated branch harnesses still
+   count. A test directory those rules miss is added per face with
+   `lint.stringsUsageTestPaths` (for example `{"web": ["tests"]}`), and
+   every run prints `usage scanned N source file(s), excluded M as test code`.
+
+   It is opt-in per run (or per project via `lint.stringsUsage`). What it
+   does **not** see is a literal that was never routed through the table at
+   all — a hardcoded display string in VM source is still this skill's
+   territory to find by reading.
 
 ## Platform-Specific String Resolution
 

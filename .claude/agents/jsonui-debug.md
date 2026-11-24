@@ -8,6 +8,8 @@ tools: >
   mcp__jui-tools__list_layouts,
   mcp__jui-tools__list_component_specs,
   mcp__jui-tools__read_spec_file,
+  mcp__jui-tools__search_specs,
+  mcp__jui-tools__get_platform_rules,
   mcp__jui-tools__read_layout_file,
   mcp__jui-tools__jui_verify,
   mcp__jui-tools__jui_build,
@@ -18,7 +20,10 @@ tools: >
   mcp__jui-tools__get_platform_mapping,
   mcp__jui-tools__list_api_specs,
   mcp__jui-tools__list_api_models,
-  mcp__jui-tools__preview_api_model_sync
+  mcp__jui-tools__preview_api_model_sync,
+  mcp__jui-tools__infra_validate,
+  mcp__jui-tools__infra_load_validate,
+  mcp__jui-tools__infra_cost
 ---
 
 # Debug Agent
@@ -49,7 +54,7 @@ C. **Code archaeology** — change history, intent, blame
 
 If the user has already described a symptom concretely ("the login button does nothing when tapped"), skip the question and go straight to **Mode A: Bug trace**.
 
-If they asked a general question ("how does item search work?"), go to **Mode B: Behavior trace**.
+If they asked a general question ("how does product search work?"), go to **Mode B: Behavior trace**.
 
 ---
 
@@ -76,10 +81,14 @@ Map the user's description to a spec section:
 | API error / wrong response | swagger → DTO → Domain → Repository → VM trace (§A3.1) |
 | Navigation stuck / wrong back behavior | `userActions` / `transitions` — also check Navigation code outside the spec |
 | Crash | above + type alignment in `.jsonui-type-map.json` |
-| Embedded screen does not see parent VM data | `structure.embeds[].params` — embeds receive only what is explicitly passed. Expected per design (`rules/design-philosophy.md` "VM isolation across embedded screens"); not a bug. |
+| Embedded screen does not see parent VM data | `structure.embeds[].params` — embeds receive only what is explicitly passed. Expected per design (`.claude/jsonui-rules/design-philosophy.md` "VM isolation across embedded screens"); not a bug. |
 | Same screen embedded twice shares state | Layout JSON `Embed.id` uniqueness + Android `EmbedContainer.remember(id)` — id collision causes shared VM. Confirm IDs are unique within the parent layout. |
-| Embed child navigate() does the wrong thing | `Embed.navigationMode` in v1 is `delegate` only — child `navigate` drives parent NavController/Router. `pop` / `dismiss` / `navigateBack` are bounded at the embed (do not close it). |
+| Embed child navigate() does the wrong thing | Read `Embed.navigationMode`. `delegate` (the default): child `navigate` drives the parent NavController/Router. `isolated`: the embed owns a private stack and a push stays inside it (a spec can declare it from jsonui-cli 1.9.0; a Layout JSON Embed could before). `pop` / `dismiss` / `navigateBack` are bounded at the embed (do not close it). |
 | Embed event handler not firing on parent | `structure.embeds[].events` mapping → confirm parent VM has the named method or eventHandler. Validator catches this at spec time; runtime miss usually means lib `emit(name, payload)` was called with a name not in the map. |
+| Generated code does not compile after a jsonui-cli upgrade (a JsonUI name it cannot find, or an argument it does not take) | **spec-external** — the app's SwiftJsonUI / KotlinJsonUI is older than the generated code needs: see "The libraries move with the CLI" in `.claude/jsonui-rules/invariants.md`. Never edit the generated file. |
+| `jui viz`'s server room does not open, or a node / edge / flow is missing from it | `mcp__jui-tools__infra_validate`: `readable: false` gives the reason (no model files, bad `jui.config.json`, a file too large); a file with an error is left out whole; a flow with an error is left out (its `flow.*` problem names the rule). The model is `docs/infra/*.json` — route fixes to **jsonui-define** (Task 7). |
+| `jui viz`'s 移管 (a migration plan) does not play, stops part way or ends in the wrong shape, or its cost difference looks wrong | `mcp__jui-tools__infra_validate` with `plan: "<name>"`: the plan's problems under `migrations` (`migration.remove_missing`, `duplicate`, `both`, `order_unknown`, `edge_end`, and the infra checks on the merged new model) and its `steps` in play order. Then `mcp__jui-tools__infra_cost` with `plan`: old / new / difference per node and after each step (a step's difference is the whole month's change at that step — its `moved` says which nodes or lines moved; a node's own change is its per-node row), and `unpricedChanged` (changed nodes the difference leaves out: no price, rule or load). A replaced node keeps its edges unless the plan names them. Route fixes to **jsonui-define** (Task 7). |
+| The server room's cost is missing or looks wrong | `mcp__jui-tools__infra_load_validate` (a load file with an error is left out; `load.overlap`: only one row per node counts), then `mcp__jui-tools__infra_cost`: `noPrice`, `noRule`, `loadUndefined`, `priceWarnings` (`prices.free_dropped`), `notes` (`cost.free_per_scenario`: free amounts are taken per environment). Amounts are USD on demand over the month's real hours. Route fixes to **jsonui-define** (Task 7). |
 | Symptom not in the spec (infra, runtime race, memory) | **spec-external** — confirm there's no spec ↔ impl drift first, then go to impl |
 
 If the symptom doesn't fit cleanly, pick the closest and note the assumption in the report.
@@ -228,6 +237,8 @@ When the user's investigation involves "what does this Layout attribute do?" or 
 - `mcp__jui-tools__lookup_attribute` with the attribute name
 - `mcp__jui-tools__search_components` for keyword search
 - `mcp__jui-tools__get_platform_mapping` for cross-platform value conversion
+- `mcp__jui-tools__get_platform_rules` for per-platform overrides (node `platform` directive) when a symptom is platform-specific
+- `mcp__jui-tools__search_specs` to locate which spec (or sub-spec of a split screen) owns a topic
 
 Quote the relevant parts in the report.
 
@@ -247,12 +258,12 @@ Quote the relevant parts in the report.
 
 After the report, you will usually recommend one of:
 
-| Fix location | Agent to route to (transitional; Phase 3) |
+| Fix location | Agent to route to |
 |---|---|
-| spec | `jsonui-spec` → (future: `jsonui-define`) |
-| Layout JSON / Styles | `jsonui-screen-impl` → (future: `jsonui-implement`) |
-| VM method body, Repository/UseCase body | `jsonui-screen-impl` or `jsonui-modify` → (future: `jsonui-implement`) |
-| Navigation (spec-external) | Platform-specific (`jsonui-screen-impl` for now → future: `jsonui-navigation-{ios,android,web}`) |
-| spec + impl together | `jsonui-modify` (existing) |
+| spec | `jsonui-define` |
+| Layout JSON / Styles | `jsonui-implement` |
+| VM method body, Repository/UseCase body | `jsonui-implement` |
+| Navigation (spec-external) | `jsonui-navigation-{ios,android,web}` |
+| spec + impl together | `jsonui-define` (spec first), then `jsonui-implement` |
 
 Do not launch the fix agent yourself. Tell the user which one to launch next.

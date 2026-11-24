@@ -121,24 +121,25 @@ This pattern allows easy mocking in unit tests by injecting a mock implementatio
 
 ---
 
-## Mandatory Build with --clean Before Starting
+## Mandatory Clean Build Before Starting
 
-**CRITICAL**: Before starting ANY work, you MUST run `jui build` to ensure layouts are distributed, then platform build with `--clean`:
+**CRITICAL**: Before starting ANY work, you MUST run a clean `jui build` (via MCP: `jui_build`) so the shared layouts are distributed and every platform is rebuilt from them:
 
 ```bash
-# Distribute layouts from shared directory + build all platforms
-jui build
-
-# Then platform-specific clean build if needed:
-./sjui_tools/bin/sjui build --clean   # iOS
-./kjui_tools/bin/kjui build --clean   # Android
+# Distribute layouts / styles / resources from the shared directory,
+# sync the ViewModel Protocol/Base files, and build ALL active platforms
+jui build --clean
 ```
+
+Do **not** run the platform tools directly (`./sjui_tools/bin/sjui build`, `./kjui_tools/bin/kjui build`, `./gradlew`). `jui build` already runs them, and the direct path skips the layout distribution — the platform copy under `Layouts/` may then be stale. Until jsonui-cli 1.8.45 a second direct run on an unchanged tree also skipped validation entirely (the build cache silenced `--strict` and the `[error]` refusal), so a direct invocation could report a clean build for a tree the orchestrated build refuses.
 
 This ensures all auto-generated Data models are up-to-date.
 
 ---
 
 ## ViewModel Patterns
+
+**A method or var the spec declares in `dataFlow.viewModel` is a member of the generated Protocol / Interface — keep its visibility.** Kotlin: never `private`, `protected` or `internal` on the member (`jui build` adds `override`). A method is `fun X(…)`. A var takes the form the protocol declares: a `readOnly` one is `val X`, observable or not (or `var X` with `private set` — Kotlin prohibits a private setter on an open property, so this holds in the generated class, which is final; in an open class it is `final override var X`); a settable one is `val X: StateFlow<…>` over a private `MutableStateFlow` when observable (the default), and `var X` with `observable: false`. Swift: `func` / `var`, never `private` or `fileprivate` (a readOnly var may be `private(set) var`). A narrowed one does not satisfy the protocol, and the build fails. Only helpers the spec does not declare (`validateInput()` below) stay private.
 
 ### Swift (SwiftUI)
 
@@ -155,6 +156,80 @@ This ensures all auto-generated Data models are up-to-date.
 ## StringManager & ColorManager Usage (MANDATORY)
 
 **CRITICAL**: NEVER hardcode strings or colors. Always use StringManager and ColorManager.
+
+### ⛔ No machine check will catch this for you
+
+`jui lint-strings` proves that literals **in the layout** resolve. `--usage`
+compares the **key sets** between `strings.json` and the code that references
+keys. A display string you wrote directly into VM source **references no key
+at all**, so neither check can see it: the gates go green, the build is clean,
+`jui verify` reports no drift, and the untranslated text ships.
+
+**You are the only check.** That is why the rule below is a mechanical sweep
+rather than a principle to keep in mind.
+
+### The rule, in the form you can actually apply
+
+Deciding "is this user-visible?" per literal while you are writing logic is
+what fails — an error message does not feel like UI text when you are writing
+error handling. So do not decide that. Decide the opposite question, which has
+a closed answer:
+
+**Every string literal in VM source is display text UNLESS it is one of:**
+
+| Allowed non-display literal | Example |
+|---|---|
+| Dictionary / JSON keys, param names | `params["orderId"]`, `"Content-Type"` |
+| API paths, URLs, scheme names | `"/api/orders"` |
+| Enum raw values, state identifiers, screen ids | `case pending = "pending"` |
+| Log / debug output (never rendered) | `logger.debug("fetch failed: \(error)")` |
+| Format specifiers and separators with no words | `"%.2f"`, `", "`, `"-"` |
+| Resource key strings being passed TO the resolver | `StringManager.get("login_title")` |
+
+**Anything else goes through StringManager / R.string / getString. When you
+are unsure, it is display text** — a wrongly-localized internal string costs
+one redundant key; a wrongly-inlined display string ships untranslated and no
+gate reports it.
+
+**One exception, and state it in a comment when you use it:** text that is
+displayed but must NOT follow the active language — a language switcher whose
+options each render in their own language (`["日本語", "English"]`), a proper
+noun, a brand name. Localizing these is the bug. They are display text that is
+deliberately not localized, which is a different thing from a literal nobody
+noticed, and the comment is what tells the next reader which one it is.
+
+### Literals that keep slipping through
+
+These are display text. They are missed because they are written while you are
+thinking about something else:
+
+- **Error and validation messages** — `"通信に失敗しました"`, `"Invalid email"`
+- **Empty-state and placeholder text** — `"データがありません"`
+- **Alert/dialog titles, bodies, and button labels** — including `"OK"`, `"キャンセル"`
+- **Status and result labels assigned in code** — `status = "承認待ち"`
+- **Units and suffixes concatenated onto numbers** — `"\(count)件"`, `"円"`
+- **Accessibility labels and hints**
+- **Text inside a `switch`/`when` that maps a state to words**
+
+### Required sweep before you report done
+
+Not "review your work" — list every literal and account for each one:
+
+```bash
+# Swift
+grep -nE '"[^"]*[^\x00-\x7F][^"]*"|"[A-Za-z][^"]{3,}"' <ViewModel>.swift
+# Kotlin
+grep -nE '"[^"]*[^\x00-\x7F][^"]*"|"[A-Za-z][^"]{3,}"' <ViewModel>.kt
+```
+
+For **every** hit, name which allowed category it falls in, or localize it.
+A hit you cannot place in the table is display text. If you touched several
+VM/Repository/UseCase files, sweep all of them — the rule is about the file
+you wrote, not about the screen.
+
+**Do not report the ViewModel complete with an unaccounted literal.** Hand any
+strings you localized to `/jsonui-localize` so they are registered with all
+declared languages.
 
 ### Resource File Locations
 
@@ -253,7 +328,10 @@ data.productItems = CollectionDataSource(section = Section(cellData = items))
 ## Important Rules
 
 1. **NEVER put business logic in View** - Move all logic to ViewModel
-2. **NEVER hardcode strings** - Use StringManager
+2. **NEVER hardcode strings** - Use StringManager. **No gate catches a violation**
+   (a literal never routed through the table references no key, so `lint-strings`
+   and `--usage` are both blind to it). Run the sweep in "StringManager &
+   ColorManager Usage" and account for every literal before reporting done.
 3. **NEVER hardcode colors** - Use ColorManager
 4. **ALWAYS handle loading states** - Show UI during async operations
 5. **ALWAYS handle errors gracefully** - Show user-friendly messages
@@ -262,6 +340,8 @@ data.productItems = CollectionDataSource(section = Section(cellData = items))
 8. **FOLLOW platform conventions** - Use idiomatic patterns
 9. **NEVER modify code inside tools directories** (`sjui_tools/`, `kjui_tools/`, `rjui_tools/`)
 10. **NEVER edit GENERATED_CODE sections** (Kotlin only) - Code between `// >>> GENERATED_CODE_START` and `// >>> GENERATED_CODE_END` is auto-generated
+11. **A var bound to an enum attribute holds one of the spellings the attribute declares, case and all** (1.9.0+) - the generated code looks the value up as written. A word the attribute does not declare (another case, or a word declared nowhere) is not one it has to read, and can draw the default — nothing warns, since the build cannot see what the var will hold. Look the spellings up with `lookup_attribute`. (Before jsonui-cli 1.9.0, the value was lowercased first.)
+12. **A display line made of text and values is composed here, not in the layout** - a layout that writes `"Total: @{count}"` gets a `[binding-mixed-text]` warning from jsonui-cli 1.9.6. Expose one var (`totalLine`) whose text comes from strings.json through StringManager / R.string with the value formatted in (a format string key, e.g. `"Total: %d"`), and the layout binds `@{totalLine}`.
 
 ---
 
@@ -356,6 +436,6 @@ function didFinishEditingOrder(id: string) {
 
 If the embedded screen is rendered standalone (not via Embed), `emit` is a no-op — events have no parent to deliver to. The VM does not need to branch on context.
 
-### Navigation inside an embedded VM (v1: `delegate` only)
+### Navigation inside an embedded VM
 
-`navigate(...)` calls forward to the parent's NavController/Router. `pop` / `dismiss` / `navigateBack` are bounded at the embed (they do NOT close the embed). Write VM methods that call these as you would for the standalone case — the runtime handles the rest.
+With `delegate` (the default), `navigate(...)` calls forward to the parent's NavController/Router; with `isolated` they push onto the embed's own stack, and a pop stops at its root. `pop` / `dismiss` / `navigateBack` are bounded at the embed (they do NOT close the embed). Write VM methods that call these as you would for the standalone case — the runtime handles the rest.
