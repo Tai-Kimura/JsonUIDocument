@@ -8,8 +8,8 @@
     "ja": "短い文字列を受け取る単一行の入力フィールド。複数行は TextView を使う。パスワード入力は `secure: true` を指定。"
   },
   "usage": {
-    "en": "TextField owns its text state via two-way binding. The ViewModel declares the property as mutable (`@Published var text: String` on iOS / `MutableStateFlow<String>` on Android / plain mutable on web). TextField writes back through the bound property on every commit. On Android, `borderWidth` sets the outline's width: the declared width unfocused, the larger of it and 2dp under focus, and no line at 0. A bound width with no value yet draws 1dp. A TextView takes it the same way. The widths are read from KotlinJsonUI's source; no screen was drawn here. On Android, a bound `text` in generated Compose code follows the view model when it takes an edit back to a value it already held (say `12年` corrected to `12`), and a key typed while the screen is busy is not overwritten by an older value. Dynamic mode leaves a correction to the same value in the field. The typing behaviour is jsonui-cli's measurement with an app's own IME and adb input, not a real keyboard. The value and the handler come from the data the view is given (`rememberUpdatedState(data)` in the generated code), so a field drawn from data a parent view model passes in (a sheet, say) keeps the parent's initial value and its edits reach the parent. That is jsonui-cli's measurement on an app. Unwritten, `cornerRadius` is 0, a square corner, on all three platforms. No setting changes the default. rjui.config's `defaults.textField.cornerRadius` is not read, and written it draws no corner; the same block's `fontColor`, `padding` and `background` are applied to a TextField that does not write them, the layout's own keys winning. SwiftJsonUIConfiguration.shared has no button or textField; a line that sets them does not compile.",
-    "ja": "TextField は two-way binding で自身の text 状態を保持する。ViewModel 側で mutable プロパティ（iOS なら `@Published var text: String`、Android なら `MutableStateFlow<String>`、Web は通常の mutable）を宣言すると、確定ごとに書き戻される。Android では `borderWidth` が枠の太さになる。未フォーカスは宣言の太さ、フォーカス中は宣言の太さと 2dp の大きいほう、0 は線なし。binding の値がまだ無いときは 1dp。Android の TextView も同じように受ける。太さは KotlinJsonUI のソースから読んだ。画面は描いていない。Android では、Compose の生成コードで binding した `text` が、ViewModel が前と同じ値へ訂正したとき（`12年` を `12` にするなど）にも欄に従い、画面が詰まっている間に打ったキーが古い値で上書きされない。Dynamic モードでは、同じ値への訂正は欄に残る。入力の動きは jsonui-cli がアプリ自作の IME と adb の入力で測ったもので、本物のキーボードではない。値も handler も、ビューに渡された data から取る（生成コードの `rememberUpdatedState(data)`）ので、親の ViewModel が渡した data で描く欄（シートなど）でも、親が入れた初めの値が残り、打った字も親に届く。これは jsonui-cli がアプリで測ったもの。 `cornerRadius` を書かないと、3 面とも 0、つまり四角になる。既定は設定では変えられない。rjui.config の `defaults.textField.cornerRadius` は読まれず、書いても角は付かない。同じ所の `fontColor`・`padding`・`background` は、それを書いていない TextField に付き、レイアウトに書いた値が勝つ。 SwiftJsonUIConfiguration.shared に button と textField は無く、これらに値を入れる行はコンパイルが通らない。"
+    "en": "TextField owns its text state via two-way binding. The ViewModel declares the property as mutable (`@Published var text: String` on iOS / `MutableStateFlow<String>` on Android / plain mutable on web). TextField writes back through the bound property on every commit. On Android, `borderWidth` sets the outline's width: the declared width unfocused, the larger of it and 2dp under focus, and no line at 0. A bound width with no value yet draws 1dp. A TextView takes it the same way. The widths are read from KotlinJsonUI's source; no screen was drawn here. On Android, a bound `text` in generated Compose code follows the view model when it takes an edit back to a value it already held (say `12年` corrected to `12`), and a key typed while the screen is busy is not overwritten by an older value. Dynamic mode leaves a correction to the same value in the field. The typing behaviour is jsonui-cli's measurement with an app's own IME and adb input, not a real keyboard. The value and the handler come from the data the view is given (`rememberUpdatedState(data)` in the generated code), so a field drawn from data a parent view model passes in (a sheet, say) keeps the parent's initial value and its edits reach the parent. That is jsonui-cli's measurement on an app. Unwritten, `cornerRadius` is 0, a square corner, on all three platforms. No setting changes the default. rjui.config's `defaults.textField.cornerRadius` is not read, and written it draws no corner; the same block's `fontColor`, `padding` and `background` are applied to a TextField that does not write them, the layout's own keys winning. SwiftJsonUIConfiguration.shared has no button or textField; a line that sets them does not compile. `input`, `maxLength`, `returnKeyType`, `autocapitalizationType`, `autocorrectionType` and `editable` take a binding as well as a written value, on iOS, Android and web in generated code and in Dynamic mode (Dynamic is jsonui-cli's word; not drawn here). A bound value is read whenever it changes, and a value the platform does not know falls back exactly as the same written value would.",
+    "ja": "TextField は two-way binding で自身の text 状態を保持する。ViewModel 側で mutable プロパティ（iOS なら `@Published var text: String`、Android なら `MutableStateFlow<String>`、Web は通常の mutable）を宣言すると、確定ごとに書き戻される。Android では `borderWidth` が枠の太さになる。未フォーカスは宣言の太さ、フォーカス中は宣言の太さと 2dp の大きいほう、0 は線なし。binding の値がまだ無いときは 1dp。Android の TextView も同じように受ける。太さは KotlinJsonUI のソースから読んだ。画面は描いていない。Android では、Compose の生成コードで binding した `text` が、ViewModel が前と同じ値へ訂正したとき（`12年` を `12` にするなど）にも欄に従い、画面が詰まっている間に打ったキーが古い値で上書きされない。Dynamic モードでは、同じ値への訂正は欄に残る。入力の動きは jsonui-cli がアプリ自作の IME と adb の入力で測ったもので、本物のキーボードではない。値も handler も、ビューに渡された data から取る（生成コードの `rememberUpdatedState(data)`）ので、親の ViewModel が渡した data で描く欄（シートなど）でも、親が入れた初めの値が残り、打った字も親に届く。これは jsonui-cli がアプリで測ったもの。 `cornerRadius` を書かないと、3 面とも 0、つまり四角になる。既定は設定では変えられない。rjui.config の `defaults.textField.cornerRadius` は読まれず、書いても角は付かない。同じ所の `fontColor`・`padding`・`background` は、それを書いていない TextField に付き、レイアウトに書いた値が勝つ。 SwiftJsonUIConfiguration.shared に button と textField は無く、これらに値を入れる行はコンパイルが通らない。`input`・`maxLength`・`returnKeyType`・`autocapitalizationType`・`autocorrectionType`・`editable` は、書いた値と同じく binding も受ける。iOS・Android・web の生成コードと Dynamic モードで読まれる（Dynamic は jsonui-cli の言で、ここでは描いていない）。binding の値は変わるたびに読まれ、その面が知らない値は、同じ値を書いた時とまったく同じ既定に落ちる。"
   },
   "aliasNotice": null,
   "kicker": "Component · Reference",
@@ -517,6 +517,12 @@
                           "label": "number",
                           "background": "var(--color-warning_chip_bg)",
                           "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -550,10 +556,10 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Positive integer. Enforced at platform level; paste beyond limit is truncated silently.",
-                "ja": "正の整数。プラットフォーム側で強制される。超過ペーストは silent に切り詰められる。"
+                "en": "A whole number, or a binding to an Int. 0 or not written means no limit. On iOS and Android the limit applies to the next edit: when a bound limit drops below the length of the text already in the field, the text is not cut until it is next edited. On iOS it is enforced by cutting the bound text, so a field whose text is not bound has nothing to cut. On web it is the element's own maxlength, which stops further typing and never cuts a value, so a longer text stays until it is deleted.",
+                "ja": "整数、または Int への binding。0 か未設定なら上限なし。iOS と Android では上限は次の編集から効く。binding の上限が、欄にもう入っている文字数より小さくなっても、その時には切り詰めず、次に編集した時に切り詰める。iOS は binding した text を切り詰めて守るので、text を binding していない欄には切り詰める物が無い。web では要素自身の maxlength で、それ以上の入力を止めるだけで値は切り詰めないため、長い文字列は消されるまで残る。"
               },
-              "type": "number",
+              "type": "number | binding",
               "required": ""
             },
             {
@@ -709,6 +715,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -812,7 +824,7 @@
                 "en": "`default` / `go` / `done` / `next` / `send` / `search`. Affects the keyboard's return-key label. Maps to `enterkeyhint` on Web. Not written, iOS shows the system's own return key: the generated code puts no label on, and iOS Dynamic mode does the same. Dynamic also applies a declared returnKeyType to a secure field with an `id`.",
                 "ja": "`default` / `go` / `done` / `next` / `send` / `search`。キーボードのリターンキー表記を変える。Web では `enterkeyhint` にマップ。書かないときの iOS は、システムの既定のリターンキーになる。生成コードは表記を付けず、iOS の Dynamic モードも同じ。また Dynamic は `id` のある secure の欄でも、書いた returnKeyType を付ける。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -1222,6 +1234,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -1289,7 +1307,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -1317,6 +1335,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -1396,7 +1420,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -2025,6 +2049,12 @@
                           "label": "boolean",
                           "background": "var(--color-accent_secondary_tint)",
                           "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -2061,7 +2091,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "boolean",
+              "type": "boolean | binding",
               "required": ""
             },
             {
@@ -2817,6 +2847,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -2932,7 +2968,7 @@
                 "en": "When the field also declares `contentType`, the keyboard still comes from `input` on every platform (see `contentType`). Cross-platform keyboard hint. The date family (`date` / `time` / `datetime`) reaches a native keyboard only in Android's generated code on Compose 1.12 or newer: the Android dynamic renderer has no case for them and shows a plain text keyboard, iOS has no matching keyboard type and falls back to the default one, and web changes the input element's type instead of setting an input mode. `signedDecimal` shares its web `inputmode` with `decimal`, so on web the two are indistinguishable; iOS maps it to the punctuation keyboard because the decimal pad has no minus key. A project that declares a Compose version below 1.12.0 gets exactly these four degraded to plain text; one that declares nothing and builds against an older Compose gets a compile error instead, because the generated Kotlin names the member.",
                 "ja": "`contentType` も宣言した欄でも、キーボードはどの面でも `input` から取る（`contentType` を参照）。クロスプラットフォームのキーボード指定。`date` / `time` / `datetime` の 3 つがネイティブのキーボードになるのは、Compose 1.12 以降の Android 生成コードだけ: Android の dynamic レンダラーには分岐が無くプレーンなテキストになり、iOS には対応するキーボード種別が無いので既定に落ち、web は input mode ではなく要素の type が変わる。`signedDecimal` は web では `decimal` と `inputmode` を共有するため区別がつかない。iOS は記号キーボードに割り当てる — decimal pad にマイナスキーが無いため。Compose のバージョンを 1.12.0 未満と宣言したプロジェクトでは、この 4 つだけがプレーンなテキストに縮退する。何も宣言せず古い Compose でビルドした場合は縮退ではなくコンパイルエラーになる — 生成された Kotlin がそのメンバーを名指しするため。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -5657,6 +5693,12 @@
                           "label": "number",
                           "background": "var(--color-warning_chip_bg)",
                           "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -5690,10 +5732,10 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Positive integer. Enforced at platform level; paste beyond limit is truncated silently.",
-                "ja": "正の整数。プラットフォーム側で強制される。超過ペーストは silent に切り詰められる。"
+                "en": "A whole number, or a binding to an Int. 0 or not written means no limit. On iOS and Android the limit applies to the next edit: when a bound limit drops below the length of the text already in the field, the text is not cut until it is next edited. On iOS it is enforced by cutting the bound text, so a field whose text is not bound has nothing to cut. On web it is the element's own maxlength, which stops further typing and never cuts a value, so a longer text stays until it is deleted.",
+                "ja": "整数、または Int への binding。0 か未設定なら上限なし。iOS と Android では上限は次の編集から効く。binding の上限が、欄にもう入っている文字数より小さくなっても、その時には切り詰めず、次に編集した時に切り詰める。iOS は binding した text を切り詰めて守るので、text を binding していない欄には切り詰める物が無い。web では要素自身の maxlength で、それ以上の入力を止めるだけで値は切り詰めないため、長い文字列は消されるまで残る。"
               },
-              "type": "number",
+              "type": "number | binding",
               "required": ""
             },
             {
@@ -5849,6 +5891,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -5952,7 +6000,7 @@
                 "en": "`default` / `go` / `done` / `next` / `send` / `search`. Affects the keyboard's return-key label. Maps to `enterkeyhint` on Web. Not written, iOS shows the system's own return key: the generated code puts no label on, and iOS Dynamic mode does the same. Dynamic also applies a declared returnKeyType to a secure field with an `id`.",
                 "ja": "`default` / `go` / `done` / `next` / `send` / `search`。キーボードのリターンキー表記を変える。Web では `enterkeyhint` にマップ。書かないときの iOS は、システムの既定のリターンキーになる。生成コードは表記を付けず、iOS の Dynamic モードも同じ。また Dynamic は `id` のある secure の欄でも、書いた returnKeyType を付ける。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -6749,6 +6797,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -6816,7 +6870,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -6844,6 +6898,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -6923,7 +6983,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -7723,6 +7783,12 @@
                           "label": "boolean",
                           "background": "var(--color-accent_secondary_tint)",
                           "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -7759,7 +7825,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "boolean",
+              "type": "boolean | binding",
               "required": ""
             },
             {
@@ -8515,6 +8581,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -8630,7 +8702,7 @@
                 "en": "When the field also declares `contentType`, the keyboard still comes from `input` on every platform (see `contentType`). Cross-platform keyboard hint. The date family (`date` / `time` / `datetime`) reaches a native keyboard only in Android's generated code on Compose 1.12 or newer: the Android dynamic renderer has no case for them and shows a plain text keyboard, iOS has no matching keyboard type and falls back to the default one, and web changes the input element's type instead of setting an input mode. `signedDecimal` shares its web `inputmode` with `decimal`, so on web the two are indistinguishable; iOS maps it to the punctuation keyboard because the decimal pad has no minus key. A project that declares a Compose version below 1.12.0 gets exactly these four degraded to plain text; one that declares nothing and builds against an older Compose gets a compile error instead, because the generated Kotlin names the member.",
                 "ja": "`contentType` も宣言した欄でも、キーボードはどの面でも `input` から取る（`contentType` を参照）。クロスプラットフォームのキーボード指定。`date` / `time` / `datetime` の 3 つがネイティブのキーボードになるのは、Compose 1.12 以降の Android 生成コードだけ: Android の dynamic レンダラーには分岐が無くプレーンなテキストになり、iOS には対応するキーボード種別が無いので既定に落ち、web は input mode ではなく要素の type が変わる。`signedDecimal` は web では `decimal` と `inputmode` を共有するため区別がつかない。iOS は記号キーボードに割り当てる — decimal pad にマイナスキーが無いため。Compose のバージョンを 1.12.0 未満と宣言したプロジェクトでは、この 4 つだけがプレーンなテキストに縮退する。何も宣言せず古い Compose でビルドした場合は縮退ではなくコンパイルエラーになる — 生成された Kotlin がそのメンバーを名指しするため。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {

@@ -8,8 +8,8 @@
     "ja": "複数行の長文入力（コメント・説明・メッセージ）用。`height` で制約されない限り、内容に応じて縦に伸びる。"
   },
   "usage": {
-    "en": "Use TextView when expected input exceeds one line. For messaging UI, pair with a fixed-height container and a Scroll. On Android, `borderWidth` sets the outline's width the same way as on TextField: the declared width unfocused, the larger of it and 2dp under focus, and no line at 0; a bound width with no value yet draws 1dp. No screen was drawn here, and Dynamic is jsonui-cli's measurement. Unwritten, `cornerRadius` is 0, a square corner, on all three platforms. No setting changes the default. rjui.config's `defaults.textView.cornerRadius` is not read, and written it draws no corner; the same block's `fontColor`, `padding` and `background` are applied to a TextView that does not write them, the layout's own keys winning.",
-    "ja": "入力が複数行に及ぶことが想定される場合に使う。メッセージ UI では固定高さのコンテナと Scroll を組み合わせる。Android では `borderWidth` が TextField と同じく枠の太さになる。未フォーカスは宣言の太さ、フォーカス中は宣言の太さと 2dp の大きいほう、0 は線なし。binding の値がまだ無いときは 1dp。画面は描いていない。Dynamic は jsonui-cli の測定。 `cornerRadius` を書かないと、3 面とも 0、つまり四角になる。既定は設定では変えられない。rjui.config の `defaults.textView.cornerRadius` は読まれず、書いても角は付かない。同じ所の `fontColor`・`padding`・`background` は、それを書いていない TextView に付き、レイアウトに書いた値が勝つ。"
+    "en": "Use TextView when expected input exceeds one line. For messaging UI, pair with a fixed-height container and a Scroll. On Android, `borderWidth` sets the outline's width the same way as on TextField: the declared width unfocused, the larger of it and 2dp under focus, and no line at 0; a bound width with no value yet draws 1dp. No screen was drawn here, and Dynamic is jsonui-cli's measurement. Unwritten, `cornerRadius` is 0, a square corner, on all three platforms. No setting changes the default. rjui.config's `defaults.textView.cornerRadius` is not read, and written it draws no corner; the same block's `fontColor`, `padding` and `background` are applied to a TextView that does not write them, the layout's own keys winning. `input`, `keyboardType`, `returnKeyType`, `maxLength` and `editable` take a binding as well as a written value, on iOS, Android and web in generated code and in Dynamic mode (Dynamic is jsonui-cli's word; not drawn here). A bound value is read whenever it changes, and a value the platform does not know falls back exactly as the same written value would.",
+    "ja": "入力が複数行に及ぶことが想定される場合に使う。メッセージ UI では固定高さのコンテナと Scroll を組み合わせる。Android では `borderWidth` が TextField と同じく枠の太さになる。未フォーカスは宣言の太さ、フォーカス中は宣言の太さと 2dp の大きいほう、0 は線なし。binding の値がまだ無いときは 1dp。画面は描いていない。Dynamic は jsonui-cli の測定。 `cornerRadius` を書かないと、3 面とも 0、つまり四角になる。既定は設定では変えられない。rjui.config の `defaults.textView.cornerRadius` は読まれず、書いても角は付かない。同じ所の `fontColor`・`padding`・`background` は、それを書いていない TextView に付き、レイアウトに書いた値が勝つ。`input`・`keyboardType`・`returnKeyType`・`maxLength`・`editable` は、書いた値と同じく binding も受ける。iOS・Android・web の生成コードと Dynamic モードで読まれる（Dynamic は jsonui-cli の言で、ここでは描いていない）。binding の値は変わるたびに読まれ、その面が知らない値は、同じ値を書いた時とまったく同じ既定に落ちる。"
   },
   "aliasNotice": null,
   "kicker": "Component · Reference",
@@ -258,6 +258,12 @@
                           "label": "number",
                           "background": "var(--color-warning_chip_bg)",
                           "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -291,10 +297,10 @@
               "platformAndroidLabel": "—",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Positive integer; enforced platform-side. Characters beyond limit are silently dropped.",
-                "ja": "正の整数。プラットフォーム側で強制。超過文字は silent に破棄される。"
+                "en": "A whole number, or a binding to an Int. 0 or not written means no limit. On iOS and Android the limit applies to the next edit: when a bound limit drops below the length of the text already in the field, the text is not cut until it is next edited. On iOS it is enforced by cutting the bound text, so a field whose text is not bound has nothing to cut. On web it is the element's own maxlength, which stops further typing and never cuts a value, so a longer text stays until it is deleted.",
+                "ja": "整数、または Int への binding。0 か未設定なら上限なし。iOS と Android では上限は次の編集から効く。binding の上限が、欄にもう入っている文字数より小さくなっても、その時には切り詰めず、次に編集した時に切り詰める。iOS は binding した text を切り詰めて守るので、text を binding していない欄には切り詰める物が無い。web では要素自身の maxlength で、それ以上の入力を止めるだけで値は切り詰めないため、長い文字列は消されるまで残る。"
               },
-              "type": "number",
+              "type": "number | binding",
               "required": ""
             },
             {
@@ -962,6 +968,12 @@
                           "label": "boolean",
                           "background": "var(--color-accent_secondary_tint)",
                           "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -998,7 +1010,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "boolean",
+              "type": "boolean | binding",
               "required": ""
             },
             {
@@ -1684,6 +1696,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -1796,10 +1814,10 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Cross-platform keyboard hint, with one limit a TextField does not have: on web a TextView is a `textarea`, which has no `type` attribute, so `date`, `time` and `datetime` cannot be honoured there at all. Everywhere else it behaves as on TextField — native in Android's generated code on Compose 1.12 or newer, plain text in the Android dynamic renderer, and the default keyboard on iOS, which has no member for the date family.",
-                "ja": "クロスプラットフォームのキーボード指定。TextField に無い制約が 1 つある: web では TextView は `textarea` で、`type` 属性を持たないため `date` / `time` / `datetime` はそこでは一切反映されない。それ以外は TextField と同じ — Compose 1.12 以降の Android 生成コードではネイティブ、Android の dynamic レンダラーではプレーンなテキスト、iOS には date 系のメンバーが無いので既定のキーボード。"
+                "en": "Cross-platform keyboard hint, with one limit a TextField does not have: on web a TextView is a `textarea`, which has no `type` attribute, so `date`, `time` and `datetime` cannot be honoured there at all. Everywhere else it behaves as on TextField — native in Android's generated code on Compose 1.12 or newer, plain text in the Android dynamic renderer, and the default keyboard on iOS, which has no member for the date family. When `keyboardType` is written too, the keyboard comes from `keyboardType` on every platform, web included, and `input` is not used for it.",
+                "ja": "クロスプラットフォームのキーボード指定。TextField に無い制約が 1 つある: web では TextView は `textarea` で、`type` 属性を持たないため `date` / `time` / `datetime` はそこでは一切反映されない。それ以外は TextField と同じ — Compose 1.12 以降の Android 生成コードではネイティブ、Android の dynamic レンダラーではプレーンなテキスト、iOS には date 系のメンバーが無いので既定のキーボード。`keyboardType` も書いた時は、web も含めてどの面でもキーボードは `keyboardType` から決まり、`input` はそれには使われない。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -1827,6 +1845,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -1984,7 +2008,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -2580,6 +2604,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -2683,7 +2713,7 @@
                 "en": "Changes the return key's label on the on-screen keyboard (Done / Go / Next / Search / Send, ...). It does not change what pressing return does — handle that in the ViewModel. iOS Dynamic mode reads it, the same as the generated code. Continue / Join / Route show the return key there.",
                 "ja": "スクリーンキーボードのリターンキー表示を変える（Done / Go / Next / Search / Send など）。押下時の挙動自体は変わらない — 挙動は ViewModel 側で扱う。iOS の Dynamic モードも、生成コードと同じにこれを読む。Continue / Join / Route は、そこではリターンキーになる。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -3865,6 +3895,12 @@
                           "label": "number",
                           "background": "var(--color-warning_chip_bg)",
                           "fontColor": "var(--color-warning_chip_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -3898,10 +3934,10 @@
               "platformAndroidLabel": "—",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Positive integer; enforced platform-side. Characters beyond limit are silently dropped.",
-                "ja": "正の整数。プラットフォーム側で強制。超過文字は silent に破棄される。"
+                "en": "A whole number, or a binding to an Int. 0 or not written means no limit. On iOS and Android the limit applies to the next edit: when a bound limit drops below the length of the text already in the field, the text is not cut until it is next edited. On iOS it is enforced by cutting the bound text, so a field whose text is not bound has nothing to cut. On web it is the element's own maxlength, which stops further typing and never cuts a value, so a longer text stays until it is deleted.",
+                "ja": "整数、または Int への binding。0 か未設定なら上限なし。iOS と Android では上限は次の編集から効く。binding の上限が、欄にもう入っている文字数より小さくなっても、その時には切り詰めず、次に編集した時に切り詰める。iOS は binding した text を切り詰めて守るので、text を binding していない欄には切り詰める物が無い。web では要素自身の maxlength で、それ以上の入力を止めるだけで値は切り詰めないため、長い文字列は消されるまで残る。"
               },
-              "type": "number",
+              "type": "number | binding",
               "required": ""
             },
             {
@@ -4633,6 +4669,12 @@
                           "label": "boolean",
                           "background": "var(--color-accent_secondary_tint)",
                           "fontColor": "var(--color-accent_secondary_strong)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -4669,7 +4711,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "boolean",
+              "type": "boolean | binding",
               "required": ""
             },
             {
@@ -5355,6 +5397,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -5467,10 +5515,10 @@
               "platformAndroidLabel": "✓",
               "platformWebLabel": "✓",
               "note": {
-                "en": "Cross-platform keyboard hint, with one limit a TextField does not have: on web a TextView is a `textarea`, which has no `type` attribute, so `date`, `time` and `datetime` cannot be honoured there at all. Everywhere else it behaves as on TextField — native in Android's generated code on Compose 1.12 or newer, plain text in the Android dynamic renderer, and the default keyboard on iOS, which has no member for the date family.",
-                "ja": "クロスプラットフォームのキーボード指定。TextField に無い制約が 1 つある: web では TextView は `textarea` で、`type` 属性を持たないため `date` / `time` / `datetime` はそこでは一切反映されない。それ以外は TextField と同じ — Compose 1.12 以降の Android 生成コードではネイティブ、Android の dynamic レンダラーではプレーンなテキスト、iOS には date 系のメンバーが無いので既定のキーボード。"
+                "en": "Cross-platform keyboard hint, with one limit a TextField does not have: on web a TextView is a `textarea`, which has no `type` attribute, so `date`, `time` and `datetime` cannot be honoured there at all. Everywhere else it behaves as on TextField — native in Android's generated code on Compose 1.12 or newer, plain text in the Android dynamic renderer, and the default keyboard on iOS, which has no member for the date family. When `keyboardType` is written too, the keyboard comes from `keyboardType` on every platform, web included, and `input` is not used for it.",
+                "ja": "クロスプラットフォームのキーボード指定。TextField に無い制約が 1 つある: web では TextView は `textarea` で、`type` 属性を持たないため `date` / `time` / `datetime` はそこでは一切反映されない。それ以外は TextField と同じ — Compose 1.12 以降の Android 生成コードではネイティブ、Android の dynamic レンダラーではプレーンなテキスト、iOS には date 系のメンバーが無いので既定のキーボード。`keyboardType` も書いた時は、web も含めてどの面でもキーボードは `keyboardType` から決まり、`input` はそれには使われない。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -5498,6 +5546,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -5655,7 +5709,7 @@
                 "en": "",
                 "ja": ""
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
@@ -6717,6 +6771,12 @@
                           "label": "string",
                           "background": "var(--color-chip_string_bg)",
                           "fontColor": "var(--color-chip_string_fg)"
+                        },
+                        {
+                          "id": "tc_1",
+                          "label": "binding",
+                          "background": "var(--color-accent_tint)",
+                          "fontColor": "var(--color-accent_secondary_strong)"
                         }
                       ]
                     }
@@ -6820,7 +6880,7 @@
                 "en": "Changes the return key's label on the on-screen keyboard (Done / Go / Next / Search / Send, ...). It does not change what pressing return does — handle that in the ViewModel. iOS Dynamic mode reads it, the same as the generated code. Continue / Join / Route show the return key there.",
                 "ja": "スクリーンキーボードのリターンキー表示を変える（Done / Go / Next / Search / Send など）。押下時の挙動自体は変わらない — 挙動は ViewModel 側で扱う。iOS の Dynamic モードも、生成コードと同じにこれを読む。Continue / Join / Route は、そこではリターンキーになる。"
               },
-              "type": "string",
+              "type": "string | binding",
               "required": ""
             },
             {
